@@ -1,0 +1,22 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --nav-color:rgb(0, 0, 0);
+    --bg-color:rgb(85, 85, 85);
+    --text-a-color:rgb(255, 255, 255);
+    --text-b-color:rgb(0, 0, 0);
+    --button-color: rgb(255, 255, 0);
+    --button-hover-color: rgb(255, 235, 85);
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-a-color);
+    margin: 0;
+    padding: 0;
+}
