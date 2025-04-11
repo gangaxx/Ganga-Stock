@@ -20,3 +20,111 @@ body {
     margin: 0;
     padding: 0;
 }
+
+body.light-mode {
+    --bg-color: rgb(255, 235, 185);
+    --text-a-color: rgb(115, 85, 65);
+    --text-b-color: rgb(255, 235, 185);
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 0 0;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    justify-content: center;
+    align-items: center;
+}
+
+.form-group {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+input[type="text"],
+input[type="password"] {
+    width: 100%;
+    padding: 18px;
+    border: 1px solid #999;
+    border-radius: 6px;
+    font-size: 20px;
+    background-color: #000;
+    color: white;
+}
+
+.left-panel {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 40px;
+  }
+
+.logo-img {
+    width: 380px;
+    height: auto;
+    object-fit: contain;
+}
+
+.right-panel {
+    background-color: rgb(0, 0, 0);
+    padding: 50px;
+    border-radius: 15px;
+    box-shadow: 0 0 35px rgba(0, 0, 0, 0.6);
+    width: 420px;
+    height: 450px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.style-button {
+    width: 100%;
+    padding: 18px;
+    background-color: var(--button-color);
+    color: black;
+    font-weight: bold;
+    font-size: 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.style-button:hover {
+    background-color: var(--button-hover-color);
+}
+
+
+
+
+
+@media (max-width: 768px) {
+    .container {
+        flex-direction: column;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .left-panel {
+        margin-right: 0;
+        margin-bottom: 30px;
+    }
+
+    .logo-img {
+        width: 280px;
+    }
+
+    .right-panel {
+        width: 100%;
+        max-width: 420px;
+        height: auto;
+        padding: 40px 30px;
+    }
+}
