@@ -1,140 +1,24 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Ganga Stock</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #444;
-      color: white;
-    }
+{% extends "base.html" %}
+{% load static %}
 
-    .top-bar {
-      background-color: black;
-      padding: 10px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+{% block content %}
 
-    .logo-container {
-      display: flex;
-      align-items: center;
-    }
-
-    .logo-container img {
-      height: 60px;
-      margin-right: 10px;
-    }
-
-    .logo-text {
-      font-weight: bold;
-      font-size: 24px;
-      font-family: Impact, sans-serif;
-    }
-
-    .dropdown {
-      background-color: yellow;
-      border: none;
-      padding: 10px 20px;
-      font-size: 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .main {
-      display: flex;
-      padding: 20px;
-      gap: 20px;
-      height: 600px; /* Altura fija como en la imagen */
-    }
-
-    .panel {
-      background-color: #4a4a4a;
-      border: 2px solid #ccc;
-      border-radius: 10px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .panel h2 {
-      margin-top: 0;
-      font-size: 28px;
-    }
-
-    .left-panel {
-      flex: 2.5;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .right-panel {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-start;
-    }
-
-    .section {
-      margin-top: 30px;
-      text-align: center;
-    }
-
-    .section-title {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-
-    .btn {
-      background-color: yellow;
-      color: black;
-      padding: 15px;
-      width: 100%;
-      font-size: 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-
-    .history-box {
-      flex: 1;
-      border-top: 2px solid #ccc;
-      margin-top: 20px;
-    }
-  </style>
-</head>
-<body>
-  <div class="top-bar">
-    <div class="logo-container">
-      <img src="image.png" alt="Logo" />
-      <div class="logo-text">GANGA STOCK</div>
-    </div>
-    <select class="dropdown">
-      <option>Nombre</option>
-    </select>
+<div class="main">
+  <div class="panel left-panel-admin">
+    <h2>Historial de Movimientos</h2>
+    <div class="history-box"></div>
   </div>
-
-  <div class="main">
-    <div class="panel left-panel">
-      <h2>Historial de Movimientos</h2>
-      <div class="history-box"></div>
+  <div class="panel right-panel-admin">
+    <h2>Base de Datos</h2>
+    <div class="section">
+      <div class="section-title">Inventario</div>
+      <button class="btn">Ver todo</button>
     </div>
-    <div class="panel right-panel">
-      <h2>Base de Datos</h2>
-      <div class="section">
-        <div class="section-title">Inventario</div>
-        <button class="btn">Ver todo</button>
-      </div>
-      <div class="section">
-        <div class="section-title">Empleados</div>
-        <button class="btn">Ver todo</button>
-      </div>
+    <div class="section">
+      <div class="section-title">Empleados</div>
+      <button class="btn">Ver todo</button>
     </div>
   </div>
-</body>
-</html>
+</div>
+
+{% endblock %}

@@ -7,6 +7,7 @@ from django.conf import settings
 urlpatterns = [
     path('', views.index, name='index'),
     path('index/', views.index, name='index'),
+    path('admin/', views.admin, name='admin'),
 ]
 
 if settings.DEBUG:

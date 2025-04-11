@@ -35,6 +35,15 @@ body.light-mode {
     padding: 0 0;
 }
 
+.dropdown {
+    background-color: var(--button-color);
+    border: none;
+    padding: 10px 20px;
+    font-size: 20px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
 form {
     display: flex;
     flex-direction: column;
@@ -47,6 +56,12 @@ form {
 .form-group {
     width: 100%;
     margin-bottom: 25px;
+}
+
+.history-box {
+    flex: 1;
+    border-top: 2px solid #ccc;
+    margin-top: 20px;
 }
 
 input[type="text"],
@@ -65,12 +80,57 @@ input[type="password"] {
     justify-content: center;
     align-items: center;
     margin-right: 40px;
-  }
+}
 
+.left-panel-admin {
+    flex: 2.5;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo-container img {
+    height: 60px;
+    margin-right: 10px;
+}
+  
 .logo-img {
     width: 380px;
     height: auto;
     object-fit: contain;
+}
+
+.logo-text {
+    font-weight: bold;
+    font-size: 24px;
+    font-family: Impact, sans-serif;
+    color: var(--text-a-color);
+}
+
+.main {
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    height: 600px;
+}
+
+.panel {
+    background-color: var(--bg-color);
+    border: 2px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.panel h2 {
+    margin-top: 0;
+    font-size: 28px;
 }
 
 .right-panel {
@@ -84,6 +144,24 @@ input[type="password"] {
     justify-content: center;
     align-items: center;
 }
+
+.right-panel-admin {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+.section {
+    margin-top: 30px;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
 .style-button {
     width: 100%;
     padding: 18px;
@@ -99,6 +177,14 @@ input[type="password"] {
 
 .style-button:hover {
     background-color: var(--button-hover-color);
+}
+
+.top-bar {
+    background-color: var(--nav-color);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
 
 
