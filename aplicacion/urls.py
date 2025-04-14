@@ -7,7 +7,8 @@ from django.conf import settings
 urlpatterns = [
     path('', views.index, name='index'),
     path('index/', views.index, name='index'),
-    path('admin/', views.admin, name='admin'),
+    path('index_admin/', views.index_admin, name='index_admin'),
+
 ]
 
 if settings.DEBUG:
