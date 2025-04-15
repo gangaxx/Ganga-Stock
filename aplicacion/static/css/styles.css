@@ -33,6 +33,7 @@ body.light-mode {
     justify-content: center;
     height: 100vh;
     padding: 0 0;
+    gap: 200px;
 }
 
 .dropdown {
