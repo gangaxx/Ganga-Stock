@@ -22,6 +22,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('aplicacion.urls')),
     path('', TemplateView.as_view(template_name="aplicacion/index.html")),
+    path('placamadre/', TemplateView.as_view(template_name="placamadre.html")),
+
 ]
 
 ## borrar si no sirve para las imagenes
@@ -29,4 +31,5 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 if settings.DEBUG:
-    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    ##respaldo  16/4/2025   urlpatterns += static(settings.STATIC_URL, document_root=settings.STATICFILES_DIRS[0])
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
