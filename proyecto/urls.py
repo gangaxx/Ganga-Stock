@@ -23,7 +23,7 @@ urlpatterns = [
     path('', include('aplicacion.urls')),
     path('', TemplateView.as_view(template_name="aplicacion/index.html")),
     path('placamadre/', TemplateView.as_view(template_name="placamadre.html")),
-
+    path('index_empleado/', TemplateView.as_view(template_name="index_empleado.html")),
 ]
 
 ## borrar si no sirve para las imagenes

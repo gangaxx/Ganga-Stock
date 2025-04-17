@@ -8,7 +8,7 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('index/', views.index, name='index'),
     path('index_admin/', views.index_admin, name='index_admin'),
-
+    path('index_empleado/', views.index_empleado, name='index_empleado'),
 ]
 
 if settings.DEBUG:

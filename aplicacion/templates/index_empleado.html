@@ -1,0 +1,114 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Inventario</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #2f2f2f;
+            color: white;
+        }
+
+        .header {
+            background-color: #000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+        }
+
+        .logo-titulo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo {
+            height: 50px;
+            width: 50px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .filtro select {
+            background-color: yellow;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        .contenedor {
+            padding: 20px;
+        }
+
+        .tabla-inventario {
+            background-color: #444;
+            border: 2px solid #aaa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        .tabla-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #aaa;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .tabla-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .tabla-header input {
+            padding: 8px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .tabla-cuerpo {
+            /* aquí puedes poner la tabla de productos o tarjetas */
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo-titulo">
+            <img src="{% static 'images/logo.png' %}" alt="Logo" class="logo">
+            <h1>GANGA STOCK</h1>
+        </div>
+        <div class="filtro">
+            <select>
+                <option>Nombre</option>
+                <option>Precio</option>
+                <option>Categoría</option>
+            </select>
+        </div>
+    </header>
+
+    <main class="contenedor">
+        <div class="tabla-inventario">
+            <div class="tabla-header">
+                <h2>Inventario</h2>
+                <input type="text" placeholder="Buscar">
+            </div>
+            <div class="tabla-cuerpo">
+                <!-- Aquí puedes poner contenido dinámico con Django -->
+                {# {% for producto in productos %} ... {% endfor %} #}
+            </div>
+        </div>
+    </main>
+</body>
+</html>
