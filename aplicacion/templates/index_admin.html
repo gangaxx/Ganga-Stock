@@ -3,13 +3,76 @@
 
 {% block content %}
 
+<style>
+  body {
+    background-color: #1e1e1e;
+    color: white;
+    font-family: 'Lato', sans-serif;
+  }
+
+  .main {
+    display: flex;
+    justify-content: space-between;
+    padding: 40px 60px;
+  }
+
+  .panel {
+    border: 1px solid #fff;
+    padding: 20px;
+    background-color: #1e1e1e;
+  }
+
+  .left-panel-admin {
+    flex: 2;
+    margin-right: 20px;
+  }
+
+  .right-panel-admin {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  .history-box {
+    height: 400px;
+    background-color: #1e1e1e;
+  }
+
+  .section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .section-title {
+    font-weight: bold;
+  }
+
+  .style-button {
+    background: none;
+    border: none;
+    color: #ff0;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .style-button::after {
+    content: " ❯";
+  }
+
+  h2 {
+    margin-bottom: 20px;
+  }
+</style>
+
 <div class="main">
   <div class="panel left-panel-admin">
-    <h2>Historial de Movimientos</h2>
+    <h2>Historial de movimientos</h2>
     <div class="history-box"></div>
   </div>
   <div class="panel right-panel-admin">
-    <h2>Base de Datos</h2>
+    <h2>Base de datos</h2>
     <div class="section">
       <div class="section-title">Inventario</div>
       <button class="style-button">Ver todo</button>

@@ -20,7 +20,7 @@
     }
 
     body.light-mode {
-      --bg-color: #e0e0e0; /* ← nuevo color de fondo claro */
+      --bg-color: #e0e0e0;
       --panel-color: #f5f5f5;
       --text-color: #000000;
       --input-bg: #ffffff;
@@ -109,6 +109,11 @@
       color: var(--button-text);
       padding: 10px 20px;
       font-size: 16px;
+    }
+
+    /* Delineado negro del botón solo en modo claro */
+    body.light-mode .btn-warning {
+      border: 2px solid #000;
     }
 
     .toggle-password {
