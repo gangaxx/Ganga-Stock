@@ -5,11 +5,73 @@
 
 <style>
   body {
-    background-color: #1e1e1e;
-    color: white;
     font-family: 'Lato', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
   }
 
+  /* === MODO OSCURO === */
+  body.dark-mode {
+    background-color: #1e1e1e;
+    color: white;
+  }
+
+  .dark-mode .panel {
+    background-color: #1e1e1e;
+    border: 1px solid #fff;
+  }
+
+  .dark-mode .history-box {
+    background-color: #1e1e1e;
+    border-top: 1px solid #999;
+  }
+
+  .dark-mode .section-title,
+  .dark-mode h2 {
+    color: white;
+  }
+
+  .dark-mode .style-button {
+    color: #ff0;
+  }
+
+  .dark-mode .mode-toggle {
+    background-color: #333;
+    color: #ff0;
+    border: 1px solid #ff0;
+  }
+
+  /* === MODO CLARO === */
+  body.light-mode {
+    background-color: #ffffff;
+    color: #1e1e1e;
+  }
+
+  .light-mode .panel {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+  }
+
+  .light-mode .history-box {
+    background-color: #ffffff;
+    border-top: 1px solid #999;
+  }
+
+  .light-mode .section-title,
+  .light-mode h2 {
+    color: #1e1e1e;
+  }
+
+  .light-mode .style-button {
+    color: #ff0;
+  }
+
+  .light-mode .mode-toggle {
+    background-color: #f5f5f5;
+    color: #1e1e1e;
+    border: 1px solid #ccc;
+  }
+
+  /* === ESTRUCTURA GENERAL === */
   .main {
     display: flex;
     justify-content: space-between;
@@ -17,9 +79,8 @@
   }
 
   .panel {
-    border: 1px solid #fff;
     padding: 20px;
-    background-color: #1e1e1e;
+    border-radius: 4px;
   }
 
   .left-panel-admin {
@@ -36,7 +97,7 @@
 
   .history-box {
     height: 400px;
-    background-color: #1e1e1e;
+    margin-top: 20px;
   }
 
   .section {
@@ -52,7 +113,6 @@
   .style-button {
     background: none;
     border: none;
-    color: #ff0;
     font-weight: bold;
     cursor: pointer;
   }
@@ -64,8 +124,63 @@
   h2 {
     margin-bottom: 20px;
   }
+
+  /* === BARRA SUPERIOR (modificada) === */
+  .topbar {
+    background-color: black; /* Color cambiado a negro */
+    padding: 20px 40px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .mode-toggle {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+
+  .user-button {
+    background-color: yellow;
+    padding: 6px 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .user-button span {
+    font-weight: bold;
+  }
 </style>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const storedMode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    document.body.classList.add(storedMode + '-mode');
+    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  });
+
+  function toggleMode() {
+    const isDark = document.body.classList.contains('dark-mode');
+    document.body.classList.toggle('dark-mode', !isDark);
+    document.body.classList.toggle('light-mode', isDark);
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  }
+</script>
+
+<!-- Barra superior con botón de modo al lado de "Nombre" -->
+<div class="topbar">
+
+  <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+</div>
+
+<!-- Contenido principal -->
 <div class="main">
   <div class="panel left-panel-admin">
     <h2>Historial de movimientos</h2>
