@@ -12,7 +12,6 @@
     height: 100vh;
   }
 
-  /* === MODO OSCURO === */
   body.dark-mode {
     background-color: #1e1e1e;
     color: white;
@@ -24,7 +23,6 @@
     color: white;
   }
 
-  /* === MODO CLARO === */
   body.light-mode {
     background-color: #ffffff;
     color: #1e1e1e;
@@ -36,7 +34,6 @@
     color: #1e1e1e;
   }
 
-  /* === TOPBAR === */
   .topbar {
     background-color: black;
     padding: 20px 40px;
@@ -56,11 +53,10 @@
     border: 1px solid #ff0;
   }
 
-  /* === CUERPO INVENTARIO === */
   .main-content {
     display: flex;
     padding: 40px 60px;
-    height: calc(100vh - 100px); /* Altura total menos topbar */
+    height: calc(100vh - 100px);
     box-sizing: border-box;
   }
 
@@ -70,8 +66,9 @@
     width: 100%;
     max-width: 95%;
     margin: 0 auto;
-    height: 100%; /* Extiende hasta abajo */
+    height: 100%;
     box-sizing: border-box;
+    overflow-y: auto;
   }
 
   .inventory-header {
@@ -80,8 +77,9 @@
     align-items: center;
     border-bottom: 1px solid #bbb;
     padding-bottom: 10px;
-    font-size: 36px; /* Doble de tamaño */
+    font-size: 36px;
     font-weight: bold;
+    margin-bottom: 20px;
   }
 
   .inventory-header input[type="text"] {
@@ -99,11 +97,58 @@
     color: white;
     border: 1px solid #666;
   }
+
+  .product-list {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .product-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+    border-radius: 8px;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid #ccc;
+  }
+
+  body.dark-mode .product-row {
+    background-color: #333;
+    border: 1px solid #666;
+  }
+
+  .product-row img {
+    width: 100px;
+    height: auto;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+
+  .product-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .product-info span {
+    font-size: 16px;
+  }
+
+  .product-info .price {
+    font-weight: bold;
+    color: #0c0;
+  }
+
+  body.dark-mode .product-info .price {
+    color: #9f9;
+  }
 </style>
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || 'dark'; // ← inicia en modo oscuro
+    const storedMode = localStorage.getItem('theme') || 'dark';
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
   });
@@ -117,17 +162,137 @@
   }
 </script>
 
-<!-- Topbar -->
 <div class="topbar">
   <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
 </div>
 
-<!-- Contenido del inventario -->
 <div class="main-content">
   <div class="inventory-box">
     <div class="inventory-header">
       <span>Inventario</span>
       <input type="text" placeholder="Buscar" />
+    </div>
+
+    <div class="product-list">
+      <!-- Disco duro -->
+      <div class="product-row">
+        <img src="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" alt="">
+        <div class="product-info">
+          <span>Seagate Barracuda 2 TB</span>
+          <span class="price">$62.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/discos/Seagate Barracuda 500 GB.png' %}" alt="">
+        <div class="product-info">
+          <span>Seagate Barracuda 500 GB</span>
+          <span class="price">$41.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/discos/Western Digital Blue 1 TB.jpg' %}" alt="">
+        <div class="product-info">
+          <span>Western Digital Blue 1 TB</span>
+          <span class="price">$55.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/discos/Western Digital Purple 4 TB.png' %}" alt="">
+        <div class="product-info">
+          <span>Western Digital Purple 4 TB</span>
+          <span class="price">$90.000</span>
+        </div>
+      </div>
+
+      <!-- Placas madre -->
+      <div class="product-row">
+        <img src="{% static 'img/placamadre/Asus620M.jpg' %}" alt="">
+        <div class="product-info">
+          <span>ASUS PRIME A620M-K</span>
+          <span class="price">$80.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/placamadre/giga840m.png' %}" alt="">
+        <div class="product-info">
+          <span>Gigabyte B840M EAGLE WIFI6</span>
+          <span class="price">$145.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/placamadre/giga850m.jpg' %}" alt="">
+        <div class="product-info">
+          <span>Gigabyte B850M GAMING X WIFI6E</span>
+          <span class="price">$215.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/placamadre/msib650m.jpg' %}" alt="">
+        <div class="product-info">
+          <span>MSI B650M GAMING WIFI</span>
+          <span class="price">$135.000</span>
+        </div>
+      </div>
+
+      <!-- Procesadores -->
+      <div class="product-row">
+        <img src="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" alt="">
+        <div class="product-info">
+          <span>AMD Ryzen 5 9600X</span>
+          <span class="price">$260.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/procesador/AMD Ryzen 7 5700.webp' %}" alt="">
+        <div class="product-info">
+          <span>AMD Ryzen 7 5700</span>
+          <span class="price">$155.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/procesador/Intel Core i5-11400.jpg' %}" alt="">
+        <div class="product-info">
+          <span>Intel Core i5-11400</span>
+          <span class="price">$150.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/procesador/Intel Core i5-14600F.jpg' %}" alt="">
+        <div class="product-info">
+          <span>Intel Core i5-14600KF</span>
+          <span class="price">$260.000</span>
+        </div>
+      </div>
+
+      <!-- RAM -->
+      <div class="product-row">
+        <img src="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" alt="">
+        <div class="product-info">
+          <span>A-DATA AD4S32008G22-SGN (1 x 8GB | SO-DIMM DDR4-3200)</span>
+          <span class="price">$14.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/rams/A-DATA XPG.jpg' %}" alt="">
+        <div class="product-info">
+          <span>A-DATA XPG Spectrix D35G AX4U32008G16A-SBKD35G (1 x 8 GB | DIMM DDR4-3200)</span>
+          <span class="price">$18.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/rams/Kingston DDR4 3200.jpg' %}" alt="">
+        <div class="product-info">
+          <span>A-DATA XPG Spectrix D35G AX4U32008G16A-SBKD35G (1 x 8 GB | DIMM DDR4-3200)</span>
+          <span class="price">$18.000</span>
+        </div>
+      </div>
+      <div class="product-row">
+        <img src="{% static 'img/rams/Ramaxel 4gb ddr4 3200.png' %}" alt="">
+        <div class="product-info">
+          <span>Ramaxel RMSA3310MR86H9F-3200 (1 x 4 GB | SO-DIMM DDR4-3200)</span>
+          <span class="price">$8.000</span>
+        </div>
+      </div>
     </div>
   </div>
 </div>
