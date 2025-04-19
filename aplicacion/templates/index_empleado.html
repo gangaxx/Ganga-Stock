@@ -1,115 +1,135 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Inventario</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #2f2f2f;
-            color: white;
-        }
 
-        .header {
-            background-color: #000;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-        }
+{% block content %}
 
-        .logo-titulo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+<style>
+  body {
+    font-family: 'Lato', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
 
-        .logo {
-            height: 50px;
-            width: 50px;
-        }
+  /* === MODO OSCURO === */
+  body.dark-mode {
+    background-color: #1e1e1e;
+    color: white;
+  }
 
-        .header h1 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
-        }
+  .dark-mode .inventory-box {
+    background-color: #2b2b2b;
+    border: 1px solid #aaa;
+    color: white;
+  }
 
-        .filtro select {
-            background-color: yellow;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: 500;
-        }
+  /* === MODO CLARO === */
+  body.light-mode {
+    background-color: #ffffff;
+    color: #1e1e1e;
+  }
 
-        .contenedor {
-            padding: 20px;
-        }
+  .light-mode .inventory-box {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #1e1e1e;
+  }
 
-        .tabla-inventario {
-            background-color: #444;
-            border: 2px solid #aaa;
-            border-radius: 10px;
-            padding: 15px;
-            min-height: 400px; /* Altura ajustada según el segundo screenshot */
-        }
+  /* === TOPBAR === */
+  .topbar {
+    background-color: black;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+  }
 
-        .tabla-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 2px solid #aaa;
-            padding-bottom: 10px;
-            margin-bottom: 10px;
-        }
+  .mode-toggle {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #333;
+    color: #ff0;
+    border: 1px solid #ff0;
+  }
 
-        .tabla-header h2 {
-            margin: 0;
-            font-size: 24px;
-        }
+  /* === CUERPO INVENTARIO === */
+  .main-content {
+    display: flex;
+    padding: 40px 60px;
+    height: calc(100vh - 100px); /* Altura total menos topbar */
+    box-sizing: border-box;
+  }
 
-        .tabla-header input {
-            padding: 8px;
-            font-size: 16px;
-            border: none;
-            border-radius: 4px;
-        }
+  .inventory-box {
+    padding: 40px;
+    border-radius: 6px;
+    width: 100%;
+    max-width: 95%;
+    margin: 0 auto;
+    height: 100%; /* Extiende hasta abajo */
+    box-sizing: border-box;
+  }
 
-        .tabla-cuerpo {
-            /* Espacio para los productos */
-        }
-    </style>
-</head>
-<body>
-    <header class="header">
-        <div class="logo-titulo">
-            <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo">
-            <h1>GANGA STOCK</h1>
-        </div>
-        <div class="filtro">
-            <select>
-                <option>Nombre</option>
-                <option>Precio</option>
-                <option>Categoría</option>
-            </select>
-        </div>
-    </header>
+  .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #bbb;
+    padding-bottom: 10px;
+    font-size: 36px; /* Doble de tamaño */
+    font-weight: bold;
+  }
 
-    <main class="contenedor">
-        <div class="tabla-inventario">
-            <div class="tabla-header">
-                <h2>Inventario</h2>
-                <input type="text" placeholder="Buscar">
-            </div>
-            <div class="tabla-cuerpo">
-                <!-- Aquí puedes poner contenido dinámico con Django -->
-                {# {% for producto in productos %} ... {% endfor %} #}
-            </div>
-        </div>
-    </main>
-</body>
-</html>
+  .inventory-header input[type="text"] {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 180px;
+    background-color: white;
+    color: black;
+  }
+
+  body.dark-mode .inventory-header input[type="text"] {
+    background-color: #111;
+    color: white;
+    border: 1px solid #666;
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const storedMode = localStorage.getItem('theme') || 'dark'; // ← inicia en modo oscuro
+    document.body.classList.add(storedMode + '-mode');
+    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  });
+
+  function toggleMode() {
+    const isDark = document.body.classList.contains('dark-mode');
+    document.body.classList.toggle('dark-mode', !isDark);
+    document.body.classList.toggle('light-mode', isDark);
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  }
+</script>
+
+<!-- Topbar -->
+<div class="topbar">
+  <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+</div>
+
+<!-- Contenido del inventario -->
+<div class="main-content">
+  <div class="inventory-box">
+    <div class="inventory-header">
+      <span>Inventario</span>
+      <input type="text" placeholder="Buscar" />
+    </div>
+  </div>
+</div>
+
+{% endblock %}
