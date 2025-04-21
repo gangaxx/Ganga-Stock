@@ -9,4 +9,7 @@ def index_admin(request):
 def index_empleado(request):
     return render(request, 'index_empleado.html')
 
+def registro_usuario(request):
+    return render(request, 'registro_usuario.html') 
+
 # Create your views here.
