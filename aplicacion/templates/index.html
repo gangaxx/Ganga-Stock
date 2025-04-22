@@ -172,13 +172,15 @@
     <div class="right-panel">
       <div class="login-box">
         <h2 class="login-title">Inicio de sesión</h2>
+
+        <!-- Formulario corregido -->
         <form method="POST">
           {% csrf_token %}
           <div class="form-group mb-3">
-            <input type="text" class="form-control" placeholder="Correo electrónico o RUT" required>
+            <input type="text" class="form-control" name="username" placeholder="Correo electrónico o RUT" required>
           </div>
           <div class="form-group mb-2 position-relative">
-            <input type="password" class="form-control" id="password" placeholder="Contraseña" required>
+            <input type="password" class="form-control" name="password" id="password" placeholder="Contraseña" required>
             <span class="toggle-password" onclick="togglePassword()">👁️‍🗨️</span>
           </div>
           <div class="text-end mb-3">
@@ -186,6 +188,7 @@
           </div>
           <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar sesión</button>
         </form>
+
       </div>
     </div>
   </div>
@@ -199,7 +202,7 @@
   <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
-        <form method="POST" action="{% url 'registro_usuario' %}">
+        <form method="POST" action="{% url 'index_admin' %}">
           {% csrf_token %}
           <div class="modal-header">
             <h5 class="modal-title" id="createAccountModalLabel">Crear Cuenta</h5>
