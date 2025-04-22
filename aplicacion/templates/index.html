@@ -155,12 +155,10 @@
   <!-- Botón para cambiar tema y crear cuenta -->
   <div class="theme-toggle">
     <button class="btn-toggle" onclick="toggleTheme()">Cambiar Tema</button>
-    <!-- Botón que activa el modal -->
     <button class="btn-toggle" data-bs-toggle="modal" data-bs-target="#createAccountModal">Crear Cuenta</button>
   </div>
 
   <div class="login-container">
-    <!-- Panel izquierdo -->
     <div class="left-panel">
       <div class="logo-container">
         <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img">
@@ -168,14 +166,12 @@
       </div>
     </div>
 
-    <!-- Panel derecho -->
     <div class="right-panel">
       <div class="login-box">
         <h2 class="login-title">Inicio de sesión</h2>
-
-        <!-- Formulario corregido -->
-        <form method="POST">
+        <form method="POST" action="{% url 'index' %}">
           {% csrf_token %}
+          <input type="hidden" name="login" value="1">
           <div class="form-group mb-3">
             <input type="text" class="form-control" name="username" placeholder="Correo electrónico o RUT" required>
           </div>
@@ -188,37 +184,32 @@
           </div>
           <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar sesión</button>
         </form>
-
       </div>
     </div>
-  </div>
-
-  <div class="text-center mt-3">
-    <button onclick="window.location.href='{% url 'index_admin' %}'" class="btn btn-secondary m-2">Botón Admin</button>
-    <button onclick="window.location.href='{% url 'index_empleado' %}'" class="btn btn-secondary m-2">Botón Empleado</button>
   </div>
 
   <!-- Modal de creación de cuenta -->
   <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content bg-dark text-white">
-        <form method="POST" action="{% url 'index_admin' %}">
+        <form method="POST" action="{% url 'index' %}">
           {% csrf_token %}
+          <input type="hidden" name="registro" value="1">
           <div class="modal-header">
             <h5 class="modal-title" id="createAccountModalLabel">Crear Cuenta</h5>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
           </div>
           <div class="modal-body">
             <div class="mb-3">
-              <label for="username" class="form-label">Nombre o RUT de usuario</label>
+              <label class="form-label">Nombre o RUT de usuario</label>
               <input type="text" name="username" class="form-control" required>
             </div>
             <div class="mb-3">
-              <label for="password1" class="form-label">Contraseña</label>
+              <label class="form-label">Contraseña</label>
               <input type="password" name="password1" class="form-control" required>
             </div>
             <div class="mb-3">
-              <label for="password2" class="form-label">Confirmar contraseña</label>
+              <label class="form-label">Confirmar contraseña</label>
               <input type="password" name="password2" class="form-control" required>
             </div>
           </div>

@@ -14,7 +14,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
-    'django.contrib.sessions',
+    'django.contrib.sessions',  # <-- Agregado correctamente
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'aplicacion',
@@ -23,7 +23,9 @@ INSTALLED_APPS = [
 # Middlewares
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
+    # ...
+    'django.contrib.sessions.middleware.SessionMiddleware',  # <-- Agregado correctamente
+    # ...
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -94,3 +96,4 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Clave primaria por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+LOGIN_URL = '/index/'  # o la ruta que tengas para tu vista de login
