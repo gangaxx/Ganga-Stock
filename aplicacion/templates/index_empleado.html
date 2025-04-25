@@ -53,6 +53,16 @@
     border: 1px solid #ff0;
   }
 
+  .logout-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
   .main-content {
     display: flex;
     padding: 40px 60px;
@@ -160,10 +170,17 @@
     document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
 </script>
 
 <div class="topbar">
   <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+  <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
 </div>
 
 <div class="main-content">
@@ -172,9 +189,8 @@
       <span>Inventario</span>
       <input type="text" placeholder="Buscar" />
     </div>
-
     <div class="product-list">
-      <!-- Aquí están tus productos -->
+
       {% comment %} Discos duros {% endcomment %}
       <div class="product-row">
         <img src="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" alt="">

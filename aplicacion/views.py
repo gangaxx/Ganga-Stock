@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import RegistroEmpleadoForm
@@ -78,3 +78,8 @@ def login_empleado(request):
         else:
             messages.error(request, 'Credenciales inválidas o acceso no autorizado.')
     return render(request, 'index.html')
+
+
+def cerrar_sesion(request):
+    logout(request)
+    return redirect('index')

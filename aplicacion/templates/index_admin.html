@@ -9,7 +9,6 @@
     transition: background-color 0.3s, color 0.3s;
   }
 
-  /* === MODO OSCURO === */
   body.dark-mode {
     background-color: #1e1e1e;
     color: white;
@@ -40,7 +39,6 @@
     border: 1px solid #ff0;
   }
 
-  /* === MODO CLARO === */
   body.light-mode {
     background-color: #ffffff;
     color: #1e1e1e;
@@ -71,7 +69,6 @@
     border: 1px solid #ccc;
   }
 
-  /* === ESTRUCTURA GENERAL === */
   .main {
     display: flex;
     justify-content: space-between;
@@ -125,7 +122,6 @@
     margin-bottom: 20px;
   }
 
-  /* === BARRA SUPERIOR (modificada) === */
   .topbar {
     background-color: black;
     padding: 20px 40px;
@@ -142,19 +138,14 @@
     font-weight: bold;
   }
 
-  .user-button {
-    background-color: yellow;
+  .logout-button {
     padding: 6px 12px;
+    border-radius: 4px;
+    background-color: red;
+    color: white;
     border: none;
+    font-weight: bold;
     cursor: pointer;
-    font-weight: bold;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .user-button span {
-    font-weight: bold;
   }
 </style>
 
@@ -172,14 +163,19 @@
     document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
 </script>
 
-<!-- Barra superior con botón de modo al lado de "Nombre" -->
 <div class="topbar">
   <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+  <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
 </div>
 
-<!-- Contenido principal -->
 <div class="main">
   <div class="panel left-panel-admin">
     <h2>Historial de movimientos</h2>
