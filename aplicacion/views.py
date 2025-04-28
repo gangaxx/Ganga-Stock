@@ -15,6 +15,8 @@ def index(request):
 
             if user is not None:
                 login(request, user)
+                ## lo que esta abajo en la linea de request fue agregago el 28/4/2025 es para que el nombre de usuario se guarde en la sesion y se pueda usar en el index_empleado (sea visible) eso xd
+                request.session['nombre_usuario'] = user.username  # 👈 AGREGADO
                 if user.is_superuser:
                     return redirect('index_admin')
                 else:
@@ -74,6 +76,8 @@ def login_empleado(request):
         user = authenticate(request, username=username, password=password)
         if user is not None and not user.is_superuser:
             login(request, user)
+            ## lo que esta abajo en la linea de request fue agregago el 28/4/2025 es para que el nombre de usuario se guarde en la sesion y se pueda usar en el index_empleado (sea visible) eso xd
+            request.session['nombre_usuario'] = user.username  # 👈 AGREGADO AQUÍ TAMBIÉN
             return redirect('index_empleado')
         else:
             messages.error(request, 'Credenciales inválidas o acceso no autorizado.')

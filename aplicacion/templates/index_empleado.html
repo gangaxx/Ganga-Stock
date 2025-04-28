@@ -2,157 +2,66 @@
 {% load static %}
 
 {% block content %}
-
 <style>
-  body {
-    font-family: 'Lato', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-  }
+  body { font-family: 'Lato', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0; height: 100vh; }
+  body.dark-mode { background-color: #1e1e1e; color: white; }
+  .dark-mode .inventory-box { background-color: #2b2b2b; border: 1px solid #aaa; color: white; }
+  body.light-mode { background-color: #ffffff; color: #1e1e1e; }
+  .light-mode .inventory-box { background-color: #f0f0f0; border: 1px solid #ccc; color: #1e1e1e; }
+  .topbar { background-color: black; padding: 20px 40px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
+  .mode-toggle { padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; background-color: #333; color: #ff0; border: 1px solid #ff0; }
+  .logout-button { padding: 6px 12px; border-radius: 4px; background-color: red; color: white; border: none; font-weight: bold; cursor: pointer; }
+  .main-content { display: flex; padding: 40px 60px; height: calc(100vh - 100px); box-sizing: border-box; }
+  .inventory-box { padding: 40px; border-radius: 6px; width: 100%; max-width: 95%; margin: 0 auto; height: 100%; box-sizing: border-box; overflow-y: auto; }
+  .inventory-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #bbb; padding-bottom: 10px; font-size: 36px; font-weight: bold; margin-bottom: 20px; }
+  .inventory-header input[type="text"] { padding: 6px 12px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; width: 180px; background-color: white; color: black; }
+  body.dark-mode .inventory-header input[type="text"] { background-color: #111; color: white; border: 1px solid #666; }
+  .product-list { display: flex; flex-direction: column; gap: 20px; }
+  .product-row { display: flex; align-items: center; gap: 20px; padding: 15px; border-radius: 8px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid #ccc; cursor: pointer; }
+  body.dark-mode .product-row { background-color: #333; border: 1px solid #666; }
+  .product-row img { width: 100px; height: auto; border-radius: 4px; object-fit: cover; }
+  .product-info { display: flex; flex-direction: column; gap: 4px; }
+  .product-info span { font-size: 16px; }
+  .product-info .price { font-weight: bold; color: #0c0; }
+  body.dark-mode .product-info .price { color: #9f9; }
 
-  body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.8);
   }
-
-  .dark-mode .inventory-box {
-    background-color: #2b2b2b;
-    border: 1px solid #aaa;
-    color: white;
+  .modal-content {
+    background-color: #fefefe;
+    margin: 80px auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    border-radius: 8px;
+    text-align: center;
+    animation: fadeIn 0.3s ease;
   }
-
-  body.light-mode {
-    background-color: #ffffff;
-    color: #1e1e1e;
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
   }
-
-  .light-mode .inventory-box {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #1e1e1e;
-  }
-
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-  }
-
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .main-content {
-    display: flex;
-    padding: 40px 60px;
-    height: calc(100vh - 100px);
-    box-sizing: border-box;
-  }
-
-  .inventory-box {
-    padding: 40px;
-    border-radius: 6px;
+  .modal-content img {
     width: 100%;
-    max-width: 95%;
-    margin: 0 auto;
-    height: 100%;
-    box-sizing: border-box;
-    overflow-y: auto;
-  }
-
-  .inventory-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 1px solid #bbb;
-    padding-bottom: 10px;
-    font-size: 36px;
-    font-weight: bold;
+    height: auto;
+    border-radius: 8px;
     margin-bottom: 20px;
   }
-
-  .inventory-header input[type="text"] {
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 180px;
-    background-color: white;
-    color: black;
-  }
-
-  body.dark-mode .inventory-header input[type="text"] {
-    background-color: #111;
-    color: white;
-    border: 1px solid #666;
-  }
-
-  .product-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .product-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid #ccc;
-  }
-
-  body.dark-mode .product-row {
-    background-color: #333;
-    border: 1px solid #666;
-  }
-
-  .product-row img {
-    width: 100px;
-    height: auto;
-    border-radius: 4px;
-    object-fit: cover;
-  }
-
-  .product-info {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .product-info span {
-    font-size: 16px;
-  }
-
-  .product-info .price {
+  .close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
     font-weight: bold;
-    color: #0c0;
-  }
-
-  body.dark-mode .product-info .price {
-    color: #9f9;
+    cursor: pointer;
   }
 </style>
 
@@ -161,6 +70,30 @@
     const storedMode = localStorage.getItem('theme') || 'dark';
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+
+    // Modal
+    const products = document.querySelectorAll('.product-row');
+    products.forEach(product => {
+      product.addEventListener('click', () => {
+        const imgSrc = product.querySelector('img').src;
+        const title = product.querySelectorAll('span')[0].innerText;
+        const price = product.querySelectorAll('span')[1].innerText;
+
+        document.getElementById('modalImg').src = imgSrc;
+        document.getElementById('modalTitle').innerText = title;
+        document.getElementById('modalPrice').innerText = price;
+        document.getElementById('myModal').style.display = 'block';
+      });
+    });
+
+    document.querySelector('.close-modal').onclick = function() {
+      document.getElementById('myModal').style.display = 'none';
+    }
+    window.onclick = function(event) {
+      if (event.target == document.getElementById('myModal')) {
+        document.getElementById('myModal').style.display = 'none';
+      }
+    }
   });
 
   function toggleMode() {
@@ -189,9 +122,10 @@
       <span>Inventario</span>
       <input type="text" placeholder="Buscar" />
     </div>
+
     <div class="product-list">
 
-      {% comment %} Discos duros {% endcomment %}
+      {# Discos duros #}
       <div class="product-row">
         <img src="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" alt="">
         <div class="product-info">
@@ -221,7 +155,7 @@
         </div>
       </div>
 
-      {% comment %} Placas madre {% endcomment %}
+      {# Placas madre #}
       <div class="product-row">
         <img src="{% static 'img/placamadre/Asus620M.jpg' %}" alt="">
         <div class="product-info">
@@ -251,7 +185,7 @@
         </div>
       </div>
 
-      {% comment %} Procesadores {% endcomment %}
+      {# Procesadores #}
       <div class="product-row">
         <img src="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" alt="">
         <div class="product-info">
@@ -281,7 +215,7 @@
         </div>
       </div>
 
-      {% comment %} Memorias RAM {% endcomment %}
+      {# Memorias RAM #}
       <div class="product-row">
         <img src="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" alt="">
         <div class="product-info">
@@ -312,6 +246,16 @@
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="close-modal">&times;</span>
+    <img id="modalImg" src="" alt="Producto">
+    <h2 id="modalTitle"></h2>
+    <p id="modalPrice"></p>
   </div>
 </div>
 
