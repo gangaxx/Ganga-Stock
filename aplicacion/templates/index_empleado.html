@@ -3,7 +3,6 @@
 
 {% block content %}
 <style>
-  /* (tu CSS original, sin cambios) */
   body { font-family: 'Lato', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0; height: 100vh; }
   body.dark-mode { background-color: #1e1e1e; color: white; }
   .dark-mode .inventory-box { background-color: #2b2b2b; border: 1px solid #aaa; color: white; }
@@ -24,7 +23,7 @@
   .add-button { background-color: green; color: white; }
   .remove-button { background-color: red; color: white; }
   .total-column { font-weight: bold; font-size: 18px; }
-  /* Modal */
+  .product-image { width: 60px; border-radius: 4px; }
   .modal {
     display: none;
     position: fixed;
@@ -133,6 +132,7 @@
     <table class="inventory-table">
       <thead>
         <tr>
+          <th>Producto</th>
           <th>Nombre</th>
           <th>Precio</th>
           <th>Disponibles</th>
@@ -143,6 +143,7 @@
       </thead>
       <tbody>
         <tr>
+          <td><img src="{% static 'imagenes/seagate2tb.jpg' %}" alt="Seagate 2TB" class="product-image"></td>
           <td class="product-name" data-img="{% static 'imagenes/seagate2tb.jpg' %}" data-price="$55">Seagate Barracuda 2 TB</td>
           <td>$55</td>
           <td>10</td>
@@ -151,6 +152,7 @@
           <td class="quantity" id="qty1">0</td>
         </tr>
         <tr>
+          <td><img src="{% static 'imagenes/seagate500gb.jpg' %}" alt="Seagate 500GB" class="product-image"></td>
           <td class="product-name" data-img="{% static 'imagenes/seagate500gb.jpg' %}" data-price="$30">Seagate Barracuda 500 GB</td>
           <td>$30</td>
           <td>15</td>
@@ -159,6 +161,7 @@
           <td class="quantity" id="qty2">0</td>
         </tr>
         <tr>
+          <td><img src="{% static 'imagenes/wdblue1tb.jpg' %}" alt="WD 1TB" class="product-image"></td>
           <td class="product-name" data-img="{% static 'imagenes/wdblue1tb.jpg' %}" data-price="$45">Western Digital Blue 1 TB</td>
           <td>$45</td>
           <td>8</td>
@@ -167,6 +170,7 @@
           <td class="quantity" id="qty3">0</td>
         </tr>
         <tr>
+          <td><img src="{% static 'imagenes/wdpurple4tb.jpg' %}" alt="WD 4TB" class="product-image"></td>
           <td class="product-name" data-img="{% static 'imagenes/wdpurple4tb.jpg' %}" data-price="$110">Western Digital Purple 4 TB</td>
           <td>$110</td>
           <td>5</td>
@@ -174,11 +178,10 @@
           <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
           <td class="quantity" id="qty4">0</td>
         </tr>
-        <!-- Aquí puedes seguir agregando hasta 16 productos -->
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="5" style="text-align: right; font-weight: bold;">Total productos agregados:</td>
+          <td colspan="6" style="text-align: right; font-weight: bold;">Total productos agregados:</td>
           <td class="total-column" id="totalSum">0</td>
         </tr>
       </tfoot>
@@ -195,5 +198,4 @@
     <p id="modalPrice"></p>
   </div>
 </div>
-
 {% endblock %}
