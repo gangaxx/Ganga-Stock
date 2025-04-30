@@ -23,7 +23,7 @@
   .add-button { background-color: green; color: white; }
   .remove-button { background-color: red; color: white; }
   .total-column { font-weight: bold; font-size: 18px; }
-  .product-image { width: 60px; border-radius: 4px; }
+  .product-image { width: 60px; border-radius: 4px; cursor: pointer; }
   .modal {
     display: none;
     position: fixed;
@@ -58,11 +58,11 @@
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
 
-    document.querySelectorAll('.product-name').forEach(item => {
-      item.addEventListener('click', function() {
+    document.querySelectorAll('.product-image').forEach(img => {
+      img.addEventListener('click', function() {
         document.getElementById('myModal').style.display = 'block';
         document.getElementById('modalImg').src = this.dataset.img;
-        document.getElementById('modalTitle').innerText = this.innerText;
+        document.getElementById('modalTitle').innerText = this.dataset.name;
         document.getElementById('modalPrice').innerText = "Precio: " + this.dataset.price;
       });
     });
@@ -75,6 +75,8 @@
         document.getElementById('myModal').style.display = 'none';
       }
     }
+
+    updateTotal(); // Inicializar totales
   });
 
   function toggleMode() {
@@ -93,10 +95,20 @@
 
   function updateTotal() {
     let total = 0;
-    document.querySelectorAll('.quantity').forEach(qty => {
-      total += parseInt(qty.innerText || 0);
+    const rows = document.querySelectorAll('tbody tr');
+    rows.forEach(row => {
+      const priceCell = row.querySelector('.price-cell');
+      const qtyCell = row.querySelector('.quantity');
+      const totalCell = row.querySelector('.row-total');
+
+      const price = parseFloat(priceCell.dataset.price);
+      const qty = parseInt(qtyCell.innerText);
+      const rowTotal = price * qty;
+
+      totalCell.innerText = '$' + rowTotal.toFixed(2);
+      total += rowTotal;
     });
-    document.getElementById('totalSum').innerText = total;
+    document.getElementById('totalSum').innerText = total.toFixed(2);
   }
 
   function addProduct(qtyId) {
@@ -137,52 +149,57 @@
           <th>Precio</th>
           <th>Disponibles</th>
           <th>Agregar</th>
+          <th>Cantidades</th>
           <th>Eliminar</th>
           <th>Total</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td><img src="{% static 'imagenes/seagate2tb.jpg' %}" alt="Seagate 2TB" class="product-image"></td>
-          <td class="product-name" data-img="{% static 'imagenes/seagate2tb.jpg' %}" data-price="$55">Seagate Barracuda 2 TB</td>
-          <td>$55</td>
+          <td><img src="{% static 'discos/seagate2tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/seagate2tb.jpg' %}" data-name="Seagate Barracuda 2 TB" data-price="$55"></td>
+          <td>Seagate Barracuda 2 TB</td>
+          <td class="price-cell" data-price="55">$55</td>
           <td>10</td>
           <td><button class="add-button" onclick="addProduct('qty1')">+</button></td>
-          <td><button class="remove-button" onclick="removeProduct('qty1')">-</button></td>
           <td class="quantity" id="qty1">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty1')">-</button></td>
+          <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/seagate500gb.jpg' %}" alt="Seagate 500GB" class="product-image"></td>
-          <td class="product-name" data-img="{% static 'imagenes/seagate500gb.jpg' %}" data-price="$30">Seagate Barracuda 500 GB</td>
-          <td>$30</td>
+          <td><img src="{% static 'imagenes/seagate500gb.jpg' %}" class="product-image" data-img="{% static 'imagenes/seagate500gb.jpg' %}" data-name="Seagate Barracuda 500 GB" data-price="$30"></td>
+          <td>Seagate Barracuda 500 GB</td>
+          <td class="price-cell" data-price="30">$30</td>
           <td>15</td>
           <td><button class="add-button" onclick="addProduct('qty2')">+</button></td>
-          <td><button class="remove-button" onclick="removeProduct('qty2')">-</button></td>
           <td class="quantity" id="qty2">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty2')">-</button></td>
+          <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/wdblue1tb.jpg' %}" alt="WD 1TB" class="product-image"></td>
-          <td class="product-name" data-img="{% static 'imagenes/wdblue1tb.jpg' %}" data-price="$45">Western Digital Blue 1 TB</td>
-          <td>$45</td>
+          <td><img src="{% static 'imagenes/wdblue1tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/wdblue1tb.jpg' %}" data-name="Western Digital Blue 1 TB" data-price="$45"></td>
+          <td>Western Digital Blue 1 TB</td>
+          <td class="price-cell" data-price="45">$45</td>
           <td>8</td>
           <td><button class="add-button" onclick="addProduct('qty3')">+</button></td>
-          <td><button class="remove-button" onclick="removeProduct('qty3')">-</button></td>
           <td class="quantity" id="qty3">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty3')">-</button></td>
+          <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/wdpurple4tb.jpg' %}" alt="WD 4TB" class="product-image"></td>
-          <td class="product-name" data-img="{% static 'imagenes/wdpurple4tb.jpg' %}" data-price="$110">Western Digital Purple 4 TB</td>
-          <td>$110</td>
+          <td><img src="{% static 'imagenes/wdpurple4tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/wdpurple4tb.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Western Digital Purple 4 TB</td>
+          <td class="price-cell" data-price="110">$110</td>
           <td>5</td>
           <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
-          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
           <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
         </tr>
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="6" style="text-align: right; font-weight: bold;">Total productos agregados:</td>
-          <td class="total-column" id="totalSum">0</td>
+          <td colspan="7" style="text-align: right; font-weight: bold;">Total en $:</td>
+          <td class="total-column" id="totalSum">0.00</td>
         </tr>
       </tfoot>
     </table>
