@@ -3,36 +3,181 @@
 
 {% block content %}
 <style>
-  body { font-family: 'Lato', sans-serif; transition: background-color 0.3s, color 0.3s; margin: 0; padding: 0; height: 100vh; }
-  body.dark-mode { background-color: #1e1e1e; color: white; }
-  .dark-mode .inventory-box { background-color: #2b2b2b; border: 1px solid #aaa; color: white; }
-  body.light-mode { background-color: #ffffff; color: #1e1e1e; }
-  .light-mode .inventory-box { background-color: #f0f0f0; border: 1px solid #ccc; color: #1e1e1e; }
-  .topbar { background-color: black; padding: 20px 40px; display: flex; justify-content: flex-end; align-items: center; gap: 10px; }
-  .mode-toggle { padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; background-color: #333; color: #ff0; border: 1px solid #ff0; }
-  .logout-button { padding: 6px 12px; border-radius: 4px; background-color: red; color: white; border: none; font-weight: bold; cursor: pointer; }
-  .main-content { display: flex; flex-direction: column; padding: 40px 60px; height: calc(100vh - 100px); box-sizing: border-box; }
-  .inventory-header { display: flex; justify-content: space-between; align-items: center; font-size: 36px; font-weight: bold; margin-bottom: 20px; }
-  .inventory-header input[type="text"] { padding: 6px 12px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; width: 180px; background-color: white; color: black; }
-  body.dark-mode .inventory-header input[type="text"] { background-color: #111; color: white; border: 1px solid #666; }
-  .inventory-box { padding: 20px; border-radius: 6px; width: 100%; overflow-x: auto; }
-  .inventory-table { width: 100%; border-collapse: collapse; }
-  .inventory-table th, .inventory-table td { padding: 12px; border: 1px solid #ccc; text-align: center; }
-  body.dark-mode .inventory-table th, body.dark-mode .inventory-table td { border: 1px solid #666; }
-  .add-button, .remove-button { padding: 6px 10px; border: none; border-radius: 4px; font-size: 18px; cursor: pointer; }
-  .add-button { background-color: green; color: white; }
-  .remove-button { background-color: red; color: white; }
-  .total-column { font-weight: bold; font-size: 18px; }
-  .product-image { width: 60px; border-radius: 4px; cursor: pointer; }
+  body {
+    font-family: 'Lato', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+  }
+
+  body.dark-mode {
+    background-color: #1e1e1e;
+    color: white;
+  }
+
+  .dark-mode .inventory-box {
+    background-color: #2b2b2b;
+    border: 1px solid #aaa;
+    color: white;
+  }
+
+  body.light-mode {
+    background-color: #ffffff;
+    color: #1e1e1e;
+  }
+
+  .light-mode .inventory-box {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    color: #1e1e1e;
+  }
+
+  .topbar {
+    background-color: black;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .topbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .welcome-message {
+    font-size: 24px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .mode-toggle {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #333;
+    color: #ff0;
+    border: 1px solid #ff0;
+  }
+
+  .logout-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    padding: 40px 60px;
+    height: calc(100vh - 100px);
+    box-sizing: border-box;
+  }
+
+  .inventory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  .inventory-header input[type="text"] {
+    padding: 6px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 360px;
+    background-color: white;
+    color: black;
+  }
+
+  body.dark-mode .inventory-header input[type="text"] {
+    background-color: #111;
+    color: white;
+    border: 1px solid #666;
+  }
+
+  .inventory-box {
+    padding: 20px;
+    border-radius: 6px;
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .inventory-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+    vertical-align: middle;
+    height: 120px;
+  }
+
+  body.dark-mode .inventory-table th,
+  body.dark-mode .inventory-table td {
+    border: 1px solid #666;
+  }
+
+  .add-button,
+  .remove-button {
+    padding: 6px 10px;
+    border: none;
+    border-radius: 4px;
+    font-size: 18px;
+    cursor: pointer;
+  }
+
+  .add-button {
+    background-color: green;
+    color: white;
+  }
+
+  .remove-button {
+    background-color: red;
+    color: white;
+  }
+
+  .total-column {
+    font-weight: bold;
+    font-size: 18px;
+  }
+
+  .product-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+
   .modal {
     display: none;
     position: fixed;
     z-index: 999;
-    left: 0; top: 0;
-    width: 100%; height: 100%;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
     overflow: auto;
-    background-color: rgba(0,0,0,0.8);
+    background-color: rgba(0, 0, 0, 0.8);
   }
+
   .modal-content {
     background-color: #fefefe;
     margin: 80px auto;
@@ -44,13 +189,35 @@
     text-align: center;
     animation: fadeIn 0.3s ease;
   }
+
   @keyframes fadeIn {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
   }
-  .modal-content img { width: 100%; height: auto; border-radius: 8px; margin-bottom: 20px; }
-  .close-modal { color: #aaa; float: right; font-size: 28px; font-weight: bold; cursor: pointer; }
+
+  .modal-content img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 20px;
+  }
+
+  .close-modal {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+  }
 </style>
+
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
@@ -127,9 +294,16 @@
 </script>
 
 <div class="topbar">
-  <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
-  <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
+  <div class="topbar-center">
+    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions" style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
 </div>
+
 
 <div class="main-content">
   <div class="inventory-header">
@@ -156,7 +330,7 @@
       </thead>
       <tbody>
         <tr>
-          <td><img src="{% static 'discos/seagate2tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/seagate2tb.jpg' %}" data-name="Seagate Barracuda 2 TB" data-price="$55"></td>
+          <td><img src="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" class="product-image" data-img="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" data-name="Seagate Barracuda 2 TB" data-price="$55"></td>
           <td>Seagate Barracuda 2 TB</td>
           <td class="price-cell" data-price="55">$55</td>
           <td>10</td>
@@ -166,7 +340,7 @@
           <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/seagate500gb.jpg' %}" class="product-image" data-img="{% static 'imagenes/seagate500gb.jpg' %}" data-name="Seagate Barracuda 500 GB" data-price="$30"></td>
+          <td><img src="{% static 'img/discos/seagate Barracuda 500 GB.png' %}" class="product-image" data-img="{% static 'img/discos/seagate Barracuda 500 GB.png' %}" data-name="Seagate Barracuda 500 GB" data-price="$30"></td>
           <td>Seagate Barracuda 500 GB</td>
           <td class="price-cell" data-price="30">$30</td>
           <td>15</td>
@@ -176,7 +350,7 @@
           <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/wdblue1tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/wdblue1tb.jpg' %}" data-name="Western Digital Blue 1 TB" data-price="$45"></td>
+          <td><img src="{% static 'img/discos/western Digital Blue 1 TB.jpg' %}" class="product-image" data-img="{% static 'img/discos/western Digital Blue 1 TB.jpg' %}" data-name="Western Digital Blue 1 TB" data-price="$45"></td>
           <td>Western Digital Blue 1 TB</td>
           <td class="price-cell" data-price="45">$45</td>
           <td>8</td>
@@ -186,8 +360,128 @@
           <td class="row-total">$0.00</td>
         </tr>
         <tr>
-          <td><img src="{% static 'imagenes/wdpurple4tb.jpg' %}" class="product-image" data-img="{% static 'imagenes/wdpurple4tb.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td><img src="{% static 'img/discos/western Digital Purple 4 TB.png' %}" class="product-image" data-img="{% static 'img/discos/western Digital Purple 4 TB.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
           <td>Western Digital Purple 4 TB</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/placamadre/Asus620M.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/Asus620M.jpg' %}" data-name="Tarjeta Madre Asus620M" data-price="$110"></td>
+          <td>Tarjeta Madre Asus620M</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/placamadre/giga840m.png' %}" class="product-image" data-img="{% static 'img/placamadre/giga840m.png' %}" data-name="Tarjeta Madre gigabyte 840m" data-price="$110"></td>
+          <td>Tarjeta Madre gigabyte 840m</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/placamadre/giga850m.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/giga850m.jpg' %}" data-name="Tarjeta Madre Gigabyte 850m " data-price="$110"></td>
+          <td>Tarjeta Madre Gigabyte 850m</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/placamadre/msib650m.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/msib650m.jpg' %}" data-name="Tarjeta Madre msi b650m" data-price="$110"></td>
+          <td>Tarjeta Madre msi b650m</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" class="product-image" data-img="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Procesador AMD Ryzen 5 9600X</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/procesador/AMD Ryzen 7 5700.webp' %}" class="product-image" data-img="{% static 'img/procesador/AMD Ryzen 7 5700.webp' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Procesador AMD Ryzen 7 5700</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/procesador/Intel Core i5-11400.jpg' %}" class="product-image" data-img="{% static 'img/procesador/Intel Core i5-11400.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Procesador Intel Core i5-11400</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/procesador/Intel Core i5-14600KF.jpg' %}" class="product-image" data-img="{% static 'img/procesador/Intel Core i5-14600KF.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Procesador Intel Core i5-14600KF</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" class="product-image" data-img="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>"Memoria ram A-DATA 8gb ddr4 3200</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/rams/A-DATA XPG.jpg' %}" class="product-image" data-img="{% static 'img/rams/A-DATA XPG.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Memoria ram A-DATA XPG</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/rams/Kingston ddr4 3200.jpg' %}" class="product-image" data-img="{% static 'img/rams/Kingston ddr4 3200.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Memoria ram Kingston ddr4 3200</td>
+          <td class="price-cell" data-price="110">$110</td>
+          <td>5</td>
+          <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>
+          <td class="quantity" id="qty4">0</td>
+          <td><button class="remove-button" onclick="removeProduct('qty4')">-</button></td>
+          <td class="row-total">$0.00</td>
+        </tr>
+        <tr>
+          <td><img src="{% static 'img/rams/Ramaxel 4gb ddr4 3200.png' %}" class="product-image" data-img="{% static 'img/rams/Ramaxel 4gb ddr4 3200.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
+          <td>Memoria ram Ramaxel 4gb ddr4 3200</td>
           <td class="price-cell" data-price="110">$110</td>
           <td>5</td>
           <td><button class="add-button" onclick="addProduct('qty4')">+</button></td>

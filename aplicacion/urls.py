@@ -5,12 +5,11 @@ from django.conf import settings
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('admin/', views.index_admin, name='index_admin'),  # Alias accesible como /admin/
-    path('empleado/', views.index_empleado, name='index_empleado'),  # Alias accesible como /empleado/
-    path('index_admin/', views.index_admin, name='index_admin'),  # Alias alternativo
-    path('index_empleado/', views.index_empleado, name='index_empleado'),  # Alias alternativo
+    path('admin/', views.index_admin, name='index_admin'),
+    path('empleado/', views.index_empleado, name='index_empleado'),
+    path('index_admin/', views.index_admin, name='index_admin'),
+    path('index_empleado/', views.index_empleado, name='index_empleado'),
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
-
 ]
 
 if settings.DEBUG:
