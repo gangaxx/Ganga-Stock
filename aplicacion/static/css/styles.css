@@ -36,14 +36,7 @@ body.light-mode {
     gap: 200px;
 }
 
-.dropdown {
-    background-color: var(--button-color);
-    border: none;
-    padding: 10px 20px;
-    font-size: 20px;
-    border-radius: 5px;
-    cursor: pointer;
-}
+
 
 form {
     display: flex;
