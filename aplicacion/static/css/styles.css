@@ -5,10 +5,10 @@
 }
 
 :root {
-    --nav-color:rgb(0, 0, 0);
-    --bg-color:rgb(85, 85, 85);
-    --text-a-color:rgb(255, 255, 255);
-    --text-b-color:rgb(0, 0, 0);
+    --nav-color: rgb(0, 0, 0);
+    --bg-color: rgb(85, 85, 85);
+    --text-a-color: rgb(255, 255, 255);
+    --text-b-color: rgb(0, 0, 0);
     --button-color: rgb(255, 255, 0);
     --button-hover-color: rgb(255, 235, 85);
 }
@@ -35,8 +35,6 @@ body.light-mode {
     padding: 0 0;
     gap: 200px;
 }
-
-
 
 form {
     display: flex;
@@ -89,13 +87,19 @@ input[type="password"] {
 }
 
 .logo-container img {
-    height: 60px;
+    height: 200px;
     margin-right: 10px;
 }
-  
+
 .logo-img {
     width: 380px;
     height: auto;
+    object-fit: contain;
+}
+
+.logo-img-small {
+    height: 60px;
+    width: auto;
     object-fit: contain;
 }
 
@@ -173,18 +177,64 @@ input[type="password"] {
     background-color: var(--button-hover-color);
 }
 
+/* 🔧 TOPBAR MEJORADO */
 .top-bar {
     background-color: var(--nav-color);
-    padding: 10px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding: 10px 20px;
 }
 
+.topbar-left,
+.topbar-center,
+.topbar-right {
+    display: flex;
+    align-items: center;
+}
 
+.topbar-center {
+    justify-content: center;
+    flex: 1;
+    text-align: center;
+}
 
+.welcome-text {
+    font-size: 24px;
+    font-weight: bold;
+    color: var(--text-a-color);
+    font-family: Arial, sans-serif;
+}
 
+.topbar-right button {
+    margin-left: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
 
+.style-switch {
+    background-color: var(--button-color);
+    color: black;
+}
+
+.style-switch:hover {
+    background-color: var(--button-hover-color);
+}
+
+.logout-button {
+    background-color: red;
+    color: white;
+}
+
+.logout-button:hover {
+    background-color: darkred;
+}
+
+/* 🔽 RESPONSIVE */
 @media (max-width: 768px) {
     .container {
         flex-direction: column;
@@ -206,5 +256,21 @@ input[type="password"] {
         max-width: 420px;
         height: auto;
         padding: 40px 30px;
+    }
+
+    .top-bar {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .topbar-center {
+        flex: unset;
+        justify-content: center;
+    }
+
+    .topbar-right {
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }

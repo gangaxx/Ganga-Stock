@@ -159,8 +159,8 @@
   }
 
   .product-image {
-    width: 120px;
-    height: 150px;
+    width: 140px;
+    height: 170px;
     object-fit: cover;
     border-radius: 4px;
     cursor: pointer;
@@ -294,6 +294,7 @@
 </script>
 
 <div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
   <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
   <div class="topbar-center">
     <span class="welcome-message">Bienvenido, {{ user.username }}</span>
