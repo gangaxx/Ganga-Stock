@@ -39,7 +39,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 10px;
     position: relative;
   }
 
@@ -218,7 +217,6 @@
   }
 </style>
 
-
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const storedMode = localStorage.getItem('theme') || 'dark';
@@ -226,24 +224,25 @@
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
 
     document.querySelectorAll('.product-image').forEach(img => {
-      img.addEventListener('click', function() {
+      img.addEventListener('click', function () {
         document.getElementById('myModal').style.display = 'block';
         document.getElementById('modalImg').src = this.dataset.img;
         document.getElementById('modalTitle').innerText = this.dataset.name;
-        document.getElementById('modalPrice').innerText = "Precio: " + this.dataset.price;
+        document.getElementById('modalPrice').innerText = "Precio: $" + this.dataset.price;
       });
     });
 
-    document.querySelector('.close-modal').onclick = function() {
+    document.querySelector('.close-modal').onclick = function () {
       document.getElementById('myModal').style.display = 'none';
     }
-    window.onclick = function(event) {
+
+    window.onclick = function (event) {
       if (event.target == document.getElementById('myModal')) {
         document.getElementById('myModal').style.display = 'none';
       }
     }
 
-    updateTotal(); // Inicializar totales
+    updateTotal();
   });
 
   function toggleMode() {
@@ -265,7 +264,7 @@
     const rows = document.querySelectorAll('tbody tr');
     rows.forEach(row => {
       const priceCell = row.querySelector('.price-cell');
-      const qtyCell = row.querySelector('.quantity');
+      const qtyCell = row.querySelector('span[id^="prov"]');
       const totalCell = row.querySelector('.row-total');
 
       const price = parseFloat(priceCell.dataset.price);
@@ -273,23 +272,33 @@
       const rowTotal = price * qty;
 
       totalCell.innerText = rowTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
-
       total += rowTotal;
     });
-    document.getElementById('totalSum').innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
 
+    const totalSumElement = document.getElementById('totalSum');
+    if (totalSumElement) {
+      totalSumElement.innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+    }
   }
 
-  function addProduct(qtyId) {
-    const qty = document.getElementById(qtyId);
-    qty.innerText = parseInt(qty.innerText) + 1;
-    updateTotal();
+  function addProduct(prodId) {
+    const disponible = document.getElementById(prodId);
+    const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
+
+    if (parseInt(disponible.innerText) > 0) {
+      disponible.innerText = parseInt(disponible.innerText) - 1;
+      seleccionada.innerText = parseInt(seleccionada.innerText) + 1;
+      updateTotal();
+    }
   }
 
-  function removeProduct(qtyId) {
-    const qty = document.getElementById(qtyId);
-    if (parseInt(qty.innerText) > 0) {
-      qty.innerText = parseInt(qty.innerText) - 1;
+  function removeProduct(prodId) {
+    const disponible = document.getElementById(prodId);
+    const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
+
+    if (parseInt(seleccionada.innerText) > 0) {
+      disponible.innerText = parseInt(disponible.innerText) + 1;
+      seleccionada.innerText = parseInt(seleccionada.innerText) - 1;
       updateTotal();
     }
   }
@@ -297,7 +306,6 @@
 
 <div class="topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
   <div class="topbar-center">
     <span class="welcome-message">Bienvenido, {{ user.username }}</span>
   </div>
@@ -306,7 +314,6 @@
     <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
-
 
 <div class="main-content">
   <div class="inventory-header">
@@ -332,178 +339,33 @@
         </tr>
       </thead>
       <tbody>
+        {% for producto in productos %}
         <tr>
-          <td><img src="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" class="product-image" data-img="{% static 'img/discos/Seagate Barracuda 2 TB.jpg' %}" data-name="Seagate Barracuda 2 TB" data-price="$55"></td>
-          <td>Seagate Barracuda 2 TB</td>
-          <td class="price-cell" data-price="55">$55</td>
-          <td>10</td>
-          <td><button class="add-button" onclick="addProduct('pro1')">+</button></td>
-          <td class="quantity" id="pro1">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro1')">-</button></td>
-          <td class="row-total">$0.00</td>
+          <td>
+            <img src="{% static producto.imagen %}" alt="{{ producto.nombre }}"
+                 class="product-image"
+                 data-img="{% static producto.imagen %}"
+                 data-name="{{ producto.nombre }}"
+                 data-price="{{ producto.precio }}">
+          </td>
+          <td>{{ producto.nombre }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
+          <td><button class="add-button" onclick="addProduct('prod{{ producto.id }}')">+</button></td>
+          <td><span id="prov{{ producto.id }}">0</span></td>
+          <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
+          <td class="row-total">$0</td>
         </tr>
-        <tr>
-          <td><img src="{% static 'img/discos/seagate Barracuda 500 GB.png' %}" class="product-image" data-img="{% static 'img/discos/seagate Barracuda 500 GB.png' %}" data-name="Seagate Barracuda 500 GB" data-price="$30"></td>
-          <td>Seagate Barracuda 500 GB</td>
-          <td class="price-cell" data-price="30">$30</td>
-          <td>15</td>
-          <td><button class="add-button" onclick="addProduct('pro2')">+</button></td>
-          <td class="quantity" id="pro2">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro2')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/discos/western Digital Blue 1 TB.jpg' %}" class="product-image" data-img="{% static 'img/discos/western Digital Blue 1 TB.jpg' %}" data-name="Western Digital Blue 1 TB" data-price="$45"></td>
-          <td>Western Digital Blue 1 TB</td>
-          <td class="price-cell" data-price="45">$45</td>
-          <td>8</td>
-          <td><button class="add-button" onclick="addProduct('pro3')">+</button></td>
-          <td class="quantity" id="pro3">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro3')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/discos/western Digital Purple 4 TB.png' %}" class="product-image" data-img="{% static 'img/discos/western Digital Purple 4 TB.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Western Digital Purple 4 TB</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro4')">+</button></td>
-          <td class="quantity" id="pro4">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro4')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/placamadre/Asus620M.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/Asus620M.jpg' %}" data-name="Tarjeta Madre Asus620M" data-price="$110"></td>
-          <td>Tarjeta Madre Asus620M</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro5')">+</button></td>
-          <td class="quantity" id="pro5">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro5')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/placamadre/giga840m.png' %}" class="product-image" data-img="{% static 'img/placamadre/giga840m.png' %}" data-name="Tarjeta Madre gigabyte 840m" data-price="$110"></td>
-          <td>Tarjeta Madre gigabyte 840m</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro6')">+</button></td>
-          <td class="quantity" id="pro6">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro6')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/placamadre/giga850m.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/giga850m.jpg' %}" data-name="Tarjeta Madre Gigabyte 850m " data-price="$110"></td>
-          <td>Tarjeta Madre Gigabyte 850m</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro7')">+</button></td>
-          <td class="quantity" id="pro7">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro7')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/placamadre/msib650m.jpg' %}" class="product-image" data-img="{% static 'img/placamadre/msib650m.jpg' %}" data-name="Tarjeta Madre msi b650m" data-price="$110"></td>
-          <td>Tarjeta Madre msi b650m</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro8')">+</button></td>
-          <td class="quantity" id="pro8">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro8')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" class="product-image" data-img="{% static 'img/procesador/AMD Ryzen 5 9600X.webp' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Procesador AMD Ryzen 5 9600X</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro9')">+</button></td>
-          <td class="quantity" id="pro9">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro9')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/procesador/AMD Ryzen 7 5700.webp' %}" class="product-image" data-img="{% static 'img/procesador/AMD Ryzen 7 5700.webp' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Procesador AMD Ryzen 7 5700</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro10')">+</button></td>
-          <td class="quantity" id="pro10">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro10')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/procesador/Intel Core i5-11400.jpg' %}" class="product-image" data-img="{% static 'img/procesador/Intel Core i5-11400.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Procesador Intel Core i5-11400</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro11')">+</button></td>
-          <td class="quantity" id="pro11">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro11')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/procesador/Intel Core i5-14600KF.jpg' %}" class="product-image" data-img="{% static 'img/procesador/Intel Core i5-14600KF.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Procesador Intel Core i5-14600KF</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro12')">+</button></td>
-          <td class="quantity" id="pro12">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro12')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" class="product-image" data-img="{% static 'img/rams/A-DATA 8gb ddr4 3200.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>"Memoria ram A-DATA 8gb ddr4 3200</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro13')">+</button></td>
-          <td class="quantity" id="pro13">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro13')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/rams/A-DATA XPG.jpg' %}" class="product-image" data-img="{% static 'img/rams/A-DATA XPG.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Memoria ram A-DATA XPG</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro14')">+</button></td>
-          <td class="quantity" id="pro14">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro14')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/rams/Kingston ddr4 3200.jpg' %}" class="product-image" data-img="{% static 'img/rams/Kingston ddr4 3200.jpg' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Memoria ram Kingston ddr4 3200</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro15')">+</button></td>
-          <td class="quantity" id="pro15">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro15')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
-        <tr>
-          <td><img src="{% static 'img/rams/Ramaxel 4gb ddr4 3200.png' %}" class="product-image" data-img="{% static 'img/rams/Ramaxel 4gb ddr4 3200.png' %}" data-name="Western Digital Purple 4 TB" data-price="$110"></td>
-          <td>Memoria ram Ramaxel 4gb ddr4 3200</td>
-          <td class="price-cell" data-price="110">$110</td>
-          <td>5</td>
-          <td><button class="add-button" onclick="addProduct('pro16')">+</button></td>
-          <td class="quantity" id="pro16">0</td>
-          <td><button class="remove-button" onclick="removeProduct('pro16')">-</button></td>
-          <td class="row-total">$0.00</td>
-        </tr>
+        {% endfor %}
       </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="7" style="text-align: right; font-weight: bold;">Total en $:</td>
-          <td class="total-column" id="totalSum">0.00</td>
-        </tr>
-      </tfoot>
     </table>
+
+    <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">
+      Total general: <span id="totalSum">$0</span>
+    </div>
   </div>
 </div>
 
-<!-- Modal -->
 <div id="myModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>

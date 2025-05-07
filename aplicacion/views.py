@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from .forms import RegistroEmpleadoForm
-
+from .models import Producto
 
 def index(request):
     if request.method == 'POST':
@@ -15,8 +15,7 @@ def index(request):
 
             if user is not None:
                 login(request, user)
-                ## lo que esta abajo en la linea de request fue agregago el 28/4/2025 es para que el nombre de usuario se guarde en la sesion y se pueda usar en el index_empleado (sea visible) eso xd
-                request.session['nombre_usuario'] = user.username  # 👈 AGREGADO
+                request.session['nombre_usuario'] = user.username
                 if user.is_superuser:
                     return redirect('index_admin')
                 else:
@@ -39,21 +38,18 @@ def index(request):
 
     return render(request, 'index.html')
 
-
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
     return render(request, 'index_admin.html')
 
-
 def is_empleado(user):
     return user.is_authenticated and not user.is_superuser
-
 
 @login_required
 @user_passes_test(is_empleado)
 def index_empleado(request):
-    return render(request, 'index_empleado.html')
-
+    productos = Producto.objects.all()
+    return render(request, 'index_empleado.html', {'productos': productos})
 
 def registro_empleado(request):
     if request.method == 'POST':
@@ -68,7 +64,6 @@ def registro_empleado(request):
         form = RegistroEmpleadoForm()
     return render(request, 'index.html', {'form': form})
 
-
 def login_empleado(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -76,13 +71,11 @@ def login_empleado(request):
         user = authenticate(request, username=username, password=password)
         if user is not None and not user.is_superuser:
             login(request, user)
-            ## lo que esta abajo en la linea de request fue agregago el 28/4/2025 es para que el nombre de usuario se guarde en la sesion y se pueda usar en el index_empleado (sea visible) eso xd
-            request.session['nombre_usuario'] = user.username  # 👈 AGREGADO AQUÍ TAMBIÉN
+            request.session['nombre_usuario'] = user.username
             return redirect('index_empleado')
         else:
             messages.error(request, 'Credenciales inválidas o acceso no autorizado.')
     return render(request, 'index.html')
-
 
 def cerrar_sesion(request):
     logout(request)
