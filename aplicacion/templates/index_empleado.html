@@ -215,9 +215,28 @@
     font-weight: bold;
     cursor: pointer;
   }
+
+  /* ✅ NUEVOS ESTILOS para visibilidad en modo oscuro */
+  body.dark-mode .modal-content {
+    background-color: #2b2b2b;
+    color: white;
+  }
+
+  body.dark-mode #carritoItems td,
+  body.dark-mode #carritoItems th {
+    color: white;
+  }
+
+  body.dark-mode .inventory-table th {
+    background-color: #444;
+    color: white;
+  }
 </style>
 
+
 <script>
+  let carrito = [];
+
   document.addEventListener('DOMContentLoaded', () => {
     const storedMode = localStorage.getItem('theme') || 'dark';
     document.body.classList.add(storedMode + '-mode');
@@ -240,9 +259,18 @@
       if (event.target == document.getElementById('myModal')) {
         document.getElementById('myModal').style.display = 'none';
       }
+      if (event.target == document.getElementById('confirmModal')) {
+        document.getElementById('confirmModal').style.display = 'none';
+      }
     }
 
-    updateTotal();
+    document.getElementById('busqueda').addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      document.querySelectorAll('.product-row').forEach(row => {
+        const nombre = row.dataset.name.toLowerCase();
+        row.style.display = nombre.includes(filtro) ? '' : 'none';
+      });
+    });
   });
 
   function toggleMode() {
@@ -259,36 +287,22 @@
     }
   }
 
-  function updateTotal() {
-    let total = 0;
-    const rows = document.querySelectorAll('tbody tr');
-    rows.forEach(row => {
-      const priceCell = row.querySelector('.price-cell');
-      const qtyCell = row.querySelector('span[id^="prov"]');
-      const totalCell = row.querySelector('.row-total');
-
-      const price = parseFloat(priceCell.dataset.price);
-      const qty = parseInt(qtyCell.innerText);
-      const rowTotal = price * qty;
-
-      totalCell.innerText = rowTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
-      total += rowTotal;
-    });
-
-    const totalSumElement = document.getElementById('totalSum');
-    if (totalSumElement) {
-      totalSumElement.innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
-    }
-  }
-
-  function addProduct(prodId) {
+  function addProduct(prodId, name, price, img) {
     const disponible = document.getElementById(prodId);
     const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
 
     if (parseInt(disponible.innerText) > 0) {
-      disponible.innerText = parseInt(disponible.innerText) - 1;
-      seleccionada.innerText = parseInt(seleccionada.innerText) + 1;
+      disponible.innerText--;
+      seleccionada.innerText++;
       updateTotal();
+
+      const item = carrito.find(p => p.id === prodId);
+      if (item) {
+        item.cantidad++;
+      } else {
+        carrito.push({ id: prodId, name, price, img, cantidad: 1 });
+      }
+      updateCarrito();
     }
   }
 
@@ -297,12 +311,83 @@
     const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
 
     if (parseInt(seleccionada.innerText) > 0) {
-      disponible.innerText = parseInt(disponible.innerText) + 1;
-      seleccionada.innerText = parseInt(seleccionada.innerText) - 1;
+      disponible.innerText++;
+      seleccionada.innerText--;
       updateTotal();
+
+      const index = carrito.findIndex(p => p.id === prodId);
+      if (index !== -1) {
+        carrito[index].cantidad--;
+        if (carrito[index].cantidad === 0) carrito.splice(index, 1);
+        updateCarrito();
+      }
     }
   }
+
+  function updateTotal() {
+    let total = 0;
+    document.querySelectorAll('tbody tr').forEach(row => {
+      const price = parseFloat(row.querySelector('.price-cell').dataset.price);
+      const qty = parseInt(row.querySelector('span[id^="prov"]').innerText);
+      const totalCell = row.querySelector('.row-total');
+      const rowTotal = price * qty;
+      totalCell.innerText = rowTotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+      total += rowTotal;
+    });
+    document.getElementById('totalSum').innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  }
+
+  function mostrarConfirmacion() {
+    if (carrito.length === 0) {
+      alert('El carrito está vacío');
+      return;
+    }
+    document.getElementById('confirmModal').style.display = 'block';
+  }
+
+  function confirmarCompra() {
+    carrito.forEach(p => {
+      const disponible = document.getElementById(p.id);
+      const cantidad = parseInt(disponible.innerText);
+      disponible.innerText = cantidad - p.cantidad;
+
+      const seleccionada = document.getElementById('prov' + p.id.replace('prod', ''));
+      seleccionada.innerText = '0';
+    });
+
+    alert('✅ Venta efectuada con éxito.');
+    carrito = [];
+    updateCarrito();
+    updateTotal();
+    document.getElementById('carritoModal').style.display = 'none';
+    document.getElementById('confirmModal').style.display = 'none';
+  }
+
+  function updateCarrito() {
+  const container = document.getElementById('carritoItems');
+  container.innerHTML = '';
+  let total = 0;
+  carrito.forEach(p => {
+    const subtotal = p.price * p.cantidad;
+    total += subtotal;
+    container.innerHTML += `
+      <tr>
+        <td><img src="${p.img}" width="60" style="border-radius: 4px;"></td>
+        <td>${p.name}</td>
+        <td>${p.cantidad}</td>
+        <td>${subtotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
+      </tr>`;
+  });
+  document.getElementById('carritoTotal').innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+}
+
+
+  function toggleCarrito() {
+    const modal = document.getElementById('carritoModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+  }
 </script>
+
 
 <div class="topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
@@ -311,6 +396,7 @@
   </div>
   <div class="topbar-actions" style="display: flex; gap: 10px;">
     <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button onclick="toggleCarrito()" class="mode-toggle">🛒 Carrito</button>
     <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
@@ -318,9 +404,8 @@
 <div class="main-content">
   <div class="inventory-header">
     <span>Inventario</span>
-    <div style="display: flex; gap: 10px;">
-      <input type="text" placeholder="Buscar producto...">
-      <button class="mode-toggle">Buscar</button>
+    <div style="display: flex; gap: 10px; align-items:center">
+      <input type="text" placeholder="Buscar producto..." id="busqueda">
     </div>
   </div>
 
@@ -340,7 +425,7 @@
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr>
+        <tr class="product-row" data-name="{{ producto.nombre }}">
           <td>
             <img src="{% static producto.imagen %}" alt="{{ producto.nombre }}"
                  class="product-image"
@@ -351,7 +436,15 @@
           <td>{{ producto.nombre }}</td>
           <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td><button class="add-button" onclick="addProduct('prod{{ producto.id }}')">+</button></td>
+          <td>
+            <button class="add-button"
+              onclick="addProduct(
+                'prod{{ producto.id }}',
+                '{{ producto.nombre }}',
+                {{ producto.precio }},
+                '{{ producto.imagen }}'
+              )">+</button>
+          </td>
           <td><span id="prov{{ producto.id }}">0</span></td>
           <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
           <td class="row-total">$0</td>
@@ -359,13 +452,13 @@
         {% endfor %}
       </tbody>
     </table>
-
     <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">
       Total general: <span id="totalSum">$0</span>
     </div>
   </div>
 </div>
 
+<!-- Modal de imagen -->
 <div id="myModal" class="modal">
   <div class="modal-content">
     <span class="close-modal">&times;</span>
@@ -374,4 +467,43 @@
     <p id="modalPrice"></p>
   </div>
 </div>
+
+<!-- ✅ MODAL DE CARRITO CORREGIDO -->
+<div id="carritoModal" class="modal">
+  <div class="modal-content" style="max-width: 850px;">
+    <span class="close-modal" onclick="toggleCarrito()">&times;</span>
+    <h2 style="margin-bottom: 20px;">Carrito de Compras</h2>
+    <table class="inventory-table" style="width: 100%; font-size: 16px;">
+      <thead>
+        <tr>
+          <th style="width: 100px;">Producto</th>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="carritoItems">
+        <!-- Se llena dinámicamente con updateCarrito() -->
+      </tbody>
+    </table>
+    <div style="margin-top: 20px; font-size: 20px; font-weight: bold; text-align: right;">
+      Total del carrito: <span id="carritoTotal">$0</span>
+    </div>
+    <div style="margin-top: 20px; text-align: center;">
+      <button class="mode-toggle" style="background-color: green; color: white;" onclick="mostrarConfirmacion()">Pagar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content" style="max-width: 400px;">
+    <span class="close-modal" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
+    <h2>¿Deseas confirmar esta compra?</h2>
+    <div style="margin-top: 20px;">
+      <button class="mode-toggle" style="background-color: green; color: white;" onclick="confirmarCompra()">Sí, Confirmar</button>
+    </div>
+  </div>
+</div>
+
 {% endblock %}
