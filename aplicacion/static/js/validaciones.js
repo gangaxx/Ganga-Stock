@@ -52,37 +52,46 @@ function confirmLogout() {
   }
 }
 
-function addProduct(prodId, name, price, img) {
-  const disponible = document.getElementById(prodId);
-  const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
-
-  if (parseInt(disponible.innerText) > 0) {
-    disponible.innerText--;
-    seleccionada.innerText++;
-    updateTotal();
-
-    const staticImg = img.startsWith('/static/') ? img : '/static/' + img;
-
-    const item = carrito.find(p => p.id === prodId);
-    if (item) {
-      item.cantidad++;
-    } else {
-      carrito.push({ id: prodId, name, price, img: staticImg, cantidad: 1 });
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+      const cookie = cookies[i].trim();
+      if (cookie.substring(0, name.length + 1) === (name + '=')) {
+        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+        break;
+      }
     }
-    updateCarrito();
   }
+  return cookieValue;
+}
+
+function addProduct(prodId, name, price, img) {
+  const idNum = prodId.replace('prod', '');
+  const seleccionada = document.getElementById('prov' + idNum);
+  seleccionada.innerText++;
+  updateTotal();
+
+  const staticImg = img; // ✅ Ya es una ruta completa
+
+  const item = carrito.find(p => p.id === idNum);
+  if (item) {
+    item.cantidad++;
+  } else {
+    carrito.push({ id: idNum, name, price, img: staticImg, cantidad: 1 });
+  }
+  updateCarrito();
 }
 
 function removeProduct(prodId) {
-  const disponible = document.getElementById(prodId);
-  const seleccionada = document.getElementById('prov' + prodId.replace('prod', ''));
-
+  const idNum = prodId.replace('prod', '');
+  const seleccionada = document.getElementById('prov' + idNum);
   if (parseInt(seleccionada.innerText) > 0) {
-    disponible.innerText++;
     seleccionada.innerText--;
     updateTotal();
 
-    const index = carrito.findIndex(p => p.id === prodId);
+    const index = carrito.findIndex(p => p.id === idNum);
     if (index !== -1) {
       carrito[index].cantidad--;
       if (carrito[index].cantidad === 0) carrito.splice(index, 1);
@@ -151,19 +160,36 @@ function mostrarConfirmacion() {
 }
 
 function confirmarCompra() {
-  carrito.forEach(p => {
-    const disponible = document.getElementById(p.id);
-    const cantidad = parseInt(disponible.innerText);
-    disponible.innerText = cantidad - p.cantidad;
+  if (carrito.length === 0) {
+    alert('El carrito está vacío');
+    return;
+  }
 
-    const seleccionada = document.getElementById('prov' + p.id.replace('prod', ''));
-    seleccionada.innerText = '0';
+  fetch('/procesar_compra/', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': getCookie('csrftoken')
+    },
+    body: JSON.stringify({ carrito: carrito })
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('✅ Venta efectuada con éxito.');
+      carrito = [];
+      updateCarrito();
+      updateTotal();
+      document.querySelectorAll('span[id^="prov"]').forEach(span => span.innerText = '0');
+      document.getElementById('carritoModal').style.display = 'none';
+      document.getElementById('confirmModal').style.display = 'none';
+      location.reload();
+    } else {
+      alert('❌ Error: ' + data.error);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error al procesar la compra.');
   });
-
-  alert('✅ Venta efectuada con éxito.');
-  carrito = [];
-  updateCarrito();
-  updateTotal();
-  document.getElementById('carritoModal').style.display = 'none';
-  document.getElementById('confirmModal').style.display = 'none';
 }

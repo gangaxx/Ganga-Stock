@@ -3,6 +3,9 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import JsonResponse
+import json
+
 from .forms import RegistroEmpleadoForm
 from .models import Producto
 
@@ -80,3 +83,23 @@ def login_empleado(request):
 def cerrar_sesion(request):
     logout(request)
     return redirect('index')
+
+@login_required
+def procesar_compra(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            carrito = data.get('carrito', [])
+            for item in carrito:
+                producto_id = item.get('id')
+                cantidad = item.get('cantidad', 0)
+                producto = Producto.objects.get(id=producto_id)
+                if producto.cantidad >= cantidad:  # Usar `cantidad` en lugar de `stock`
+                    producto.cantidad -= cantidad
+                    producto.save()
+                else:
+                    return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
