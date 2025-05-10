@@ -231,25 +231,23 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>001</td>
-            <td>Disco Jazz</td>
-            <td>5</td>
-            <td>1</td>
-            <td>10/05/2025</td>
-            <td>14:35</td>
-            <td>Juan Pérez</td>
-          </tr>
-          <tr>
-            <td>002</td>
-            <td>Disco Rock</td>
-            <td>3</td>
-            <td>0</td>
-            <td>10/05/2025</td>
-            <td>15:10</td>
-            <td>María López</td>
-          </tr>
-        </tbody>
+  {% for m in movimientos %}
+    <tr>
+      <td>{{ m.producto.id }}</td>
+      <td>{{ m.producto.nombre }}</td>
+      <td>{{ m.cantidad_vendida }}</td>
+      <td>{{ m.cantidad_devuelta }}</td>
+      <td>{{ m.fecha|date:"d/m/Y" }}</td>
+      <td>{{ m.hora|time:"H:i" }}</td>
+      <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
+    </tr>
+  {% empty %}
+    <tr>
+      <td colspan="7">No hay movimientos registrados.</td>
+    </tr>
+  {% endfor %}
+</tbody>
+
       </table>
     </div>
   </div>

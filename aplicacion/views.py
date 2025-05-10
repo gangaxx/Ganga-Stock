@@ -7,7 +7,7 @@ from django.http import JsonResponse
 import json
 
 from .forms import RegistroEmpleadoForm
-from .models import Producto
+from .models import Producto, Movimiento
 
 def index(request):
     if request.method == 'POST':
@@ -43,7 +43,10 @@ def index(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
-    return render(request, 'index_admin.html')
+    from .models import Movimiento
+    movimientos = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
+    return render(request, 'index_admin.html', {'movimientos': movimientos})
+
 
 def is_empleado(user):
     return user.is_authenticated and not user.is_superuser
@@ -94,9 +97,17 @@ def procesar_compra(request):
                 producto_id = item.get('id')
                 cantidad = item.get('cantidad', 0)
                 producto = Producto.objects.get(id=producto_id)
-                if producto.cantidad >= cantidad:  # Usar `cantidad` en lugar de `stock`
+
+                if producto.cantidad >= cantidad:
                     producto.cantidad -= cantidad
                     producto.save()
+
+                    # Registrar movimiento
+                    Movimiento.objects.create(
+                        producto=producto,
+                        cantidad_vendida=cantidad,
+                        empleado=request.user
+                    )
                 else:
                     return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
             return JsonResponse({'success': True})
@@ -111,5 +122,3 @@ def inventario(request):
 @user_passes_test(lambda u: u.is_superuser)
 def empleado(request):
     return render(request, 'empleado.html')
-
-
