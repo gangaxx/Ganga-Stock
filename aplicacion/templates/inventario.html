@@ -67,6 +67,55 @@
     margin-bottom: 20px;
   }
 
+  .inventory-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .inventory-form input {
+    padding: 5px;
+    border-radius: 4px;
+  }
+
+  .form-submit {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .inventory-table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+  }
+
+  .inventory-table th,
+  .inventory-table td {
+    padding: 8px;
+    border: 1px solid #999;
+    text-align: center;
+  }
+
+  .upload-btn {
+    background-color: #444;
+    color: white;
+    cursor: pointer;
+  }
+
+  .add-btn {
+    background-color: green;
+    color: white;
+    cursor: pointer;
+  }
+
+  .remove-btn {
+    background-color: red;
+    color: white;
+    cursor: pointer;
+  }
+
   .topbar {
     background-color: black;
     padding: 20px 40px;
@@ -86,13 +135,6 @@
   .welcome-message {
     font-size: 42px;
     color: white;
-    font-weight: bold;
-  }
-
-  .mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
     font-weight: bold;
   }
 
@@ -127,6 +169,25 @@
       window.location.href = "{% url 'cerrar_sesion' %}";
     }
   }
+
+  function updateStock(productId, action) {
+    fetch(`/update_stock/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ id: productId, action: action })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert(data.error);
+      }
+    });
+  }
 </script>
 
 <div class="topbar">
@@ -144,7 +205,34 @@
 <div class="main">
   <div class="panel">
     <h2>Inventario</h2>
-    <p>Aquí irá el contenido del inventario (CRUD de productos).</p>
+
+    <form method="POST" enctype="multipart/form-data" class="inventory-form">
+      {% csrf_token %}
+      <input type="file" name="imagen" required class="upload-btn">
+      <input type="text" name="nombre" placeholder="Nombre del producto" required>
+      <input type="number" name="precio" placeholder="Precio" step="0.01" required>
+      <input type="number" name="cantidad" placeholder="Unidades" required>
+      <div class="form-submit">
+        <button type="submit" class="add-btn">Agregar</button>
+      </div>
+    </form>
+
+
+      <tbody>
+        {% for producto in productos %}
+        <tr>
+          <td><img src="{% static producto.imagen %}" width="50"></td>
+          <td>{{ producto.nombre }}</td>
+          <td>${{ producto.precio }}</td>
+          <td><button type="button" onclick="updateStock({{ producto.id }}, 'add')" class="add-btn">+</button></td>
+          <td>{{ producto.cantidad }}</td>
+          <td><button type="button" onclick="updateStock({{ producto.id }}, 'remove')" class="remove-btn">-</button></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="6">No hay productos en inventario.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
   </div>
 </div>
 
