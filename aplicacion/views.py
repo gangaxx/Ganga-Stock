@@ -103,3 +103,13 @@ def procesar_compra(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@user_passes_test(lambda u: u.is_superuser)
+def inventario(request):
+    return render(request, 'inventario.html')
+
+@user_passes_test(lambda u: u.is_superuser)
+def empleado(request):
+    return render(request, 'empleado.html')
+
+

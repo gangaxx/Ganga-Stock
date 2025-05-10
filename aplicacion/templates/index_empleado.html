@@ -272,34 +272,33 @@
         </tr>
       </thead>
       <tbody>
-  {% for producto in productos %}
-  <tr class="product-row" data-name="{{ producto.nombre }}">
-    <td>
-      <img src="{% static producto.imagen|urlencode %}" alt="{{ producto.nombre }}"
-           class="product-image"
-           data-img="{% static producto.imagen|urlencode %}"
-           data-name="{{ producto.nombre }}"
-           data-price="{{ producto.precio }}">
-    </td>
-    <td>{{ producto.nombre }}</td>
-    <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
-    <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-    <td>
-      <button class="add-button"
-        onclick="addProduct(
-          'prod{{ producto.id }}',
-          '{{ producto.nombre }}',
-          {{ producto.precio }},
-          '{% static producto.imagen|urlencode %}'
-        )">+</button>
-    </td>
-    <td><span id="prov{{ producto.id }}">0</span></td>
-    <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
-    <td class="row-total">$0</td>
-  </tr>
-  {% endfor %}
-</tbody>
-
+        {% for producto in productos %}
+        <tr class="product-row" data-name="{{ producto.nombre }}">
+          <td>
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                 class="product-image"
+                 data-img="{{ producto.imagen.url }}"
+                 data-name="{{ producto.nombre }}"
+                 data-price="{{ producto.precio }}">
+          </td>
+          <td>{{ producto.nombre }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
+          <td>
+            <button class="add-button"
+              onclick="addProduct(
+                'prod{{ producto.id }}',
+                '{{ producto.nombre }}',
+                {{ producto.precio }},
+                '{{ producto.imagen.url }}'
+              )">+</button>
+          </td>
+          <td><span id="prov{{ producto.id }}">0</span></td>
+          <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
+          <td class="row-total">$0</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
     <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">
       Total general: <span id="totalSum">$0</span>

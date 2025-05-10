@@ -73,13 +73,14 @@ function addProduct(prodId, name, price, img) {
   seleccionada.innerText++;
   updateTotal();
 
-  const staticImg = img; // ✅ Ya es una ruta completa
+  // ✅ Asegura que la imagen esté correctamente codificada
+  const safeImg = typeof img === "string" ? encodeURI(img) : '';
 
   const item = carrito.find(p => p.id === idNum);
   if (item) {
     item.cantidad++;
   } else {
-    carrito.push({ id: idNum, name, price, img: staticImg, cantidad: 1 });
+    carrito.push({ id: idNum, name, price, img: safeImg, cantidad: 1 });
   }
   updateCarrito();
 }

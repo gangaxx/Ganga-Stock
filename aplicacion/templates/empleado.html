@@ -19,18 +19,9 @@
     border: 1px solid #fff;
   }
 
-  .dark-mode .history-box {
-    background-color: #1e1e1e;
-    border-top: 1px solid #999;
-  }
-
   .dark-mode .section-title,
   .dark-mode h2 {
     color: white;
-  }
-
-  .dark-mode .style-button {
-    color: #ff0;
   }
 
   .dark-mode .mode-toggle {
@@ -49,18 +40,9 @@
     border: 1px solid #ccc;
   }
 
-  .light-mode .history-box {
-    background-color: #ffffff;
-    border-top: 1px solid #999;
-  }
-
   .light-mode .section-title,
   .light-mode h2 {
     color: #1e1e1e;
-  }
-
-  .light-mode .style-button {
-    color: #ff0;
   }
 
   .light-mode .mode-toggle {
@@ -71,52 +53,14 @@
 
   .main {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     padding: 40px 60px;
   }
 
   .panel {
     padding: 20px;
     border-radius: 4px;
-  }
-
-  .left-panel-admin {
-    flex: 2;
-    margin-right: 20px;
-  }
-
-  .right-panel-admin {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .history-box {
-    height: 400px;
-    margin-top: 20px;
-    overflow-y: auto;
-  }
-
-  .section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .section-title {
-    font-weight: bold;
-  }
-
-  .style-button {
-    background: none;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .style-button::after {
-    content: " ❯";
+    width: 100%;
   }
 
   h2 {
@@ -161,23 +105,6 @@
     font-weight: bold;
     cursor: pointer;
   }
-
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  .history-table th,
-  .history-table td {
-    border: 1px solid #999;
-    padding: 8px;
-    text-align: center;
-  }
-
-  .history-table th {
-    font-weight: bold;
-  }
 </style>
 
 <script>
@@ -215,54 +142,9 @@
 </div>
 
 <div class="main">
-  <div class="panel left-panel-admin">
-    <h2>Historial de movimientos</h2>
-    <div class="history-box">
-      <table class="history-table">
-        <thead>
-          <tr>
-            <th>Producto</th>
-            <th>Nombre Producto</th>
-            <th>Vendidas</th>
-            <th>Devuelta</th>
-            <th>Fecha</th>
-            <th>Hora</th>
-            <th>Nombre Empleado</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>001</td>
-            <td>Disco Jazz</td>
-            <td>5</td>
-            <td>1</td>
-            <td>10/05/2025</td>
-            <td>14:35</td>
-            <td>Juan Pérez</td>
-          </tr>
-          <tr>
-            <td>002</td>
-            <td>Disco Rock</td>
-            <td>3</td>
-            <td>0</td>
-            <td>10/05/2025</td>
-            <td>15:10</td>
-            <td>María López</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-  <div class="panel right-panel-admin">
-    <h2>Base de datos</h2>
-    <div class="section">
-      <div class="section-title">Inventario</div>
-      <button class="style-button" onclick="window.location.href='{% url 'inventario' %}'">Ver todo</button>
-    </div>
-    <div class="section">
-      <div class="section-title">Empleados</div>
-      <button class="style-button" onclick="window.location.href='{% url 'empleado' %}'">Ver todo</button>
-    </div>
+  <div class="panel">
+    <h2>Empleados</h2>
+    <p>Aquí irá el contenido de gestión de empleados (CRUD de empleados).</p>
   </div>
 </div>
 

@@ -10,7 +10,11 @@ urlpatterns = [
     path('index_admin/', views.index_admin, name='index_admin'),
     path('index_empleado/', views.index_empleado, name='index_empleado'),
     path('cerrar_sesion/', views.cerrar_sesion, name='cerrar_sesion'),
-    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),  # ✅ Nueva ruta agregada
+    path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
+    path('inventario/', views.inventario, name='inventario'),
+    path('admin_empleado/', views.empleado, name='empleado'),
+
+  # ✅ Nueva ruta agregada
 ]
 
 if settings.DEBUG:
