@@ -53,14 +53,17 @@
 
   .main {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     padding: 40px 60px;
+    gap: 40px;
   }
 
   .panel {
     padding: 20px;
     border-radius: 4px;
     width: 100%;
+    max-width: 1000px;
   }
 
   h2 {
@@ -83,11 +86,11 @@
     display: flex;
     justify-content: center;
     margin-top: 10px;
+    width: 100%;
   }
 
   .inventory-table {
     width: 100%;
-    margin-top: 20px;
     border-collapse: collapse;
   }
 
@@ -204,11 +207,10 @@
 
 <div class="main">
   <div class="panel">
-    <h2>Inventario</h2>
-
-    <form method="POST" enctype="multipart/form-data" class="inventory-form">
+    <h2>Agregar nuevo producto</h2>
+    <form method="POST" class="inventory-form">
       {% csrf_token %}
-      <input type="file" name="imagen" required class="upload-btn">
+      <input type="text" name="imagen" placeholder="Ruta imagen ej: img/discos/ejemplo.jpg" required>
       <input type="text" name="nombre" placeholder="Nombre del producto" required>
       <input type="number" name="precio" placeholder="Precio" step="0.01" required>
       <input type="number" name="cantidad" placeholder="Unidades" required>
@@ -216,8 +218,21 @@
         <button type="submit" class="add-btn">Agregar</button>
       </div>
     </form>
+  </div>
 
-
+  <div class="panel">
+    <h2>Inventario actual</h2>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Agregar Unidad</th>
+          <th>Cantidad</th>
+          <th>Eliminar Unidad</th>
+        </tr>
+      </thead>
       <tbody>
         {% for producto in productos %}
         <tr>

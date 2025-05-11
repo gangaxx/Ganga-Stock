@@ -43,10 +43,8 @@ def index(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
-    from .models import Movimiento
     movimientos = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     return render(request, 'index_admin.html', {'movimientos': movimientos})
-
 
 def is_empleado(user):
     return user.is_authenticated and not user.is_superuser
@@ -117,7 +115,24 @@ def procesar_compra(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def inventario(request):
-    return render(request, 'inventario.html')
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        imagen = request.POST.get('imagen')  # Espera ruta relativa desde static/
+        precio = request.POST.get('precio')
+        cantidad = request.POST.get('cantidad')
+
+        if nombre and imagen and precio and cantidad:
+            Producto.objects.create(
+                nombre=nombre,
+                imagen=imagen,
+                precio=precio,
+                cantidad=cantidad
+            )
+            messages.success(request, "Producto agregado correctamente.")
+            return redirect('inventario')
+
+    productos = Producto.objects.all()
+    return render(request, 'inventario.html', {'productos': productos})
 
 @user_passes_test(lambda u: u.is_superuser)
 def empleado(request):

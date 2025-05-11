@@ -5,44 +5,58 @@ let carrito = [];
 document.addEventListener('DOMContentLoaded', () => {
   const storedMode = localStorage.getItem('theme') || 'dark';
   document.body.classList.add(storedMode + '-mode');
-  document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  const modeToggle = document.getElementById('modeToggle');
+  if (modeToggle) {
+    modeToggle.innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  }
 
   document.querySelectorAll('.product-image').forEach(img => {
     img.addEventListener('click', function () {
-      document.getElementById('myModal').style.display = 'block';
-      document.getElementById('modalImg').src = this.dataset.img;
-      document.getElementById('modalTitle').innerText = this.dataset.name;
-      document.getElementById('modalPrice').innerText = "Precio: $" + this.dataset.price;
+      const modal = document.getElementById('myModal');
+      if (modal) {
+        modal.style.display = 'block';
+        document.getElementById('modalImg').src = this.dataset.img;
+        document.getElementById('modalTitle').innerText = this.dataset.name;
+        document.getElementById('modalPrice').innerText = "Precio: $" + this.dataset.price;
+      }
     });
   });
 
-  document.querySelector('.close-modal').onclick = function () {
-    document.getElementById('myModal').style.display = 'none';
-  };
+  const closeModalBtn = document.querySelector('.close-modal');
+  if (closeModalBtn) {
+    closeModalBtn.onclick = function () {
+      const modal = document.getElementById('myModal');
+      if (modal) modal.style.display = 'none';
+    };
+  }
 
   window.onclick = function (event) {
-    if (event.target === document.getElementById('myModal')) {
-      document.getElementById('myModal').style.display = 'none';
-    }
-    if (event.target === document.getElementById('confirmModal')) {
-      document.getElementById('confirmModal').style.display = 'none';
-    }
+    const modal = document.getElementById('myModal');
+    const confirmModal = document.getElementById('confirmModal');
+    if (event.target === modal) modal.style.display = 'none';
+    if (event.target === confirmModal) confirmModal.style.display = 'none';
   };
 
-  document.getElementById('busqueda').addEventListener('input', function () {
-    const filtro = this.value.toLowerCase();
-    document.querySelectorAll('.product-row').forEach(row => {
-      const nombre = row.dataset.name.toLowerCase();
-      row.style.display = nombre.includes(filtro) ? '' : 'none';
+  const searchInput = document.getElementById('busqueda');
+  if (searchInput) {
+    searchInput.addEventListener('input', function () {
+      const filtro = this.value.toLowerCase();
+      document.querySelectorAll('.product-row').forEach(row => {
+        const nombre = row.dataset.name.toLowerCase();
+        row.style.display = nombre.includes(filtro) ? '' : 'none';
+      });
     });
-  });
+  }
 });
 
 function toggleMode() {
   const isDark = document.body.classList.contains('dark-mode');
   document.body.classList.toggle('dark-mode', !isDark);
   document.body.classList.toggle('light-mode', isDark);
-  document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+  const modeToggle = document.getElementById('modeToggle');
+  if (modeToggle) {
+    modeToggle.innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+  }
   localStorage.setItem('theme', isDark ? 'light' : 'dark');
 }
 
@@ -70,10 +84,9 @@ function getCookie(name) {
 function addProduct(prodId, name, price, img) {
   const idNum = prodId.replace('prod', '');
   const seleccionada = document.getElementById('prov' + idNum);
-  seleccionada.innerText++;
+  if (seleccionada) seleccionada.innerText++;
   updateTotal();
 
-  // ✅ Asegura que la imagen esté correctamente codificada
   const safeImg = typeof img === "string" ? encodeURI(img) : '';
 
   const item = carrito.find(p => p.id === idNum);
@@ -88,7 +101,7 @@ function addProduct(prodId, name, price, img) {
 function removeProduct(prodId) {
   const idNum = prodId.replace('prod', '');
   const seleccionada = document.getElementById('prov' + idNum);
-  if (parseInt(seleccionada.innerText) > 0) {
+  if (seleccionada && parseInt(seleccionada.innerText) > 0) {
     seleccionada.innerText--;
     updateTotal();
 
@@ -122,11 +135,16 @@ function updateTotal() {
     total += rowTotal;
   });
 
-  document.getElementById('totalSum').innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  const totalSum = document.getElementById('totalSum');
+  if (totalSum) {
+    totalSum.innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  }
 }
 
 function updateCarrito() {
   const container = document.getElementById('carritoItems');
+  if (!container) return;
+
   container.innerHTML = '';
   let total = 0;
 
@@ -144,12 +162,17 @@ function updateCarrito() {
     `;
   });
 
-  document.getElementById('carritoTotal').innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  const carritoTotal = document.getElementById('carritoTotal');
+  if (carritoTotal) {
+    carritoTotal.innerText = total.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' });
+  }
 }
 
 function toggleCarrito() {
   const modal = document.getElementById('carritoModal');
-  modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+  if (modal) {
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+  }
 }
 
 function mostrarConfirmacion() {
@@ -157,7 +180,8 @@ function mostrarConfirmacion() {
     alert('El carrito está vacío');
     return;
   }
-  document.getElementById('confirmModal').style.display = 'block';
+  const modal = document.getElementById('confirmModal');
+  if (modal) modal.style.display = 'block';
 }
 
 function confirmarCompra() {
