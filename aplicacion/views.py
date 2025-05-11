@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 import json
 
-from .forms import RegistroEmpleadoForm
 from .models import Producto, Movimiento
 
 def index(request):
@@ -19,10 +18,7 @@ def index(request):
             if user is not None:
                 login(request, user)
                 request.session['nombre_usuario'] = user.username
-                if user.is_superuser:
-                    return redirect('index_admin')
-                else:
-                    return redirect('index_empleado')
+                return redirect('index_admin' if user.is_superuser else 'index_empleado')
             else:
                 messages.error(request, 'Credenciales incorrectas.')
 
@@ -55,32 +51,6 @@ def index_empleado(request):
     productos = Producto.objects.all()
     return render(request, 'index_empleado.html', {'productos': productos})
 
-def registro_empleado(request):
-    if request.method == 'POST':
-        form = RegistroEmpleadoForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            messages.success(request, 'Cuenta creada exitosamente.')
-            return redirect('index')
-    else:
-        form = RegistroEmpleadoForm()
-    return render(request, 'index.html', {'form': form})
-
-def login_empleado(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        user = authenticate(request, username=username, password=password)
-        if user is not None and not user.is_superuser:
-            login(request, user)
-            request.session['nombre_usuario'] = user.username
-            return redirect('index_empleado')
-        else:
-            messages.error(request, 'Credenciales inválidas o acceso no autorizado.')
-    return render(request, 'index.html')
-
 def cerrar_sesion(request):
     logout(request)
     return redirect('index')
@@ -92,20 +62,12 @@ def procesar_compra(request):
             data = json.loads(request.body)
             carrito = data.get('carrito', [])
             for item in carrito:
-                producto_id = item.get('id')
-                cantidad = item.get('cantidad', 0)
-                producto = Producto.objects.get(id=producto_id)
-
+                producto = Producto.objects.get(id=item['id'])
+                cantidad = item['cantidad']
                 if producto.cantidad >= cantidad:
                     producto.cantidad -= cantidad
                     producto.save()
-
-                    # Registrar movimiento
-                    Movimiento.objects.create(
-                        producto=producto,
-                        cantidad_vendida=cantidad,
-                        empleado=request.user
-                    )
+                    Movimiento.objects.create(producto=producto, cantidad_vendida=cantidad, empleado=request.user)
                 else:
                     return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
             return JsonResponse({'success': True})
@@ -117,23 +79,30 @@ def procesar_compra(request):
 def inventario(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
-        imagen = request.POST.get('imagen')  # Espera ruta relativa desde static/
+        imagen = request.POST.get('imagen')
         precio = request.POST.get('precio')
         cantidad = request.POST.get('cantidad')
-
         if nombre and imagen and precio and cantidad:
-            Producto.objects.create(
-                nombre=nombre,
-                imagen=imagen,
-                precio=precio,
-                cantidad=cantidad
-            )
+            Producto.objects.create(nombre=nombre, imagen=imagen, precio=precio, cantidad=cantidad)
             messages.success(request, "Producto agregado correctamente.")
             return redirect('inventario')
-
     productos = Producto.objects.all()
     return render(request, 'inventario.html', {'productos': productos})
 
 @user_passes_test(lambda u: u.is_superuser)
 def empleado(request):
-    return render(request, 'empleado.html')
+    if request.method == 'POST' and 'registro' in request.POST:
+        username = request.POST.get('username')
+        password1 = request.POST.get('password1')
+        password2 = request.POST.get('password2')
+
+        if password1 != password2:
+            messages.error(request, 'Las contraseñas no coinciden.')
+        elif User.objects.filter(username=username).exists():
+            messages.error(request, 'Ese usuario ya existe.')
+        else:
+            User.objects.create_user(username=username, password=password1)
+            messages.success(request, 'Empleado registrado correctamente.')
+
+    empleados = User.objects.filter(is_superuser=False)
+    return render(request, 'empleado.html', {'empleados': empleados})

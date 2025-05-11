@@ -3,6 +3,9 @@
 
 {% block content %}
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+
 <style>
   body {
     font-family: 'Lato', sans-serif;
@@ -53,8 +56,10 @@
 
   .main {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    align-items: center;
     padding: 40px 60px;
+    gap: 40px;
   }
 
   .panel {
@@ -89,7 +94,8 @@
     font-weight: bold;
   }
 
-  .mode-toggle {
+  .mode-toggle,
+  .logout-button {
     padding: 6px 12px;
     border-radius: 4px;
     cursor: pointer;
@@ -97,13 +103,14 @@
   }
 
   .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
     background-color: red;
     color: white;
     border: none;
-    font-weight: bold;
-    cursor: pointer;
+  }
+
+  .employee-list li {
+    font-size: 18px;
+    margin-bottom: 10px;
   }
 </style>
 
@@ -143,8 +150,65 @@
 
 <div class="main">
   <div class="panel">
-    <h2>Empleados</h2>
-    <p>Aquí irá el contenido de gestión de empleados (CRUD de empleados).</p>
+    <h2>Empleados Registrados</h2>
+    <ul class="employee-list">
+      {% for empleado in empleados %}
+        <li><strong>Usuario:</strong> {{ empleado.username }} | <strong>Email:</strong> {{ empleado.email }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="panel">
+    <button class="btn btn-warning btn-sm mb-3" data-bs-toggle="modal" data-bs-target="#createAccountModal">Crear Cuenta</button>
+  </div>
+</div>
+
+<!-- Modal de creación de cuenta -->
+<div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content bg-dark text-white">
+      <form method="POST" action="{% url 'empleado' %}">
+        {% csrf_token %}
+        <input type="hidden" name="registro" value="1">
+        <div class="modal-header">
+          <h5 class="modal-title" id="createAccountModalLabel">Registrar Nuevo Empleado</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Nombre del Empleado</label>
+            <input type="text" name="nombre" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">RUT del Empleado</label>
+            <input type="text" name="rut" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Edad</label>
+            <input type="number" name="edad" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Nombre de Usuario</label>
+            <input type="text" name="username" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Correo electrónico</label>
+            <input type="email" name="email" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Contraseña</label>
+            <input type="password" name="password1" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirmar Contraseña</label>
+            <input type="password" name="password2" class="form-control" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Crear Cuenta</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 

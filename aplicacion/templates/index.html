@@ -152,10 +152,8 @@
 </head>
 <body>
 
-  <!-- Botón para cambiar tema y crear cuenta -->
   <div class="theme-toggle">
     <button class="btn-toggle" onclick="toggleTheme()">Cambiar Tema</button>
-    <button class="btn-toggle" data-bs-toggle="modal" data-bs-target="#createAccountModal">Crear Cuenta</button>
   </div>
 
   <div class="login-container">
@@ -183,39 +181,6 @@
             <a href="#" class="forgot-password">¿Has olvidado tu contraseña?</a>
           </div>
           <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar sesión</button>
-        </form>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal de creación de cuenta -->
-  <div class="modal fade" id="createAccountModal" tabindex="-1" aria-labelledby="createAccountModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content bg-dark text-white">
-        <form method="POST" action="{% url 'index' %}">
-          {% csrf_token %}
-          <input type="hidden" name="registro" value="1">
-          <div class="modal-header">
-            <h5 class="modal-title" id="createAccountModalLabel">Crear Cuenta</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
-          </div>
-          <div class="modal-body">
-            <div class="mb-3">
-              <label class="form-label">Nombre o RUT de usuario</label>
-              <input type="text" name="username" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Contraseña</label>
-              <input type="password" name="password1" class="form-control" required>
-            </div>
-            <div class="mb-3">
-              <label class="form-label">Confirmar contraseña</label>
-              <input type="password" name="password2" class="form-control" required>
-            </div>
-          </div>
-          <div class="modal-footer">
-            <button type="submit" class="btn btn-warning">Crear Cuenta</button>
-          </div>
         </form>
       </div>
     </div>
