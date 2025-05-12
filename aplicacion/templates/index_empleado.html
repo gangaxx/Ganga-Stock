@@ -39,6 +39,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 10px;
     position: relative;
   }
 
@@ -78,7 +79,6 @@
     display: flex;
     flex-direction: column;
     padding: 40px 60px;
-    height: calc(100vh - 100px);
     box-sizing: border-box;
   }
 
@@ -168,82 +168,59 @@
   .modal {
     display: none;
     position: fixed;
-    z-index: 999;
+    z-index: 1000;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.6);
   }
 
   .modal-content {
-    background-color: #fefefe;
-    margin: 80px auto;
+    background-color: white;
+    margin: 10% auto;
     padding: 20px;
-    border: 1px solid #888;
+    border-radius: 8px;
     width: 80%;
-    max-width: 600px;
-    border-radius: 8px;
-    text-align: center;
-    animation: fadeIn 0.3s ease;
+    max-width: 700px;
+    color: black;
   }
 
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: scale(0.8);
-    }
-
-    to {
-      opacity: 1;
-      transform: scale(1);
-    }
-  }
-
-  .modal-content img {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin-bottom: 20px;
-  }
-
-  .close-modal {
-    color: #aaa;
-    float: right;
-    font-size: 28px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  /* ✅ NUEVOS ESTILOS para visibilidad en modo oscuro */
   body.dark-mode .modal-content {
     background-color: #2b2b2b;
     color: white;
   }
 
-  body.dark-mode #carritoItems td,
-  body.dark-mode #carritoItems th {
-    color: white;
+  .modal-close {
+    float: right;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
   }
 
-  body.dark-mode .inventory-table th {
-    background-color: #444;
-    color: white;
+  .carrito-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .carrito-table th, .carrito-table td {
+    padding: 10px;
+    border: 1px solid #aaa;
+    text-align: center;
+    background-color: inherit;
+    color: inherit;
   }
 </style>
 
-
-
-
-
 <div class="topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
   <div class="topbar-center">
     <span class="welcome-message">Bienvenido, {{ user.username }}</span>
   </div>
   <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">🌙 Oscuro</button>
     <button onclick="toggleCarrito()" class="mode-toggle">🛒 Carrito</button>
     <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
@@ -256,7 +233,6 @@
       <input type="text" placeholder="Buscar producto..." id="busqueda">
     </div>
   </div>
-
   <div class="inventory-box">
     <table class="inventory-table">
       <thead>
@@ -272,34 +248,23 @@
         </tr>
       </thead>
       <tbody>
-  {% for producto in productos %}
-  <tr class="product-row" data-name="{{ producto.nombre }}">
-    <td>
-      <img src="{% static producto.imagen|urlencode %}" alt="{{ producto.nombre }}"
-           class="product-image"
-           data-img="{% static producto.imagen|urlencode %}"
-           data-name="{{ producto.nombre }}"
-           data-price="{{ producto.precio }}">
-    </td>
-    <td>{{ producto.nombre }}</td>
-    <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
-    <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-    <td>
-      <button class="add-button"
-        onclick="addProduct(
-          'prod{{ producto.id }}',
-          '{{ producto.nombre }}',
-          {{ producto.precio }},
-          '{% static producto.imagen|urlencode %}'
-        )">+</button>
-    </td>
-    <td><span id="prov{{ producto.id }}">0</span></td>
-    <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
-    <td class="row-total">$0</td>
-  </tr>
-  {% endfor %}
-</tbody>
-
+        {% for producto in productos %}
+        <tr class="product-row" data-name="{{ producto.nombre }}">
+          <td>
+            <img src="{% static producto.imagen|urlencode %}" alt="{{ producto.nombre }}" class="product-image" data-img="{% static producto.imagen|urlencode %}" data-name="{{ producto.nombre }}" data-price="{{ producto.precio }}">
+          </td>
+          <td>{{ producto.nombre }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
+          <td>
+            <button class="add-button" onclick="addProduct('prod{{ producto.id }}','{{ producto.nombre }}',{{ producto.precio }},'{% static producto.imagen|urlencode %}')">+</button>
+          </td>
+          <td><span id="prov{{ producto.id }}">0</span></td>
+          <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
+          <td class="row-total">$0</td>
+        </tr>
+        {% endfor %}
+      </tbody>
     </table>
     <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">
       Total general: <span id="totalSum">$0</span>
@@ -307,51 +272,42 @@
   </div>
 </div>
 
-<!-- Modal de imagen -->
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="close-modal">&times;</span>
-    <img id="modalImg" src="" alt="Producto">
-    <h2 id="modalTitle"></h2>
-    <p id="modalPrice"></p>
-  </div>
-</div>
-
-<!-- MODAL DE CARRITO -->
+<!-- MODAL CARRITO -->
 <div id="carritoModal" class="modal">
-  <div class="modal-content" style="max-width: 850px;">
-    <span class="close-modal" onclick="toggleCarrito()">&times;</span>
-    <h2 style="margin-bottom: 20px;">Carrito de Compras</h2>
-    <table class="inventory-table" style="width: 100%; font-size: 16px;">
+  <div class="modal-content">
+    <span class="modal-close" onclick="toggleCarrito()">&times;</span>
+    <h2>Carrito de Compras</h2>
+    <table class="carrito-table">
       <thead>
         <tr>
-          <th style="width: 100px;">Producto</th>
+          <th>Producto</th>
           <th>Nombre</th>
           <th>Cantidad</th>
           <th>Total</th>
         </tr>
       </thead>
-      <tbody id="carritoItems">
-        <!-- Se llena dinámicamente -->
-      </tbody>
+      <tbody id="carritoItems"></tbody>
     </table>
-    <div style="margin-top: 20px; font-size: 20px; font-weight: bold; text-align: right;">
-      Total del carrito: <span id="carritoTotal">$0</span>
+    <div style="margin-top: 20px; font-size: 18px; text-align: right;">
+      Total: <span id="carritoTotal">$0</span>
     </div>
     <div style="margin-top: 20px; text-align: center;">
-      <button class="mode-toggle" style="background-color: green; color: white;" onclick="mostrarConfirmacion()">Pagar</button>
+      <button onclick="mostrarConfirmacion()" class="mode-toggle" style="background-color: green; color: white;">Vender</button>
     </div>
   </div>
 </div>
 
-<!-- Modal de confirmación -->
+<!-- MODAL CONFIRMACION -->
 <div id="confirmModal" class="modal">
-  <div class="modal-content" style="max-width: 400px;">
-    <span class="close-modal" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
-    <h2>¿Deseas confirmar esta compra?</h2>
-    <div style="margin-top: 20px;">
-      <button class="mode-toggle" style="background-color: green; color: white;" onclick="confirmarCompra()">Sí, Confirmar</button>
+  <div class="modal-content">
+    <span class="modal-close" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
+    <h2>¿Estás seguro de realizar la venta?</h2>
+    <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
+      <button onclick="confirmarCompra()" class="mode-toggle" style="background-color: green; color: white;">Sí</button>
+      <button onclick="document.getElementById('confirmModal').style.display='none'" class="mode-toggle">No</button>
     </div>
   </div>
 </div>
+
+<script src="{% static 'js/validaciones.js' %}"></script>
 {% endblock %}
