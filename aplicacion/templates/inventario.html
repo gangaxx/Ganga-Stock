@@ -63,7 +63,12 @@
     padding: 20px;
     border-radius: 4px;
     width: 100%;
-    max-width: 1000px;
+    max-width: 1200px;
+  }
+
+  .form-panel {
+    max-width: 600px;
+    margin: 0 auto;
   }
 
   h2 {
@@ -96,15 +101,25 @@
 
   .inventory-table th,
   .inventory-table td {
-    padding: 8px;
+    padding: 12px;
     border: 1px solid #999;
     text-align: center;
+    vertical-align: middle;
+    height: 120px;
   }
 
   .upload-btn {
     background-color: #444;
     color: white;
     cursor: pointer;
+  }
+
+  .add-btn,
+  .remove-btn {
+    font-size: 24px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
   }
 
   .add-btn {
@@ -117,6 +132,15 @@
     background-color: red;
     color: white;
     cursor: pointer;
+  }
+
+  .delete-btn {
+    background-color: #555;
+    color: white;
+    cursor: pointer;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
   }
 
   .topbar {
@@ -149,6 +173,13 @@
     border: none;
     font-weight: bold;
     cursor: pointer;
+  }
+
+  .footer {
+    text-align: center;
+    margin-top: 40px;
+    font-size: 16px;
+    color: #999;
   }
 </style>
 
@@ -191,6 +222,27 @@
       }
     });
   }
+
+  function deleteProduct(productId) {
+    if (!confirm("¿Deseas eliminar este producto completamente?")) return;
+
+    fetch(`/eliminar_producto/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ id: productId })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        location.reload();
+      } else {
+        alert(data.error);
+      }
+    });
+  }
 </script>
 
 <div class="topbar">
@@ -206,7 +258,7 @@
 </div>
 
 <div class="main">
-  <div class="panel">
+  <div class="panel form-panel">
     <h2>Agregar nuevo producto</h2>
     <form method="POST" class="inventory-form">
       {% csrf_token %}
@@ -228,27 +280,42 @@
           <th>Producto</th>
           <th>Nombre</th>
           <th>Precio</th>
-          <th>Agregar Unidad</th>
-          <th>Cantidad</th>
-          <th>Eliminar Unidad</th>
+          <th>Disponibles</th>
+          <th>Agregar</th>
+          <th>Cantidades</th>
+          <th>Eliminar</th>
+          <th>Eliminar Producto</th>
         </tr>
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr>
-          <td><img src="{% static producto.imagen %}" width="50"></td>
+        <tr class="product-row" data-name="{{ producto.nombre }}">
+          <td>
+            <img src="{% static producto.imagen|urlencode %}" alt="{{ producto.nombre }}"
+                 class="product-image"
+                 style="width: 100px; height: 120px; object-fit: cover;">
+          </td>
           <td>{{ producto.nombre }}</td>
-          <td>${{ producto.precio }}</td>
-          <td><button type="button" onclick="updateStock({{ producto.id }}, 'add')" class="add-btn">+</button></td>
-          <td>{{ producto.cantidad }}</td>
-          <td><button type="button" onclick="updateStock({{ producto.id }}, 'remove')" class="remove-btn">-</button></td>
+          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
+          <td>
+            <button class="add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button>
+          </td>
+          <td><span id="prov{{ producto.id }}">0</span></td>
+          <td>
+            <button class="remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button>
+          </td>
+          <td>
+            <button class="delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button>
+          </td>
         </tr>
         {% empty %}
-        <tr><td colspan="6">No hay productos en inventario.</td></tr>
+        <tr><td colspan="8">No hay productos en inventario.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
+  <div class="footer">© 2025 Ganga Stock. Todos los derechos reservados.</div>
 </div>
 
 {% endblock %}

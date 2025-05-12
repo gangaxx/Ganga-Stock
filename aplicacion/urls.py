@@ -14,7 +14,9 @@ urlpatterns = [
     path('inventario/', views.inventario, name='inventario'),
     path('admin_empleado/', views.empleado, name='empleado'),
 
-  # ✅ Nueva ruta agregada
+    # ✅ Rutas necesarias para funciones del inventario
+    path('update_stock/', views.update_stock, name='update_stock'),
+    path('eliminar_producto/', views.eliminar_producto, name='eliminar_producto'),
 ]
 
 if settings.DEBUG:

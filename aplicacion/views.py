@@ -4,6 +4,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 import json
 
 from .models import Producto, Movimiento
@@ -79,13 +80,20 @@ def procesar_compra(request):
 def inventario(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
-        imagen = request.POST.get('imagen')
+        imagen = request.POST.get('imagen')  # Ruta relativa desde static/
         precio = request.POST.get('precio')
         cantidad = request.POST.get('cantidad')
+
         if nombre and imagen and precio and cantidad:
-            Producto.objects.create(nombre=nombre, imagen=imagen, precio=precio, cantidad=cantidad)
+            Producto.objects.create(
+                nombre=nombre,
+                imagen=imagen,
+                precio=precio,
+                cantidad=cantidad
+            )
             messages.success(request, "Producto agregado correctamente.")
             return redirect('inventario')
+
     productos = Producto.objects.all()
     return render(request, 'inventario.html', {'productos': productos})
 
@@ -106,3 +114,35 @@ def empleado(request):
 
     empleados = User.objects.filter(is_superuser=False)
     return render(request, 'empleado.html', {'empleados': empleados})
+
+# ✅ Agregado: actualizar stock
+@csrf_exempt
+@user_passes_test(lambda u: u.is_superuser)
+def update_stock(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            producto = Producto.objects.get(id=data['id'])
+            if data['action'] == 'add':
+                producto.cantidad += 1
+            elif data['action'] == 'remove' and producto.cantidad > 0:
+                producto.cantidad -= 1
+            producto.save()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+# ✅ Agregado: eliminar producto
+@csrf_exempt
+@user_passes_test(lambda u: u.is_superuser)
+def eliminar_producto(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            producto = Producto.objects.get(id=data['id'])
+            producto.delete()
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
