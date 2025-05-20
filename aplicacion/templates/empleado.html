@@ -116,7 +116,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const storedMode = localStorage.getItem('theme') || 'light';
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
   });
@@ -211,5 +211,6 @@
     </div>
   </div>
 </div>
+
 <div class="footer">© 2025 Ganga Stock. Todos los derechos reservados.</div>
 {% endblock %}

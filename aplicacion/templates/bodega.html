@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<!-- BODEGA: bodega.html -->
+<div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="topbar-center">
+    <span class="welcome-message">Bodeguero: {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions">
+    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="panel form-panel">
+    <h2>Agregar Producto a Inventario</h2>
+    <form method="POST">
+      {% csrf_token %}
+      <input type="text" name="imagen" placeholder="Ruta imagen" required>
+      <input type="text" name="nombre" placeholder="Nombre del producto" required>
+      <input type="number" name="precio" placeholder="Precio" step="0.01" required>
+      <input type="number" name="cantidad" placeholder="Cantidad" required>
+      <button type="submit" class="add-btn">Agregar</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Inventario Actual</h2>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Stock</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for producto in productos %}
+        <tr>
+          <td><img src="{% static producto.imagen %}" class="product-image"></td>
+          <td>{{ producto.nombre }}</td>
+          <td>{{ producto.precio }}</td>
+          <td>{{ producto.cantidad }}</td>
+          <td>
+            <button onclick="updateStock({{ producto.id }}, 'add')">+</button>
+            <button onclick="updateStock({{ producto.id }}, 'remove')">-</button>
+            <button onclick="deleteProduct({{ producto.id }})">Eliminar</button>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- CAJERO: cajero.html -->
+<div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="topbar-center">
+    <span class="welcome-message">Cajero: {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions">
+    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="main">
+  <div class="panel">
+    <h2>Revisar Carrito de Compras</h2>
+    <table class="inventory-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Nombre</th>
+          <th>Precio</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in carrito %}
+        <tr>
+          <td><img src="{% static item.imagen %}" class="product-image"></td>
+          <td>{{ item.nombre }}</td>
+          <td>{{ item.precio }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>{{ item.total }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="footer">
+      <strong>Total a Pagar:</strong> {{ total }}
+    </div>
+    <div class="form-submit">
+      <button onclick="procesarVenta()" class="btn btn-success">Confirmar Venta</button>
+      <button onclick="cancelarVenta()" class="btn btn-danger">Cancelar</button>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -182,7 +182,7 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    const storedMode = localStorage.getItem('theme') || 'light';
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
   });
@@ -231,23 +231,22 @@
           </tr>
         </thead>
         <tbody>
-  {% for m in movimientos %}
-    <tr>
-      <td>{{ m.producto.id }}</td>
-      <td>{{ m.producto.nombre }}</td>
-      <td>{{ m.cantidad_vendida }}</td>
-      <td>{{ m.cantidad_devuelta }}</td>
-      <td>{{ m.fecha|date:"d/m/Y" }}</td>
-      <td>{{ m.hora|time:"H:i" }}</td>
-      <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
-    </tr>
-  {% empty %}
-    <tr>
-      <td colspan="7">No hay movimientos registrados.</td>
-    </tr>
-  {% endfor %}
-</tbody>
-
+          {% for m in movimientos %}
+            <tr>
+              <td>{{ m.producto.id }}</td>
+              <td>{{ m.producto.nombre }}</td>
+              <td>{{ m.cantidad_vendida }}</td>
+              <td>{{ m.cantidad_devuelta }}</td>
+              <td>{{ m.fecha|date:"d/m/Y" }}</td>
+              <td>{{ m.hora|time:"H:i" }}</td>
+              <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="7">No hay movimientos registrados.</td>
+            </tr>
+          {% endfor %}
+        </tbody>
       </table>
     </div>
   </div>

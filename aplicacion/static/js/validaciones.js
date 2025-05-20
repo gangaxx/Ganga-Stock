@@ -3,7 +3,7 @@ console.log("scripts.js cargado correctamente.");
 let carrito = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-  const storedMode = localStorage.getItem('theme') || 'dark';
+  const storedMode = localStorage.getItem('theme') || 'light';
   document.body.classList.add(storedMode + '-mode');
   const modeToggle = document.getElementById('modeToggle');
   if (modeToggle) {
