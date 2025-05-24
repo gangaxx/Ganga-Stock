@@ -181,6 +181,42 @@
     font-size: 16px;
     color: #999;
   }
+
+  .modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+
+  .modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 700px;
+    color: black;
+    text-align: center;
+  }
+
+  body.dark-mode .modal-content {
+    background-color: #2b2b2b;
+    color: white;
+  }
+
+  .modal-img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-bottom: 20px;
+  }
 </style>
 
 <script>
@@ -188,6 +224,23 @@
     const storedMode = localStorage.getItem('theme') || 'light';
     document.body.classList.add(storedMode + '-mode');
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+
+    document.querySelectorAll('.product-image').forEach(img => {
+      img.addEventListener('click', () => {
+        const modal = document.getElementById('myModal');
+        document.getElementById('modalImg').src = img.src;
+        document.getElementById('modalTitle').textContent = img.alt;
+        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.closest('tr').querySelector('.price-cell').dataset.price).toLocaleString();
+        modal.style.display = 'block';
+      });
+    });
+
+    window.onclick = event => {
+      const modal = document.getElementById('myModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
   });
 
   function toggleMode() {
@@ -316,6 +369,16 @@
     </table>
   </div>
   <div class="footer">© 2025 Ganga Stock. Todos los derechos reservados.</div>
+</div>
+
+<!-- Modal de imagen y detalle -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+    <img id="modalImg" class="modal-img" src="" alt="Producto">
+    <h3 id="modalTitle"></h3>
+    <p id="modalPrice"></p>
+  </div>
 </div>
 
 {% endblock %}

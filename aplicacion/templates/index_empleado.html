@@ -185,6 +185,7 @@
     width: 80%;
     max-width: 700px;
     color: black;
+    text-align: center;
   }
 
   body.dark-mode .modal-content {
@@ -197,6 +198,14 @@
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
+  }
+
+  .modal-img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+    border-radius: 6px;
+    margin-bottom: 20px;
   }
 
   .carrito-table {
@@ -309,5 +318,35 @@
   </div>
 </div>
 
+<!-- MODAL DETALLE DE IMAGEN -->
+<div id="myModal" class="modal">
+  <div class="modal-content">
+    <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+    <img id="modalImg" class="modal-img" src="" alt="Producto">
+    <h3 id="modalTitle"></h3>
+    <p id="modalPrice"></p>
+  </div>
+</div>
+
 <script src="{% static 'js/validaciones.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.product-image').forEach(img => {
+      img.addEventListener('click', () => {
+        const modal = document.getElementById('myModal');
+        document.getElementById('modalImg').src = img.dataset.img;
+        document.getElementById('modalTitle').textContent = img.dataset.name;
+        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.dataset.price).toLocaleString();
+        modal.style.display = 'block';
+      });
+    });
+
+    window.onclick = event => {
+      const modal = document.getElementById('myModal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
+  });
+</script>
 {% endblock %}
