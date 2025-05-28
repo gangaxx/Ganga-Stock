@@ -2,6 +2,19 @@ console.log("scripts.js cargado correctamente.");
 
 let carrito = [];
 
+function cerrarModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.classList.remove('show');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+    modal.setAttribute('tabindex', '-1');
+    document.body.classList.remove('modal-open');
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) modalBackdrop.remove();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   const storedMode = localStorage.getItem('theme') || 'light';
   document.body.classList.add(storedMode + '-mode');
@@ -34,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('myModal');
     const confirmModal = document.getElementById('confirmModal');
     if (event.target === modal) modal.style.display = 'none';
-    if (event.target === confirmModal) confirmModal.style.display = 'none';
+    if (event.target === confirmModal) modal.style.display = 'none';
   };
 
   const searchInput = document.getElementById('busqueda');
@@ -45,6 +58,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const nombre = row.dataset.name.toLowerCase();
         row.style.display = nombre.includes(filtro) ? '' : 'none';
       });
+    });
+  }
+
+  const formCrearCuenta = document.getElementById('formCrearCuenta');
+  if (formCrearCuenta) {
+    formCrearCuenta.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const password1 = formCrearCuenta.querySelector('input[name="password"]').value;
+      const password2 = formCrearCuenta.querySelector('input[name="confirm_password"]').value;
+
+      if (password1 !== password2) {
+        alert('❌ Las contraseñas no coinciden.');
+        return;
+      }
+
+      const formData = new FormData(formCrearCuenta);
+      fetch('/admin_empleado/', {
+        method: 'POST',
+        headers: {
+          'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: formData
+      })
+      .then(res => res.ok ? res.text() : Promise.reject('Error al crear usuario'))
+      .then(() => {
+        document.getElementById('mensajeResultado').innerHTML = `<p>Cuenta creada con éxito.</p>`;
+        new bootstrap.Modal(document.getElementById('resultadoModal')).show();
+        cerrarModal('confirmModal');
+        cerrarModal('crearCuentaModal');
+        setTimeout(() => location.reload(), 1500);
+      })
+      .catch(err => alert('❌ Error: ' + err));
     });
   }
 });

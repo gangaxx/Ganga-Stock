@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Producto, Movimiento
+from .models import Producto, Movimiento, PerfilUsuario
 
 def index(request):
     if request.method == 'POST':
@@ -19,7 +19,20 @@ def index(request):
             if user is not None:
                 login(request, user)
                 request.session['nombre_usuario'] = user.username
-                return redirect('index_admin' if user.is_superuser else 'index_empleado')
+
+                if user.is_superuser:
+                    return redirect('index_admin')
+                try:
+                    perfil = PerfilUsuario.objects.get(user=user)
+                    if perfil.rol == 'vendedor':
+                        return redirect('vendedor')
+                    elif perfil.rol == 'bodeguero':
+                        return redirect('bodeguero')
+                    elif perfil.rol == 'cajero':
+                        return redirect('cajero')
+                except PerfilUsuario.DoesNotExist:
+                    messages.error(request, 'Perfil de usuario no encontrado.')
+                    return redirect('index')
             else:
                 messages.error(request, 'Credenciales incorrectas.')
 
@@ -42,15 +55,6 @@ def index(request):
 def index_admin(request):
     movimientos = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     return render(request, 'index_admin.html', {'movimientos': movimientos})
-
-def is_empleado(user):
-    return user.is_authenticated and not user.is_superuser
-
-@login_required
-@user_passes_test(is_empleado)
-def index_empleado(request):
-    productos = Producto.objects.all()
-    return render(request, 'index_empleado.html', {'productos': productos})
 
 def cerrar_sesion(request):
     logout(request)
@@ -80,7 +84,7 @@ def procesar_compra(request):
 def inventario(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
-        imagen = request.POST.get('imagen')  # Ruta relativa desde static/
+        imagen = request.POST.get('imagen')
         precio = request.POST.get('precio')
         cantidad = request.POST.get('cantidad')
 
@@ -99,23 +103,42 @@ def inventario(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def empleado(request):
-    if request.method == 'POST' and 'registro' in request.POST:
+    if request.method == 'POST':
         username = request.POST.get('username')
-        password1 = request.POST.get('password1')
-        password2 = request.POST.get('password2')
+        password1 = request.POST.get('password')
+        password2 = request.POST.get('confirm_password')
+        nombre = request.POST.get('nombre')
+        email = request.POST.get('email')
+        rut = request.POST.get('rut')
+        fecha_nacimiento = request.POST.get('fecha_nacimiento')
+        genero = request.POST.get('genero')
+        rol = request.POST.get('rol')
 
         if password1 != password2:
             messages.error(request, 'Las contraseñas no coinciden.')
         elif User.objects.filter(username=username).exists():
             messages.error(request, 'Ese usuario ya existe.')
         else:
-            User.objects.create_user(username=username, password=password1)
-            messages.success(request, 'Empleado registrado correctamente.')
+            user = User.objects.create_user(username=username, password=password1, email=email, first_name=nombre)
+            PerfilUsuario.objects.create(user=user, rol=rol, rut=rut, fecha_nacimiento=fecha_nacimiento, genero=genero)
+            messages.success(request, f'{rol.capitalize()} registrado correctamente.')
 
     empleados = User.objects.filter(is_superuser=False)
-    return render(request, 'empleado.html', {'empleados': empleados})
+    perfiles = PerfilUsuario.objects.filter(user__in=empleados)
+    empleados_info = [
+        {
+            'username': e.username,
+            'email': e.email,
+            'nombre': e.first_name,
+            'rut': perfiles.get(user=e).rut if perfiles.filter(user=e).exists() else '',
+            'fecha_nacimiento': perfiles.get(user=e).fecha_nacimiento if perfiles.filter(user=e).exists() else '',
+            'genero': perfiles.get(user=e).genero if perfiles.filter(user=e).exists() else '',
+            'rol': perfiles.get(user=e).rol if perfiles.filter(user=e).exists() else '',
+            'id': e.id,
+        } for e in empleados
+    ]
+    return render(request, 'empleado.html', {'empleados': empleados_info})
 
-# ✅ Agregado: actualizar stock
 @csrf_exempt
 @user_passes_test(lambda u: u.is_superuser)
 def update_stock(request):
@@ -133,7 +156,6 @@ def update_stock(request):
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
-# ✅ Agregado: eliminar producto
 @csrf_exempt
 @user_passes_test(lambda u: u.is_superuser)
 def eliminar_producto(request):
@@ -146,3 +168,18 @@ def eliminar_producto(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+def cajero(request):
+    productos = Producto.objects.all()
+    return render(request, 'cajero.html', {'productos': productos})
+
+@login_required
+def bodeguero(request):
+    productos = Producto.objects.all()
+    return render(request, 'bodega.html', {'productos': productos})
+
+@login_required
+def vendedor(request):
+    productos = Producto.objects.all()
+    return render(request, 'vendedor.html', {'productos': productos})

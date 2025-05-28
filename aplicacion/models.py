@@ -3,11 +3,15 @@ from django.db import models
 
 class PerfilUsuario(models.Model):
     ROLES = (
-        ('admin', 'Administrador'),
-        ('empleado', 'Empleado'),
+        ('vendedor', 'Vendedor'),
+        ('bodeguero', 'Bodeguero'),
+        ('cajero', 'Cajero'),
     )
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     rol = models.CharField(max_length=10, choices=ROLES)
+    rut = models.CharField(max_length=20)
+    fecha_nacimiento = models.DateField()
+    genero = models.CharField(max_length=10)
 
     def __str__(self):
         return f"{self.user.username} - {self.rol}"

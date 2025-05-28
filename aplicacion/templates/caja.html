@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  body {
+    font-family: 'Lato', sans-serif;
+    background-color: #ffffff;
+    color: #1e1e1e;
+    margin: 0;
+    padding: 0;
+  }
+
+  .topbar {
+    background-color: black;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .topbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .welcome-message {
+    font-size: 42px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .logout-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .main-content {
+    padding: 40px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .carrito-box {
+    width: 100%;
+    max-width: 1000px;
+    background-color: #f0f0f0;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+  }
+
+  .carrito-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .carrito-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .carrito-table th, .carrito-table td {
+    padding: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+    background-color: inherit;
+  }
+
+  .carrito-table img {
+    width: 100px;
+    border-radius: 4px;
+  }
+
+  .total-section {
+    text-align: right;
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+  }
+</style>
+
+<div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="topbar-center">
+    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions" style="display: flex; gap: 10px;">
+    <button class="logout-button" onclick="window.location.href='{% url 'cerrar_sesion' %}'">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="main-content">
+  <div class="carrito-box">
+    <h2>Resumen del Carrito</h2>
+    <table class="carrito-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="carritoItems">
+        <!-- Datos se deben poblar desde la vista Django -->
+        {% for item in carrito %}
+        <tr>
+          <td><img src="{% static item.img %}" alt="{{ item.name }}"></td>
+          <td>{{ item.name }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>${{ item.total }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay productos en el carrito.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="total-section">
+      Total a pagar: <span id="carritoTotal">${{ total }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}
