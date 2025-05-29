@@ -37,3 +37,15 @@ class Movimiento(models.Model):
 
     def __str__(self):
         return f"{self.producto.nombre} - {self.empleado.username} - {self.fecha}"
+
+
+class EmpleadoEliminado(models.Model):
+    username = models.CharField(max_length=150)
+    email = models.EmailField()
+    nombre = models.CharField(max_length=255)
+    rut = models.CharField(max_length=12)
+    fecha_nacimiento = models.DateField()
+    genero = models.CharField(max_length=20)
+
+    def __str__(self):
+        return self.username

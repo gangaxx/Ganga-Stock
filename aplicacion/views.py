@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Producto, Movimiento, PerfilUsuario
+from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado
 
 def index(request):
     if request.method == 'POST':
@@ -183,3 +183,38 @@ def bodeguero(request):
 def vendedor(request):
     productos = Producto.objects.all()
     return render(request, 'vendedor.html', {'productos': productos})
+
+@csrf_exempt
+def eliminar_empleado(request, id):
+    if request.method == 'POST' and request.headers.get('Content-Type') == 'application/json':
+        try:
+            user = User.objects.get(id=id)
+            perfil = PerfilUsuario.objects.get(user=user)
+
+            EmpleadoEliminado.objects.create(
+                username=user.username,
+                email=user.email,
+                nombre=perfil.user.first_name + " " + perfil.user.last_name,
+                rut=perfil.rut,
+                fecha_nacimiento=perfil.fecha_nacimiento,
+                genero=perfil.genero,
+            )
+
+            perfil.delete()
+            user.delete()
+
+            return JsonResponse({
+                'success': True,
+                'usuario': {
+                    'username': user.username,
+                    'email': user.email,
+                    'nombre': perfil.user.first_name + " " + perfil.user.last_name,
+                    'rut': perfil.rut,
+                    'fecha_nacimiento': perfil.fecha_nacimiento.strftime('%d/%m/%Y'),
+                    'genero': perfil.genero,
+                }
+            })
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido o cabecera incorrecta'}, status=400)

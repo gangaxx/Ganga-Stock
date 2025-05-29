@@ -208,7 +208,7 @@
         </thead>
         <tbody>
           {% for empleado in empleados %}
-          <tr>
+          <tr id="empleado-{{ empleado.id }}">
             <td>{{ empleado.username }}</td>
             <td>{{ empleado.email }}</td>
             <td>{{ empleado.nombre }}</td>
@@ -235,7 +235,7 @@
             <th>Género</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody id="tablaEliminados">
           {% for eliminado in empleados_eliminados %}
           <tr>
             <td>{{ eliminado.username }}</td>
@@ -348,9 +348,22 @@
 
 
 
-
-
 <script>
+  function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+
   function abrirModal(rol) {
     document.getElementById('rolUsuario').value = rol;
     new bootstrap.Modal(document.getElementById('crearCuentaModal')).show();
@@ -373,7 +386,6 @@
     const form = document.getElementById('formCrearCuenta');
     form.submit();
 
-    // Mostrar modal resultado después de enviar el formulario
     const modal = new bootstrap.Modal(document.getElementById('resultadoModal'));
     document.getElementById('mensajeResultado').innerHTML = `<p>Cuenta creada con éxito.</p>`;
     modal.show();
@@ -383,16 +395,45 @@
   }
 
   function eliminarCuenta(id) {
-    if (confirm("¿Deseas eliminar esta cuenta?")) {
-      alert("Cuenta con ID " + id + " eliminada (simulado)");
-    }
-  }
+    if (!confirm("¿Deseas eliminar esta cuenta?")) return;
 
-  document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(storedMode + '-mode');
-    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
-  });
+    fetch(`/eliminar_empleado/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Error en la respuesta del servidor');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        document.getElementById(`empleado-${id}`).remove();
+        const tabla = document.getElementById('tablaEliminados');
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${data.usuario.username}</td>
+          <td>${data.usuario.email}</td>
+          <td>${data.usuario.nombre}</td>
+          <td>${data.usuario.rut}</td>
+          <td>${data.usuario.fecha_nacimiento}</td>
+          <td>${data.usuario.genero}</td>
+        `;
+        tabla.appendChild(fila);
+      } else {
+        alert("Error al eliminar: " + data.error);
+      }
+    })
+    .catch(error => {
+      console.error('Error al eliminar empleado:', error);
+      alert("❌ Error inesperado. Revisa la consola.");
+    });
+  }
 
   function toggleMode() {
     const isDark = document.body.classList.contains('dark-mode');
@@ -402,12 +443,19 @@
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
 
+  document.addEventListener('DOMContentLoaded', () => {
+    const storedMode = localStorage.getItem('theme') || 'light';
+    document.body.classList.add(storedMode + '-mode');
+    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  });
+
   function confirmLogout() {
     if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
       window.location.href = "{% url 'cerrar_sesion' %}";
     }
   }
 </script>
+
 
 
 {% endblock %}
