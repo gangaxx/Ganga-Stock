@@ -137,7 +137,13 @@ def empleado(request):
             'id': e.id,
         } for e in empleados
     ]
-    return render(request, 'empleado.html', {'empleados': empleados_info})
+
+    eliminados = EmpleadoEliminado.objects.all()
+
+    return render(request, 'empleado.html', {
+        'empleados': empleados_info,
+        'empleados_eliminados': eliminados
+    })
 
 @csrf_exempt
 @user_passes_test(lambda u: u.is_superuser)
