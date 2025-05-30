@@ -214,8 +214,9 @@
   </div>
 </div>
 
-<div class="main">
-  <div class="panel left-panel-admin">
+<div class="main" style="gap: 40px;">
+  <!-- PANEL IZQUIERDO -->
+  <div class="panel left-panel-admin" style="flex: 1 1 60%;">
     <h2>Historial de movimientos</h2>
     <div class="history-box">
       <table class="history-table">
@@ -232,35 +233,41 @@
         </thead>
         <tbody>
           {% for m in movimientos %}
-            <tr>
-              <td>{{ m.producto.id }}</td>
-              <td>{{ m.producto.nombre }}</td>
-              <td>{{ m.cantidad_vendida }}</td>
-              <td>{{ m.cantidad_devuelta }}</td>
-              <td>{{ m.fecha|date:"d/m/Y" }}</td>
-              <td>{{ m.hora|time:"H:i" }}</td>
-              <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
-            </tr>
+          <tr>
+            <td>{{ m.producto.id }}</td>
+            <td>{{ m.producto.nombre }}</td>
+            <td>{{ m.cantidad_vendida }}</td>
+            <td>{{ m.cantidad_devuelta }}</td>
+            <td>{{ m.fecha|date:"d/m/Y" }}</td>
+            <td>{{ m.hora|time:"H:i" }}</td>
+            <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
+          </tr>
           {% empty %}
-            <tr>
-              <td colspan="7">No hay movimientos registrados.</td>
-            </tr>
+          <tr>
+            <td colspan="7">No hay movimientos registrados.</td>
+          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
-  <div class="panel right-panel-admin">
-    <h2>Base de datos</h2>
-    <div class="section">
-      <div class="section-title">Inventario</div>
-      <button class="style-button" onclick="window.location.href='{% url 'inventario' %}'">Ver todo</button>
+
+  <!-- PANEL DERECHO AJUSTADO A 270px -->
+  <div class="panel right-panel-admin" style="flex: 0 0 270px;">
+    <h2 style="font-size: 1.2rem;">Base de datos</h2>
+
+    <div class="section d-flex align-items-center justify-content-between mb-3">
+      <div class="section-title" style="font-size: 1rem;">Inventario</div>
+      <a href="{% url 'inventario' %}" class="btn btn-warning" style="font-size: 1rem; padding: 4px 12px;">Ver todo</a>
     </div>
-    <div class="section">
-      <div class="section-title">Empleados</div>
-      <button class="style-button" onclick="window.location.href='{% url 'empleado' %}'">Ver todo</button>
+
+    <div class="section d-flex align-items-center justify-content-between">
+      <div class="section-title" style="font-size: 1rem;">Empleados</div>
+      <a href="{% url 'empleado' %}" class="btn btn-warning" style="font-size: 1rem; padding: 4px 12px;">Ver todo</a>
     </div>
   </div>
 </div>
+
+
 
 {% endblock %}
