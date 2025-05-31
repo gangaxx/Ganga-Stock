@@ -84,7 +84,7 @@ def procesar_compra(request):
 def inventario(request):
     if request.method == 'POST':
         nombre = request.POST.get('nombre')
-        imagen = request.POST.get('imagen')
+        imagen = request.FILES.get('imagen')
         precio = request.POST.get('precio')
         cantidad = request.POST.get('cantidad')
 

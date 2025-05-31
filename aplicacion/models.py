@@ -19,7 +19,7 @@ class PerfilUsuario(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
-    imagen = models.CharField(max_length=255)  # Ruta relativa a la carpeta static
+    imagen = models.ImageField(upload_to='productos/')  # Ahora usa ImageField
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.IntegerField(default=0)
 

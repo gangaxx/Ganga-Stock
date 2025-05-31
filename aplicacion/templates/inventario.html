@@ -313,9 +313,9 @@
 <div class="main">
   <div class="panel form-panel">
     <h2>Agregar nuevo producto</h2>
-    <form method="POST" class="inventory-form">
+    <form method="POST" class="inventory-form" enctype="multipart/form-data">
       {% csrf_token %}
-      <input type="text" name="imagen" placeholder="Ruta imagen ej: img/discos/ejemplo.jpg" required>
+      <input type="file" name="imagen" accept="image/*" required>
       <input type="text" name="nombre" placeholder="Nombre del producto" required>
       <input type="number" name="precio" placeholder="Precio" step="0.01" required>
       <input type="number" name="cantidad" placeholder="Unidades" required>
@@ -344,9 +344,13 @@
         {% for producto in productos %}
         <tr class="product-row" data-name="{{ producto.nombre }}">
           <td>
-            <img src="{% static producto.imagen|urlencode %}" alt="{{ producto.nombre }}"
-                 class="product-image"
-                 style="width: 100px; height: 120px; object-fit: cover;">
+            {% if producto.imagen %}
+              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
+                   class="product-image"
+                   style="width: 100px; height: 120px; object-fit: cover;">
+            {% else %}
+              <span style="color: red;">Sin imagen</span>
+            {% endif %}
           </td>
           <td>{{ producto.nombre }}</td>
           <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
@@ -380,5 +384,7 @@
     <p id="modalPrice"></p>
   </div>
 </div>
+
+
 
 {% endblock %}

@@ -13,17 +13,13 @@ urlpatterns = [
     path('procesar_compra/', views.procesar_compra, name='procesar_compra'),
     path('inventario/', views.inventario, name='inventario'),
     path('admin_empleado/', views.empleado, name='empleado'),
-
     path('cajero/', views.cajero, name='cajero'),
     path('bodega/', views.bodeguero, name='bodeguero'),
-
-
     path('update_stock/', views.update_stock, name='update_stock'),
     path('eliminar_producto/', views.eliminar_producto, name='eliminar_producto'),
-
-    # Nueva ruta para eliminar empleados
     path('eliminar_empleado/<int:id>/', views.eliminar_empleado, name='eliminar_empleado'),
 ]
 
+# Servir archivos media en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
