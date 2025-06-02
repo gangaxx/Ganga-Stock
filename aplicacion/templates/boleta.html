@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<style>
+  .topbar {
+    background-color: black;
+    padding: 20px 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+
+  .topbar-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .welcome-message {
+    font-size: 42px;
+    color: white;
+    font-weight: bold;
+  }
+
+  .mode-toggle {
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background-color: #333;
+    color: #ff0;
+    border: 1px solid #ff0;
+  }
+
+  .logout-button {
+    padding: 6px 12px;
+    border-radius: 4px;
+    background-color: red;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .boleta-container {
+    padding: 40px 60px;
+  }
+
+  .boleta-box {
+    background: white;
+    border-radius: 10px;
+    padding: 30px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+  }
+
+  .boleta-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  .boleta-table th, .boleta-table td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+  }
+
+  .boleta-total {
+    text-align: right;
+    font-size: 20px;
+    font-weight: bold;
+    margin-top: 10px;
+    color: green;
+  }
+
+  .boleta-codigo {
+    text-align: right;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+  }
+
+  body.dark-mode .boleta-box {
+    background: #2b2b2b;
+    color: white;
+  }
+
+  body.dark-mode .boleta-table th, body.dark-mode .boleta-table td {
+    border: 1px solid #666;
+  }
+</style>
+
+<div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
+  <div class="topbar-center">
+    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions" style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">🌙 Oscuro</button>
+    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="boleta-container">
+  <div class="boleta-box">
+    <h2 style="text-align: center; margin-bottom: 30px;">Boleta de Venta</h2>
+
+    <table class="boleta-table">
+      <thead>
+        <tr>
+          <th>Imagen</th>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in carrito %}
+        <tr>
+          <td><img src="{{ item.img }}" alt="{{ item.nombre }}" width="80" style="border-radius: 6px;"></td>
+          <td>{{ item.nombre }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>${{ item.precio|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="boleta-total">
+      Total: ${{ total|floatformat:0 }}
+    </div>
+
+    <div class="boleta-codigo">
+      Código de Venta: <strong>{{ codigo }}</strong>
+    </div>
+  </div>
+</div>
+
+<script>
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "/cerrar_sesion/";
+    }
+  }
+
+  function toggleMode() {
+    const isDark = document.body.classList.contains('dark-mode');
+    document.body.classList.toggle('dark-mode', !isDark);
+    document.body.classList.toggle('light-mode', isDark);
+    const modeToggle = document.getElementById('modeToggle');
+    if (modeToggle) {
+      modeToggle.innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    }
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  }
+</script>
+{% endblock %}

@@ -49,3 +49,10 @@ class EmpleadoEliminado(models.Model):
 
     def __str__(self):
         return self.username
+
+
+class CarritoTemporal(models.Model):
+    codigo = models.CharField(max_length=6, unique=True)
+    productos = models.JSONField()  # [{id, nombre, cantidad, precio, imagen_url}]
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    creado = models.DateTimeField(auto_now_add=True)

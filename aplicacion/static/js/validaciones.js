@@ -1,6 +1,6 @@
 console.log("scripts.js cargado correctamente.");
 
-let carrito = [];
+let carrito = JSON.parse(localStorage.getItem("carrito") || "[]");
 
 function cerrarModal(modalId) {
   const modal = document.getElementById(modalId);
@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('myModal');
     const confirmModal = document.getElementById('confirmModal');
     if (event.target === modal) modal.style.display = 'none';
-    if (event.target === confirmModal) modal.style.display = 'none';
+    if (event.target === confirmModal) confirmModal.style.display = 'none';
   };
 
   const searchInput = document.getElementById('busqueda');
@@ -128,7 +128,7 @@ function getCookie(name) {
 }
 
 function addProduct(prodId, name, price, img) {
-  const idNum = prodId.replace('prod', '');
+  const idNum = parseInt(prodId.replace('prod', ''));
   const seleccionada = document.getElementById('prov' + idNum);
   if (seleccionada) seleccionada.innerText++;
   updateTotal();
@@ -139,13 +139,14 @@ function addProduct(prodId, name, price, img) {
   if (item) {
     item.cantidad++;
   } else {
-    carrito.push({ id: idNum, name, price, img: safeImg, cantidad: 1 });
+    carrito.push({ id: idNum, nombre: name, precio: price, img: safeImg, cantidad: 1 });
   }
+  localStorage.setItem("carrito", JSON.stringify(carrito));
   updateCarrito();
 }
 
 function removeProduct(prodId) {
-  const idNum = prodId.replace('prod', '');
+  const idNum = parseInt(prodId.replace('prod', ''));
   const seleccionada = document.getElementById('prov' + idNum);
   if (seleccionada && parseInt(seleccionada.innerText) > 0) {
     seleccionada.innerText--;
@@ -155,6 +156,7 @@ function removeProduct(prodId) {
     if (index !== -1) {
       carrito[index].cantidad--;
       if (carrito[index].cantidad === 0) carrito.splice(index, 1);
+      localStorage.setItem("carrito", JSON.stringify(carrito));
       updateCarrito();
     }
   }
@@ -195,13 +197,13 @@ function updateCarrito() {
   let total = 0;
 
   carrito.forEach(p => {
-    const subtotal = p.price * p.cantidad;
+    const subtotal = p.precio * p.cantidad;
     total += subtotal;
 
     container.innerHTML += `
       <tr>
         <td><img src="${p.img}" width="60" style="border-radius: 4px;"></td>
-        <td>${p.name}</td>
+        <td>${p.nombre}</td>
         <td>${p.cantidad}</td>
         <td>${subtotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>
       </tr>
@@ -232,35 +234,40 @@ function mostrarConfirmacion() {
 
 function confirmarCompra() {
   if (carrito.length === 0) {
-    alert('El carrito está vacío');
+    alert("El carrito está vacío");
     return;
   }
 
-  fetch('/procesar_compra/', {
+  const codigo = Math.floor(100000 + Math.random() * 900000);
+  console.log(">> Intentando guardar carrito con código:", codigo);
+
+  fetch('/guardar_carrito/', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-CSRFToken': getCookie('csrftoken')
     },
-    body: JSON.stringify({ carrito: carrito })
+    body: JSON.stringify({ codigo: codigo, carrito: carrito })
   })
   .then(response => response.json())
   .then(data => {
+    console.log(">> Respuesta del servidor:", data);
     if (data.success) {
-      alert('✅ Venta efectuada con éxito.');
-      carrito = [];
+      document.getElementById('confirmModal').style.display = 'none';
+
+      localStorage.removeItem('carrito');
+      carrito.length = 0;
       updateCarrito();
       updateTotal();
       document.querySelectorAll('span[id^="prov"]').forEach(span => span.innerText = '0');
-      document.getElementById('carritoModal').style.display = 'none';
-      document.getElementById('confirmModal').style.display = 'none';
-      location.reload();
+
+      window.location.href = `/boleta/${codigo}/`;
     } else {
       alert('❌ Error: ' + data.error);
     }
   })
   .catch(error => {
-    console.error('Error:', error);
-    alert('❌ Error al procesar la compra.');
+    console.error('Error al guardar carrito:', error);
+    alert('Error de red o del servidor.');
   });
 }

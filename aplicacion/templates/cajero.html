@@ -48,6 +48,31 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: 40px;
+  }
+
+  .codigo-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .codigo-form input {
+    padding: 10px;
+    font-size: 18px;
+    width: 300px;
+    text-align: center;
+  }
+
+  .codigo-form button {
+    background-color: green;
+    color: white;
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
   }
 
   .carrito-box {
@@ -87,6 +112,21 @@
     font-size: 20px;
     font-weight: bold;
   }
+
+  .confirmar-btn {
+    margin-top: 30px;
+    text-align: center;
+  }
+
+  .confirmar-btn button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 25px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
 </style>
 
 <div class="topbar">
@@ -100,6 +140,13 @@
 </div>
 
 <div class="main-content">
+  <form method="GET" class="codigo-form">
+    <h2>Buscar carrito con código</h2>
+    <input type="text" name="codigo" placeholder="Ingresa el código de 6 dígitos" required maxlength="6">
+    <button type="submit">Ver Carrito</button>
+  </form>
+
+  {% if carrito %}
   <div class="carrito-box">
     <h2>Resumen del Carrito</h2>
     <table class="carrito-table">
@@ -111,23 +158,52 @@
           <th>Total</th>
         </tr>
       </thead>
-      <tbody id="carritoItems">
-        <!-- Datos se deben poblar desde la vista Django -->
+      <tbody>
         {% for item in carrito %}
         <tr>
-          <td><img src="{% static item.img %}" alt="{{ item.name }}"></td>
-          <td>{{ item.name }}</td>
+          <td><img src="{{ item.imagen_url }}" alt="{{ item.nombre }}"></td>
+          <td>{{ item.nombre }}</td>
           <td>{{ item.cantidad }}</td>
           <td>${{ item.total }}</td>
         </tr>
-        {% empty %}
-        <tr><td colspan="4">No hay productos en el carrito.</td></tr>
         {% endfor %}
       </tbody>
     </table>
     <div class="total-section">
-      Total a pagar: <span id="carritoTotal">${{ total }}</span>
+      Total a pagar: ${{ total_general }}
+    </div>
+    <div class="confirmar-btn">
+      <input type="hidden" id="codigoVenta" value="{{ request.GET.codigo }}">
+      <button onclick="confirmarVenta()">Confirmar Venta</button>
     </div>
   </div>
+  {% endif %}
 </div>
+
+<script>
+  function confirmarVenta() {
+    const codigo = document.getElementById("codigoVenta").value;
+    fetch("/cajero/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ codigo: codigo })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert("✅ Venta confirmada correctamente");
+        window.location.href = "/cajero/";
+      } else {
+        alert("❌ Error: " + data.error);
+      }
+    })
+    .catch(error => {
+      alert("Error de red o del servidor.");
+      console.error("Error:", error);
+    });
+  }
+</script>
 {% endblock %}

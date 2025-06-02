@@ -1,7 +1,7 @@
 from django.urls import path
 from aplicacion import views
-from django.conf.urls.static import static
 from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('', views.index, name='index'),
@@ -18,8 +18,9 @@ urlpatterns = [
     path('update_stock/', views.update_stock, name='update_stock'),
     path('eliminar_producto/', views.eliminar_producto, name='eliminar_producto'),
     path('eliminar_empleado/<int:id>/', views.eliminar_empleado, name='eliminar_empleado'),
+    path('guardar_carrito/', views.guardar_carrito, name='guardar_carrito'),
+    path('boleta/<str:codigo>/', views.boleta, name='boleta'),
 ]
 
-# Servir archivos media en desarrollo
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

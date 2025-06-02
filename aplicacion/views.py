@@ -9,6 +9,9 @@ import json
 
 from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado
 
+# Diccionario temporal para guardar carritos
+carritos_guardados = {}
+
 def index(request):
     if request.method == 'POST':
         if 'login' in request.POST:
@@ -177,8 +180,14 @@ def eliminar_producto(request):
 
 @login_required
 def cajero(request):
-    productos = Producto.objects.all()
-    return render(request, 'cajero.html', {'productos': productos})
+    codigo = request.GET.get("codigo")
+    carrito = carritos_guardados.get(codigo, []) if codigo else []
+    total_general = sum(item['precio'] * item['cantidad'] for item in carrito)
+    for item in carrito:
+        item['total'] = item['precio'] * item['cantidad']
+        item['nombre'] = item.get('nombre', item.get('name'))
+        item['imagen_url'] = item.get('imagen_url', item.get('img'))
+    return render(request, 'cajero.html', {'carrito': carrito, 'total_general': total_general})
 
 @login_required
 def bodeguero(request):
@@ -224,3 +233,36 @@ def eliminar_empleado(request, id):
             return JsonResponse({'success': False, 'error': str(e)})
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido o cabecera incorrecta'}, status=400)
+
+@csrf_exempt
+@login_required
+def guardar_carrito(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            codigo = str(data.get('codigo'))
+            carrito = data.get('carrito', [])
+
+            print(">> Código recibido:", codigo)
+            print(">> Carrito recibido:", carrito)
+
+            carritos_guardados[codigo] = carrito
+            return JsonResponse({'success': True})
+        except Exception as e:
+            print(">> Error en guardar_carrito:", str(e))
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+def boleta(request, codigo):
+    carrito = carritos_guardados.get(codigo, [])
+    for item in carrito:
+        item['nombre'] = item.get('nombre', item.get('name'))
+        item['imagen_url'] = item.get('imagen_url', item.get('img'))
+    total = sum(item['precio'] * item['cantidad'] for item in carrito)
+    return render(request, 'boleta.html', {
+        'carrito': carrito,
+        'codigo': codigo,
+        'total': total
+    })
