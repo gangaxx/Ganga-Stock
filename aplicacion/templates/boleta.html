@@ -3,6 +3,16 @@
 
 {% block content %}
 <style>
+  body {
+    background-color: #ffffff;
+    color: #000000;
+  }
+
+  body.dark-mode {
+    background-color: #2b2b2b;
+    color: white;
+  }
+
   .topbar {
     background-color: black;
     padding: 20px 40px;
@@ -148,14 +158,25 @@
   }
 
   function toggleMode() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
+    const isLight = document.body.classList.contains('light-mode');
+    document.body.classList.toggle('light-mode', !isLight);
+    document.body.classList.toggle('dark-mode', isLight);
     const modeToggle = document.getElementById('modeToggle');
     if (modeToggle) {
-      modeToggle.innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+      modeToggle.innerText = isLight ? '🌙 Oscuro' : '☀ Claro';
     }
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+    localStorage.setItem('theme', isLight ? 'dark' : 'light');
   }
+
+  // Establece el modo claro por defecto
+  document.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('theme') || 'light';
+    document.body.classList.toggle('dark-mode', theme === 'dark');
+    document.body.classList.toggle('light-mode', theme !== 'dark');
+    const modeToggle = document.getElementById('modeToggle');
+    if (modeToggle) {
+      modeToggle.innerText = theme === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+    }
+  });
 </script>
 {% endblock %}
