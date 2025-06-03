@@ -183,7 +183,7 @@
 <script>
   function confirmarVenta() {
     const codigo = document.getElementById("codigoVenta").value;
-    fetch("/cajero/", {
+    fetch("/confirmar_venta/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

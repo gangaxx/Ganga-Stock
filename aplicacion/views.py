@@ -149,7 +149,7 @@ def empleado(request):
     })
 
 @csrf_exempt
-@user_passes_test(lambda u: u.is_superuser)
+@login_required
 def update_stock(request):
     if request.method == 'POST':
         try:
@@ -166,7 +166,7 @@ def update_stock(request):
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
 
 @csrf_exempt
-@user_passes_test(lambda u: u.is_superuser)
+@login_required
 def eliminar_producto(request):
     if request.method == 'POST':
         try:
@@ -190,7 +190,24 @@ def cajero(request):
     return render(request, 'cajero.html', {'carrito': carrito, 'total_general': total_general})
 
 @login_required
+@user_passes_test(lambda u: PerfilUsuario.objects.filter(user=u, rol='bodeguero').exists())
 def bodeguero(request):
+    if request.method == 'POST':
+        nombre = request.POST.get('nombre')
+        imagen = request.FILES.get('imagen')
+        precio = request.POST.get('precio')
+        cantidad = request.POST.get('cantidad')
+
+        if nombre and imagen and precio and cantidad:
+            Producto.objects.create(
+                nombre=nombre,
+                imagen=imagen,
+                precio=precio,
+                cantidad=cantidad
+            )
+            messages.success(request, "Producto agregado correctamente.")
+            return redirect('bodeguero')
+
     productos = Producto.objects.all()
     return render(request, 'bodega.html', {'productos': productos})
 
@@ -266,3 +283,33 @@ def boleta(request, codigo):
         'codigo': codigo,
         'total': total
     })
+
+@csrf_exempt
+@login_required
+def confirmar_venta(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            codigo = data.get('codigo')
+            carrito = carritos_guardados.pop(codigo, None)
+
+            if not carrito:
+                return JsonResponse({'success': False, 'error': 'Carrito no encontrado'})
+
+            for item in carrito:
+                producto = Producto.objects.get(id=item['id'])
+                if producto.cantidad < item['cantidad']:
+                    return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
+                producto.cantidad -= item['cantidad']
+                producto.save()
+                Movimiento.objects.create(
+                    producto=producto,
+                    cantidad_vendida=item['cantidad'],
+                    empleado=request.user
+                )
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

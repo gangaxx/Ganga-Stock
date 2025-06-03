@@ -20,6 +20,7 @@ urlpatterns = [
     path('eliminar_empleado/<int:id>/', views.eliminar_empleado, name='eliminar_empleado'),
     path('guardar_carrito/', views.guardar_carrito, name='guardar_carrito'),
     path('boleta/<str:codigo>/', views.boleta, name='boleta'),
+    path('confirmar_venta/', views.confirmar_venta, name='confirmar_venta'),
 ]
 
 if settings.DEBUG:
