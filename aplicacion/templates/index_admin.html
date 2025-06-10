@@ -2,224 +2,25 @@
 {% load static %}
 
 {% block content %}
+<body class="admin-light-mode">
 
-<style>
-  body {
-    font-family: 'Lato', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
-  }
-
-  .dark-mode .panel {
-    background-color: #1e1e1e;
-    border: 1px solid #fff;
-  }
-
-  .dark-mode .history-box {
-    background-color: #1e1e1e;
-    border-top: 1px solid #999;
-  }
-
-  .dark-mode .section-title,
-  .dark-mode h2 {
-    color: white;
-  }
-
-  .dark-mode .style-button {
-    color: #ff0;
-  }
-
-  .dark-mode .mode-toggle {
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-  }
-
-  body.light-mode {
-    background-color: #ffffff;
-    color: #1e1e1e;
-  }
-
-  .light-mode .panel {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-  }
-
-  .light-mode .history-box {
-    background-color: #ffffff;
-    border-top: 1px solid #999;
-  }
-
-  .light-mode .section-title,
-  .light-mode h2 {
-    color: #1e1e1e;
-  }
-
-  .light-mode .style-button {
-    color: #ff0;
-  }
-
-  .light-mode .mode-toggle {
-    background-color: #f5f5f5;
-    color: #1e1e1e;
-    border: 1px solid #ccc;
-  }
-
-  .main {
-    display: flex;
-    justify-content: space-between;
-    padding: 40px 60px;
-  }
-
-  .panel {
-    padding: 20px;
-    border-radius: 4px;
-  }
-
-  .left-panel-admin {
-    flex: 2;
-    margin-right: 20px;
-  }
-
-  .right-panel-admin {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 40px;
-  }
-
-  .history-box {
-    height: 400px;
-    margin-top: 20px;
-    overflow-y: auto;
-  }
-
-  .section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .section-title {
-    font-weight: bold;
-  }
-
-  .style-button {
-    background: none;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .style-button::after {
-    content: " ❯";
-  }
-
-  h2 {
-    margin-bottom: 20px;
-  }
-
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-
-  .topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .welcome-message {
-    font-size: 42px;
-    color: white;
-    font-weight: bold;
-  }
-
-  .mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .history-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-  }
-
-  .history-table th,
-  .history-table td {
-    border: 1px solid #999;
-    padding: 8px;
-    text-align: center;
-  }
-
-  .history-table th {
-    font-weight: bold;
-  }
-</style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(storedMode + '-mode');
-    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
-  });
-
-  function toggleMode() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
-    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-  }
-
-  function confirmLogout() {
-    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
-      window.location.href = "{% url 'cerrar_sesion' %}";
-    }
-  }
-</script>
-
-<div class="topbar">
+<div class="admin-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
-  <div class="topbar-center">
-    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+  <div class="admin-topbar-center">
+    <span class="admin-welcome-message">Bienvenido, {{ user.username }}</span>
   </div>
   <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
-    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+    <button id="modeToggle" class="admin-mode-toggle" onclick="toggleAdminMode()">Cargando...</button>
+    <button class="admin-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="main" style="gap: 40px;">
-  <!-- PANEL IZQUIERDO -->
-  <div class="panel left-panel-admin" style="flex: 1 1 60%;">
+<div class="admin-main">
+  <!-- Panel izquierdo -->
+  <div class="admin-panel" style="flex: 1 1 60%;">
     <h2>Historial de movimientos</h2>
-    <div class="history-box">
-      <table class="history-table">
+    <div class="admin-history-box">
+      <table class="admin-history-table">
         <thead>
           <tr>
             <th>Producto</th>
@@ -252,22 +53,44 @@
     </div>
   </div>
 
-  <!-- PANEL DERECHO AJUSTADO A 270px -->
-  <div class="panel right-panel-admin" style="flex: 0 0 270px;">
+  <!-- Panel derecho -->
+  <div class="admin-panel" style="flex: 0 0 270px;">
     <h2 style="font-size: 1.2rem;">Base de datos</h2>
 
     <div class="section d-flex align-items-center justify-content-between mb-3">
-      <div class="section-title" style="font-size: 1rem;">Inventario</div>
-      <a href="{% url 'inventario' %}" class="btn btn-warning" style="font-size: 1rem; padding: 4px 12px;">Ver todo</a>
+      <div class="admin-section-title">Inventario</div>
+      <a href="{% url 'inventario' %}" class="btn btn-warning" style="padding: 4px 12px;">Ver todo</a>
     </div>
 
     <div class="section d-flex align-items-center justify-content-between">
-      <div class="section-title" style="font-size: 1rem;">Empleados</div>
-      <a href="{% url 'empleado' %}" class="btn btn-warning" style="font-size: 1rem; padding: 4px 12px;">Ver todo</a>
+      <div class="admin-section-title">Empleados</div>
+      <a href="{% url 'empleado' %}" class="btn btn-warning" style="padding: 4px 12px;">Ver todo</a>
     </div>
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('admin-theme') || 'light';
+    document.body.classList.add(`admin-${saved}-mode`);
+    document.getElementById('modeToggle').innerText = saved === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  });
 
+  function toggleAdminMode() {
+    const isDark = document.body.classList.contains('admin-dark-mode');
+    document.body.classList.toggle('admin-dark-mode', !isDark);
+    document.body.classList.toggle('admin-light-mode', isDark);
+    const modeText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    document.getElementById('modeToggle').innerText = modeText;
+    localStorage.setItem('admin-theme', isDark ? 'light' : 'dark');
+  }
 
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+</script>
+
+</body>
 {% endblock %}

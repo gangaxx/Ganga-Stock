@@ -2,249 +2,27 @@
 {% load static %}
 
 {% block content %}
-<style>
-  body {
-    font-family: 'Lato', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-    margin: 0;
-    padding: 0;
-    height: 100vh;
-  }
+<body class="ven-light-mode">
 
-  body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
-  }
-
-  .dark-mode .inventory-box {
-    background-color: #2b2b2b;
-    border: 1px solid #aaa;
-    color: white;
-  }
-
-  body.light-mode {
-    background-color: #ffffff;
-    color: #1e1e1e;
-  }
-
-  .light-mode .inventory-box {
-    background-color: #f0f0f0;
-    border: 1px solid #ccc;
-    color: #1e1e1e;
-  }
-
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-
-  .topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .welcome-message {
-    font-size: 42px;
-    color: white;
-    font-weight: bold;
-  }
-
-  .mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-  }
-
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .main-content {
-    display: flex;
-    flex-direction: column;
-    padding: 40px 60px;
-    box-sizing: border-box;
-  }
-
-  .inventory-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 36px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-
-  .inventory-header input[type="text"] {
-    padding: 6px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    width: 360px;
-    background-color: white;
-    color: black;
-  }
-
-  body.dark-mode .inventory-header input[type="text"] {
-    background-color: #111;
-    color: white;
-    border: 1px solid #666;
-  }
-
-  .inventory-box {
-    padding: 20px;
-    border-radius: 6px;
-    width: 100%;
-    overflow-x: auto;
-  }
-
-  .inventory-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .inventory-table th,
-  .inventory-table td {
-    padding: 12px;
-    border: 1px solid #ccc;
-    text-align: center;
-    vertical-align: middle;
-    height: 120px;
-  }
-
-  body.dark-mode .inventory-table th,
-  body.dark-mode .inventory-table td {
-    border: 1px solid #666;
-  }
-
-  .add-button,
-  .remove-button {
-    padding: 6px 10px;
-    border: none;
-    border-radius: 4px;
-    font-size: 18px;
-    cursor: pointer;
-  }
-
-  .add-button {
-    background-color: green;
-    color: white;
-  }
-
-  .remove-button {
-    background-color: red;
-    color: white;
-  }
-
-  .total-column {
-    font-weight: bold;
-    font-size: 18px;
-  }
-
-  .product-image {
-    width: 140px;
-    height: 170px;
-    object-fit: cover;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
-  }
-
-  .modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-    color: black;
-    text-align: center;
-  }
-
-  body.dark-mode .modal-content {
-    background-color: #2b2b2b;
-    color: white;
-  }
-
-  .modal-close {
-    float: right;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .modal-img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-bottom: 20px;
-  }
-
-  .carrito-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .carrito-table th, .carrito-table td {
-    padding: 10px;
-    border: 1px solid #aaa;
-    text-align: center;
-    background-color: inherit;
-    color: inherit;
-  }
-</style>
-
-
-<div class="topbar">
+<div class="ven-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
-  <div class="topbar-center">
-    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+  <div class="ven-topbar-center">
+    <span class="ven-welcome-message">Bienvenido, {{ user.username }}</span>
   </div>
-  <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">🌙 Oscuro</button>
-    <button onclick="toggleCarrito()" class="mode-toggle">🛒 Carrito</button>
-    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  <div style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="ven-mode-toggle" onclick="toggleMode()">🌙 Oscuro</button>
+    <button onclick="toggleCarrito()" class="ven-mode-toggle">🛒 Carrito</button>
+    <button class="ven-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="main-content">
-  <div class="inventory-header">
+<div class="ven-main-content">
+  <div class="ven-inventory-header">
     <span>Inventario</span>
-    <div style="display: flex; gap: 10px; align-items:center">
-      <input type="text" placeholder="Buscar producto..." id="busqueda">
-    </div>
+    <input type="text" placeholder="Buscar producto..." id="busqueda">
   </div>
-  <div class="inventory-box">
-    <table class="inventory-table">
+  <div class="ven-inventory-box">
+    <table class="ven-inventory-table">
       <thead>
         <tr>
           <th>Producto</th>
@@ -260,71 +38,56 @@
       <tbody>
         {% for producto in productos %}
         <tr class="product-row" data-name="{{ producto.nombre }}">
-          <td>
-            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image" data-img="{{ producto.imagen.url }}" data-name="{{ producto.nombre }}" data-price="{{ producto.precio }}">
-          </td>
+          <td><img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="ven-product-image" data-img="{{ producto.imagen.url }}" data-name="{{ producto.nombre }}" data-price="{{ producto.precio }}"></td>
           <td>{{ producto.nombre }}</td>
           <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td>
-            <button class="add-button" onclick="addProduct('prod{{ producto.id }}','{{ producto.nombre }}',{{ producto.precio }},'{{ producto.imagen.url }}')">+</button>
-          </td>
+          <td><button class="ven-add-button" onclick="addProduct('prod{{ producto.id }}','{{ producto.nombre }}',{{ producto.precio }},'{{ producto.imagen.url }}')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
-          <td><button class="remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
-          <td class="row-total">$0</td>
+          <td><button class="ven-remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
+          <td class="ven-row-total">$0</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">
-      Total general: <span id="totalSum">$0</span>
-    </div>
+    <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">Total general: <span id="totalSum">$0</span></div>
   </div>
 </div>
 
-<!-- MODAL CARRITO -->
-<div id="carritoModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="toggleCarrito()">&times;</span>
+<!-- MODALES -->
+<div id="carritoModal" class="ven-modal">
+  <div class="ven-modal-content">
+    <span class="ven-modal-close" onclick="toggleCarrito()">&times;</span>
     <h2>Carrito de Compras</h2>
-    <table class="carrito-table">
+    <table class="ven-carrito-table">
       <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Nombre</th>
-          <th>Cantidad</th>
-          <th>Total</th>
-        </tr>
+        <tr><th>Producto</th><th>Nombre</th><th>Cantidad</th><th>Total</th></tr>
       </thead>
       <tbody id="carritoItems"></tbody>
     </table>
-    <div style="margin-top: 20px; font-size: 18px; text-align: right;">
-      Total: <span id="carritoTotal">$0</span>
-    </div>
+    <div style="margin-top: 20px; font-size: 18px; text-align: right;">Total: <span id="carritoTotal">$0</span></div>
     <div id="codigoGenerado" style="margin-top: 20px; font-size: 18px; color: green; font-weight: bold;"></div>
     <div style="margin-top: 20px; text-align: center;">
-      <button onclick="mostrarConfirmacion()" class="mode-toggle" style="background-color: green; color: white;">Agregar productos al carrito</button>
+      <button onclick="mostrarConfirmacion()" class="ven-mode-toggle" style="background-color: green; color: white;">Agregar productos al carrito</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL CONFIRMACION -->
-<div id="confirmModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
+<div id="confirmModal" class="ven-modal">
+  <div class="ven-modal-content">
+    <span class="ven-modal-close" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
     <h2>¿Estás seguro de agregar los productos al carrito?</h2>
     <div style="margin-top: 20px; display: flex; justify-content: center; gap: 10px;">
-      <button onclick="confirmarCompra()" class="mode-toggle" style="background-color: green; color: white;">Sí</button>
-      <button onclick="document.getElementById('confirmModal').style.display='none'" class="mode-toggle">No</button>
+      <button onclick="confirmarCompra()" class="ven-mode-toggle" style="background-color: green; color: white;">Sí</button>
+      <button onclick="document.getElementById('confirmModal').style.display='none'" class="ven-mode-toggle">No</button>
     </div>
   </div>
 </div>
 
-<!-- MODAL DETALLE DE IMAGEN -->
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
-    <img id="modalImg" class="modal-img" src="" alt="Producto">
+<div id="myModal" class="ven-modal">
+  <div class="ven-modal-content">
+    <span class="ven-modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+    <img id="modalImg" class="ven-modal-img" src="" alt="Producto">
     <h3 id="modalTitle"></h3>
     <p id="modalPrice"></p>
   </div>
@@ -335,32 +98,34 @@
   const csrfToken = "{{ csrf_token }}";
 
   document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.product-image').forEach(img => {
+    document.querySelectorAll('.ven-product-image').forEach(img => {
       img.addEventListener('click', () => {
-        const modal = document.getElementById('myModal');
         document.getElementById('modalImg').src = img.dataset.img;
         document.getElementById('modalTitle').textContent = img.dataset.name;
         document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.dataset.price).toLocaleString();
-        modal.style.display = 'block';
+        document.getElementById('myModal').style.display = 'block';
       });
     });
 
-    window.onclick = event => {
-      const modal = document.getElementById('myModal');
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
+    window.onclick = e => {
+      ['myModal', 'carritoModal', 'confirmModal'].forEach(id => {
+        if (e.target === document.getElementById(id)) {
+          document.getElementById(id).style.display = 'none';
+        }
+      });
+
+      const theme = localStorage.getItem('theme') || 'light';
+      document.body.classList.remove('ven-dark-mode', 'ven-light-mode');
+      document.body.classList.add(theme === 'dark' ? 'ven-dark-mode' : 'ven-light-mode');
+      document.getElementById('modeToggle').innerText = theme === 'dark' ? '☀ Claro' : '🌙 Oscuro';
     };
   });
 
   function toggleMode() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
-    const modeToggle = document.getElementById('modeToggle');
-    if (modeToggle) {
-      modeToggle.innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
-    }
+    const isDark = document.body.classList.contains('ven-dark-mode');
+    document.body.classList.toggle('ven-dark-mode', !isDark);
+    document.body.classList.toggle('ven-light-mode', isDark);
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
 
@@ -370,5 +135,4 @@
     }
   }
 </script>
-
 {% endblock %}

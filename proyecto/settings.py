@@ -17,7 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'aplicacion',  # Tu app principal
+    'aplicacion',
 ]
 
 # Middlewares
@@ -64,18 +64,10 @@ DATABASES = {
 
 # Validadores de contraseña
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
 # Internacionalización
@@ -85,12 +77,12 @@ USE_I18N = True
 USE_L10N = True
 USE_TZ = True
 
-# Archivos estáticos
+# Archivos estáticos (CSS, JS, logo, etc.)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'aplicacion' / 'static']
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # opcional para producción
+STATICFILES_DIRS = [BASE_DIR / 'aplicacion' / 'static']  # Ruta válida existente
+STATIC_ROOT = BASE_DIR / 'staticfiles'  # Solo necesario en producción
 
-# Archivos multimedia (subidos por usuario)
+# Archivos multimedia (imagenes subidas por el usuario, como productos)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

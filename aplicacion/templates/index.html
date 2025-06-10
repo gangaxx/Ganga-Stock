@@ -5,182 +5,41 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Iniciar Sesión</title>
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
-
-  <style>
-    :root {
-      --bg-color: #1f1e1e;
-      --panel-color: #111;
-      --text-color: #ffffff;
-      --input-bg: #222;
-      --input-border: #444;
-      --placeholder-color: #aaa;
-      --button-bg: #ff0;
-      --button-text: #000;
-    }
-
-    body.light-mode {
-      --bg-color: #e0e0e0;
-      --panel-color: #f5f5f5;
-      --text-color: #000000;
-      --input-bg: #ffffff;
-      --input-border: #ccc;
-      --placeholder-color: #666;
-      --button-bg: #ff0;
-      --button-text: #000;
-    }
-
-    body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', sans-serif;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      height: 100vh;
-    }
-
-    .login-container {
-      display: flex;
-      height: 100vh;
-    }
-
-    .left-panel {
-      flex: 1;
-      background-color: var(--bg-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-
-    .logo-img {
-      width: 320px;
-      height: auto;
-      margin-bottom: 20px;
-    }
-
-    .logo-text {
-      font-size: 28px;
-      font-weight: bold;
-      text-align: center;
-    }
-
-    .right-panel {
-      flex: 1;
-      background-color: var(--panel-color);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .login-box {
-      width: 100%;
-      max-width: 400px;
-      padding: 40px;
-      background-color: var(--panel-color);
-      border-radius: 10px;
-    }
-
-    .login-title {
-      font-size: 28px;
-      font-weight: bold;
-      margin-bottom: 25px;
-    }
-
-    .form-control {
-      background-color: var(--input-bg);
-      border: 1px solid var(--input-border);
-      color: var(--text-color);
-    }
-
-    .form-control::placeholder {
-      color: var(--placeholder-color);
-    }
-
-    .forgot-password {
-      font-size: 14px;
-      color: var(--text-color);
-      text-decoration: underline;
-    }
-
-    .btn-warning {
-      background-color: var(--button-bg);
-      border: none;
-      color: var(--button-text);
-      padding: 10px 20px;
-      font-size: 16px;
-    }
-
-    body.light-mode .btn-warning {
-      border: 2px solid #000;
-    }
-
-    .toggle-password {
-      position: absolute;
-      top: 50%;
-      right: 15px;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 18px;
-      color: var(--placeholder-color);
-    }
-
-    .theme-toggle {
-      position: absolute;
-      top: 20px;
-      right: 20px;
-      z-index: 999;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .btn-toggle {
-      background-color: #888;
-      color: white;
-      border: none;
-      padding: 8px 12px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    .btn-toggle:hover {
-      background-color: #555;
-    }
-  </style>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
-<body class="light-mode">
+<body>
 
-  <div class="theme-toggle">
-    <button class="btn-toggle" onclick="toggleTheme()">Cambiar Tema</button>
+  <div class="ind-theme-toggle">
+    <button class="ind-btn-toggle" onclick="toggleTheme()">Cambiar Tema</button>
   </div>
 
-  <div class="login-container">
-    <div class="left-panel">
+  <div class="ind-container">
+    <div class="ind-left-panel">
       <div class="logo-container">
-        <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img">
-        <h1 class="logo-text">GANGA STOCK</h1>
+        <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="ind-logo-img">
+        <h1 class="ind-logo-text">GANGA STOCK</h1>
       </div>
     </div>
 
-    <div class="right-panel">
-      <div class="login-box">
-        <h2 class="login-title">Inicio de sesión</h2>
+    <div class="ind-right-panel">
+      <div class="ind-login-box">
+        <h2 class="ind-login-title">Inicio de sesión</h2>
         <form method="POST" action="{% url 'index' %}">
           {% csrf_token %}
           <input type="hidden" name="login" value="1">
           <div class="form-group mb-3">
-            <input type="text" class="form-control" name="username" placeholder="Correo electrónico o RUT" required>
+            <input type="text" class="form-control ind-form-control" name="username" placeholder="Correo electrónico o RUT" required>
           </div>
           <div class="form-group mb-2 position-relative">
-            <input type="password" class="form-control" name="password" id="password" placeholder="Contraseña" required>
-            <span class="toggle-password" onclick="togglePassword()">👁️‍🗨️</span>
+            <input type="password" class="form-control ind-form-control" name="password" id="password" placeholder="Contraseña" required>
+            <span class="ind-toggle-password" onclick="togglePassword()">👁️‍🗨️</span>
           </div>
           <div class="text-end mb-3">
-            <a href="#" class="forgot-password">¿Has olvidado tu contraseña?</a>
+            <a href="#" class="ind-forgot-password">¿Has olvidado tu contraseña?</a>
           </div>
-          <button type="submit" class="btn btn-warning w-100 fw-bold">Iniciar sesión</button>
+          <button type="submit" class="btn ind-btn-warning">Iniciar sesión</button>
         </form>
       </div>
     </div>
@@ -193,18 +52,16 @@
     }
 
     function toggleTheme() {
-      const isLight = document.body.classList.contains('light-mode');
-      document.body.classList.toggle('light-mode', !isLight);
-      document.body.classList.toggle('dark-mode', isLight);
-      localStorage.setItem('theme', isLight ? 'dark' : 'light');
+      const body = document.body;
+      const isDark = body.classList.contains("ind-dark-mode");
+      body.classList.toggle("ind-dark-mode", !isDark);
+      body.classList.toggle("ind-light-mode", isDark);
+      localStorage.setItem("theme", isDark ? "light" : "dark");
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      const theme = localStorage.getItem('theme') || 'light';
-      if (theme === 'dark') {
-        document.body.classList.remove('light-mode');
-        document.body.classList.add('dark-mode');
-      }
+    window.addEventListener("DOMContentLoaded", () => {
+      const saved = localStorage.getItem("theme") || "light";
+      document.body.classList.add(saved === "dark" ? "ind-dark-mode" : "ind-light-mode");
     });
   </script>
 

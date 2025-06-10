@@ -133,7 +133,7 @@ function addProduct(prodId, name, price, img) {
   if (seleccionada) seleccionada.innerText++;
   updateTotal();
 
-  const safeImg = typeof img === "string" ? encodeURI(img) : '';
+  const safeImg = (typeof img === "string" && img.trim() !== "") ? encodeURI(img) : null;
 
   const item = carrito.find(p => p.id === idNum);
   if (item) {
@@ -200,9 +200,13 @@ function updateCarrito() {
     const subtotal = p.precio * p.cantidad;
     total += subtotal;
 
+    const imgHTML = p.img
+      ? `<img src="${p.img}" width="60" style="border-radius: 4px;">`
+      : `<span style="color: gray;">Sin imagen</span>`;
+
     container.innerHTML += `
       <tr>
-        <td><img src="${p.img}" width="60" style="border-radius: 4px;"></td>
+        <td>${imgHTML}</td>
         <td>${p.nombre}</td>
         <td>${p.cantidad}</td>
         <td>${subtotal.toLocaleString('es-CL', { style: 'currency', currency: 'CLP' })}</td>

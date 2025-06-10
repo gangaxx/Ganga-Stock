@@ -3,331 +3,31 @@
 
 {% block content %}
 
-<style>
-  body {
-    font-family: 'Lato', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
-  }
-
-  .dark-mode .panel {
-    background-color: #1e1e1e;
-    border: 1px solid #fff;
-  }
-
-  .dark-mode .section-title,
-  .dark-mode h2 {
-    color: white;
-  }
-
-  .dark-mode .mode-toggle {
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-  }
-
-  body.light-mode {
-    background-color: #ffffff;
-    color: #1e1e1e;
-  }
-
-  .light-mode .panel {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-  }
-
-  .light-mode .section-title,
-  .light-mode h2 {
-    color: #1e1e1e;
-  }
-
-  .light-mode .mode-toggle {
-    background-color: #f5f5f5;
-    color: #1e1e1e;
-    border: 1px solid #ccc;
-  }
-
-  .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 60px;
-    gap: 40px;
-  }
-
-  .panel {
-    padding: 20px;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 1200px;
-  }
-
-  .form-panel {
-    max-width: 600px;
-    margin: 0 auto;
-  }
-
-  h2 {
-    margin-bottom: 20px;
-  }
-
-  .inventory-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
-  }
-
-  .inventory-form input {
-    padding: 5px;
-    border-radius: 4px;
-  }
-
-  .form-submit {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    width: 100%;
-  }
-
-  .inventory-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .inventory-table th,
-  .inventory-table td {
-    padding: 12px;
-    border: 1px solid #999;
-    text-align: center;
-    vertical-align: middle;
-    height: 120px;
-  }
-
-  .upload-btn {
-    background-color: #444;
-    color: white;
-    cursor: pointer;
-  }
-
-  .add-btn,
-  .remove-btn {
-    font-size: 24px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-  }
-
-  .add-btn {
-    background-color: green;
-    color: white;
-    cursor: pointer;
-  }
-
-  .remove-btn {
-    background-color: red;
-    color: white;
-    cursor: pointer;
-  }
-
-  .delete-btn {
-    background-color: #555;
-    color: white;
-    cursor: pointer;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-  }
-
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-
-  .topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .welcome-message {
-    font-size: 42px;
-    color: white;
-    font-weight: bold;
-  }
-
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .footer {
-    text-align: center;
-    margin-top: 40px;
-    font-size: 16px;
-    color: #999;
-  }
-
-  .modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.6);
-  }
-
-  .modal-content {
-    background-color: white;
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-    color: black;
-    text-align: center;
-  }
-
-  body.dark-mode .modal-content {
-    background-color: #2b2b2b;
-    color: white;
-  }
-
-  .modal-img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-bottom: 20px;
-  }
-</style>
-
-<script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const storedMode = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(storedMode + '-mode');
-    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
-
-    document.querySelectorAll('.product-image').forEach(img => {
-      img.addEventListener('click', () => {
-        const modal = document.getElementById('myModal');
-        document.getElementById('modalImg').src = img.src;
-        document.getElementById('modalTitle').textContent = img.alt;
-        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.closest('tr').querySelector('.price-cell').dataset.price).toLocaleString();
-        modal.style.display = 'block';
-      });
-    });
-
-    window.onclick = event => {
-      const modal = document.getElementById('myModal');
-      if (event.target === modal) {
-        modal.style.display = 'none';
-      }
-    };
-  });
-
-  function toggleMode() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
-    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-  }
-
-  function confirmLogout() {
-    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
-      window.location.href = "{% url 'cerrar_sesion' %}";
-    }
-  }
-
-  function updateStock(productId, action) {
-    fetch(`/update_stock/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({ id: productId, action: action })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.error);
-      }
-    });
-  }
-
-  function deleteProduct(productId) {
-    if (!confirm("¿Deseas eliminar este producto completamente?")) return;
-
-    fetch(`/eliminar_producto/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({ id: productId })
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.error);
-      }
-    });
-  }
-</script>
-
-<div class="topbar">
+<div class="inv-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
-  <div class="topbar-center">
-    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
-  </div>
-  <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
-    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  <div class="inv-topbar-center">Bienvenido, {{ user.username }}</div>
+  <div style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="inv-mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="inv-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="main">
-  <div class="panel form-panel">
+<div class="inv-main">
+  <div class="inv-panel">
     <h2>Agregar nuevo producto</h2>
-    <form method="POST" class="inventory-form" enctype="multipart/form-data">
+    <form method="POST" class="inv-inventory-form" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="file" name="imagen" accept="image/*" required>
       <input type="text" name="nombre" placeholder="Nombre del producto" required>
       <input type="number" name="precio" placeholder="Precio" step="0.01" required>
       <input type="number" name="cantidad" placeholder="Unidades" required>
-      <div class="form-submit">
-        <button type="submit" class="add-btn">Agregar</button>
-      </div>
+      <button type="submit" class="inv-add-btn">Agregar</button>
     </form>
   </div>
 
-  <div class="panel">
+  <div class="inv-panel">
     <h2>Inventario actual</h2>
-    <table class="inventory-table">
+    <table class="inv-inventory-table">
       <thead>
         <tr>
           <th>Producto</th>
@@ -342,12 +42,10 @@
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr class="product-row" data-name="{{ producto.nombre }}">
+        <tr>
           <td>
             {% if producto.imagen %}
-              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                   class="product-image"
-                   style="width: 100px; height: 120px; object-fit: cover;">
+              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image" style="width: 100px; height: 120px; object-fit: cover;">
             {% else %}
               <span style="color: red;">Sin imagen</span>
             {% endif %}
@@ -355,16 +53,10 @@
           <td>{{ producto.nombre }}</td>
           <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td>
-            <button class="add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button>
-          </td>
+          <td><button class="inv-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
-          <td>
-            <button class="remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button>
-          </td>
-          <td>
-            <button class="delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button>
-          </td>
+          <td><button class="inv-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
+          <td><button class="inv-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
         </tr>
         {% empty %}
         <tr><td colspan="8">No hay productos en inventario.</td></tr>
@@ -372,19 +64,80 @@
       </tbody>
     </table>
   </div>
-  <div class="footer">© 2025 Ganga Stock. Todos los derechos reservados.</div>
 </div>
 
-<!-- Modal de imagen y detalle -->
-<div id="myModal" class="modal">
-  <div class="modal-content">
-    <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
-    <img id="modalImg" class="modal-img" src="" alt="Producto">
+<div id="invModal" class="inv-modal">
+  <div class="inv-modal-content">
+    <span onclick="document.getElementById('invModal').style.display='none'" style="float:right;cursor:pointer;">&times;</span>
+    <img id="modalImg" class="inv-modal-img" src="" alt="Producto">
     <h3 id="modalTitle"></h3>
     <p id="modalPrice"></p>
   </div>
 </div>
 
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const mode = localStorage.getItem('theme') || 'light';
+    document.body.classList.add('inv-' + mode + '-mode');
+    document.getElementById('modeToggle').innerText = mode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
 
+    document.querySelectorAll('.product-image').forEach(img => {
+      img.addEventListener('click', () => {
+        document.getElementById('modalImg').src = img.src;
+        document.getElementById('modalTitle').textContent = img.alt;
+        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.closest('tr').querySelector('.price-cell').dataset.price).toLocaleString();
+        document.getElementById('invModal').style.display = 'block';
+      });
+    });
+
+    window.onclick = e => {
+      if (e.target === document.getElementById('invModal')) {
+        document.getElementById('invModal').style.display = 'none';
+      }
+    };
+  });
+
+  function toggleMode() {
+    const isDark = document.body.classList.contains('inv-dark-mode');
+    document.body.classList.toggle('inv-dark-mode', !isDark);
+    document.body.classList.toggle('inv-light-mode', isDark);
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  }
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+
+  function updateStock(id, action) {
+    fetch('/update_stock/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ id: id, action: action })
+    })
+    .then(response => response.json())
+    .then(data => data.success ? location.reload() : alert(data.error));
+  }
+
+  function deleteProduct(id) {
+    if (!confirm("¿Deseas eliminar este producto completamente?")) return;
+
+    fetch('/eliminar_producto/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({ id: id })
+    })
+    .then(response => response.json())
+    .then(data => data.success ? location.reload() : alert(data.error));
+  }
+</script>
 
 {% endblock %}

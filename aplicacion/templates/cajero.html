@@ -2,154 +2,32 @@
 {% load static %}
 
 {% block content %}
-<style>
-  body {
-    font-family: 'Lato', sans-serif;
-    background-color: #ffffff;
-    color: #1e1e1e;
-    margin: 0;
-    padding: 0;
-  }
+<body class="caj caj-light-mode">
 
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-
-  .topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .welcome-message {
-    font-size: 42px;
-    color: white;
-    font-weight: bold;
-  }
-
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-  }
-
-  .main-content {
-    padding: 40px 60px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 40px;
-  }
-
-  .codigo-form {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .codigo-form input {
-    padding: 10px;
-    font-size: 18px;
-    width: 300px;
-    text-align: center;
-  }
-
-  .codigo-form button {
-    background-color: green;
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .carrito-box {
-    width: 100%;
-    max-width: 1000px;
-    background-color: #f0f0f0;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-  }
-
-  .carrito-box h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-
-  .carrito-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-
-  .carrito-table th, .carrito-table td {
-    padding: 12px;
-    border: 1px solid #ccc;
-    text-align: center;
-    background-color: inherit;
-  }
-
-  .carrito-table img {
-    width: 100px;
-    border-radius: 4px;
-  }
-
-  .total-section {
-    text-align: right;
-    margin-top: 20px;
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .confirmar-btn {
-    margin-top: 30px;
-    text-align: center;
-  }
-
-  .confirmar-btn button {
-    background-color: #28a745;
-    color: white;
-    padding: 12px 25px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-</style>
-
-<div class="topbar">
-  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-center">
-    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
+<!-- TOPBAR -->
+<div class="caj-topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo">
+  <div class="caj-topbar-center">
+    Bienvenido, {{ user.username }}
   </div>
-  <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button class="logout-button" onclick="window.location.href='{% url 'cerrar_sesion' %}'">Cerrar sesión</button>
+  <div class="caj-topbar-actions">
+    <button id="cajModeToggle" class="caj-mode-toggle" onclick="toggleCajeroTheme()">🌙 Oscuro</button>
+    <button class="caj-logout-button" onclick="window.location.href='{% url 'cerrar_sesion' %}'">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="main-content">
-  <form method="GET" class="codigo-form">
+<!-- CONTENIDO -->
+<div class="caj-main-content">
+  <form method="GET" class="caj-codigo-form">
     <h2>Buscar carrito con código</h2>
     <input type="text" name="codigo" placeholder="Ingresa el código de 6 dígitos" required maxlength="6">
     <button type="submit">Ver Carrito</button>
   </form>
 
   {% if carrito %}
-  <div class="carrito-box">
+  <div class="caj-carrito-box">
     <h2>Resumen del Carrito</h2>
-    <table class="carrito-table">
+    <table class="caj-carrito-table">
       <thead>
         <tr>
           <th>Producto</th>
@@ -169,10 +47,10 @@
         {% endfor %}
       </tbody>
     </table>
-    <div class="total-section">
+    <div class="caj-total-section">
       Total a pagar: ${{ total_general }}
     </div>
-    <div class="confirmar-btn">
+    <div class="caj-confirmar-btn">
       <input type="hidden" id="codigoVenta" value="{{ request.GET.codigo }}">
       <button onclick="confirmarVenta()">Confirmar Venta</button>
     </div>
@@ -180,6 +58,7 @@
   {% endif %}
 </div>
 
+<!-- SCRIPTS -->
 <script>
   function confirmarVenta() {
     const codigo = document.getElementById("codigoVenta").value;
@@ -205,5 +84,28 @@
       console.error("Error:", error);
     });
   }
+
+  function toggleCajeroTheme() {
+    const body = document.body;
+    const isLight = body.classList.contains('caj-light-mode');
+    body.classList.toggle('caj-light-mode', !isLight);
+    body.classList.toggle('caj-dark-mode', isLight);
+    const toggleBtn = document.getElementById('cajModeToggle');
+    toggleBtn.textContent = isLight ? '☀ Claro' : '🌙 Oscuro';
+    localStorage.setItem('cajTheme', isLight ? 'dark' : 'light');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('cajTheme') || 'light';
+    document.body.classList.toggle('caj-light-mode', theme === 'light');
+    document.body.classList.toggle('caj-dark-mode', theme === 'dark');
+
+    const toggleBtn = document.getElementById('cajModeToggle');
+    if (toggleBtn) {
+      toggleBtn.textContent = theme === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+    }
+  });
 </script>
+
+</body>
 {% endblock %}

@@ -2,199 +2,23 @@
 {% load static %}
 
 {% block content %}
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
 
-<style>
-  body {
-    font-family: 'Lato', sans-serif;
-    transition: background-color 0.3s, color 0.3s;
-  }
-
-  body.dark-mode {
-    background-color: #1e1e1e;
-    color: white;
-  }
-
-  .dark-mode .panel {
-    background-color: #1e1e1e;
-    border: 1px solid #fff;
-  }
-
-  .dark-mode .section-title,
-  .dark-mode h2 {
-    color: white;
-  }
-
-  .dark-mode .mode-toggle {
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-  }
-
-  .dark-mode .modal-content,
-  .dark-mode .modal-content input,
-  .dark-mode .modal-content select,
-  .dark-mode .modal-content label,
-  .dark-mode .modal-content button,
-  .dark-mode .modal-header,
-  .dark-mode .modal-body {
-    background-color: #2b2b2b;
-    color: white;
-  }
-
-  .dark-mode .modal-content input,
-  .dark-mode .modal-content select {
-    background-color: #2b2b2b;
-    color: white;
-    border: 1px solid #666;
-  }
-
-  body.light-mode {
-    background-color: #ffffff;
-    color: #1e1e1e;
-  }
-
-  .light-mode .panel {
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-  }
-
-  .light-mode .section-title,
-  .light-mode h2 {
-    color: #1e1e1e;
-  }
-
-  .light-mode .mode-toggle {
-    background-color: #f5f5f5;
-    color: #1e1e1e;
-    border: 1px solid #ccc;
-  }
-
-  .light-mode .modal-content,
-  .light-mode .modal-content input,
-  .light-mode .modal-content select,
-  .light-mode .modal-content label,
-  .light-mode .modal-content button,
-  .light-mode .modal-header,
-  .light-mode .modal-body {
-    background-color: #ffffff;
-    color: #000000;
-  }
-
-  .light-mode .modal-content input,
-  .light-mode .modal-content select {
-    background-color: #ffffff;
-    color: #000000;
-    border: 1px solid #ccc;
-  }
-
-  .main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 60px;
-    gap: 40px;
-  }
-
-  .panel {
-    padding: 20px;
-    border-radius: 4px;
-    width: 100%;
-  }
-
-  .panel-container {
-    display: flex;
-    gap: 40px;
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .half-panel {
-    width: 50%;
-  }
-
-  h2 {
-    margin-bottom: 20px;
-  }
-
-  .topbar {
-    background-color: black;
-    padding: 20px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    position: relative;
-  }
-
-  .topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .welcome-message {
-    font-size: 42px;
-    color: white;
-    font-weight: bold;
-  }
-
-  .mode-toggle,
-  .logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-
-  .logout-button {
-    background-color: red;
-    color: white;
-    border: none;
-  }
-
-  .employee-table,
-  .deleted-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 16px;
-  }
-
-  .employee-table th,
-  .employee-table td,
-  .deleted-table th,
-  .deleted-table td {
-    padding: 8px;
-    border: 1px solid #ccc;
-    text-align: left;
-  }
-
-  .delete-icon {
-    color: red;
-    cursor: pointer;
-    font-weight: bold;
-  }
-</style>
-
-<div class="topbar">
+<div class="emp-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="topbar-logo" style="color: white; font-weight: bold;"></div>
-  <div class="topbar-center">
-    <span class="welcome-message">Bienvenido, {{ user.username }}</span>
-  </div>
-  <div class="topbar-actions" style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="mode-toggle" onclick="toggleMode()">Cargando...</button>
-    <button class="logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  <div class="emp-topbar-center">Bienvenido, {{ user.username }}</div>
+  <div style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="emp-mode-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="emp-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="main">
-  <div class="panel-container">
-    <div class="panel half-panel">
+<div class="main" style="padding: 40px 60px;">
+  <div class="panel-container" style="display: flex; gap: 40px; justify-content: space-between;">
+    <div class="emp-panel" style="width: 50%;">
       <h2>Empleados Registrados</h2>
-      <table class="employee-table">
+      <table class="table table-bordered table-striped">
         <thead>
           <tr>
             <th>Usuario</th>
@@ -215,16 +39,16 @@
             <td>{{ empleado.rut }}</td>
             <td>{{ empleado.fecha_nacimiento|date:"d/m/Y" }}</td>
             <td>{{ empleado.genero }}</td>
-            <td><span class="delete-icon" onclick="eliminarCuenta('{{ empleado.id }}')">🗑</span></td>
+            <td><span class="text-danger fw-bold" style="cursor: pointer;" onclick="eliminarCuenta('{{ empleado.id }}')">🗑</span></td>
           </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <div class="panel half-panel">
+    <div class="emp-panel" style="width: 50%;">
       <h2>Empleados Eliminados</h2>
-      <table class="deleted-table">
+      <table class="table table-bordered">
         <thead>
           <tr>
             <th>Usuario</th>
@@ -251,9 +75,9 @@
     </div>
   </div>
 
-  <div class="panel">
-    <h2 style="text-align: center;">Crear Cuenta</h2>
-    <div style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap;">
+  <div class="emp-panel mt-4 text-center">
+    <h2>Crear Cuenta</h2>
+    <div class="d-flex justify-content-center gap-3 flex-wrap">
       <button class="btn btn-success" onclick="abrirModal('vendedor')">Crear cuenta vendedor</button>
       <button class="btn btn-primary" onclick="abrirModal('bodeguero')">Crear cuenta bodeguero</button>
       <button class="btn btn-warning" onclick="abrirModal('cajero')">Crear cuenta cajero</button>
@@ -261,10 +85,10 @@
   </div>
 </div>
 
-<!-- Modal Crear Cuenta -->
+<!-- Modales y scripts -->
 <div class="modal fade" id="crearCuentaModal" tabindex="-1" aria-hidden="true">
   <div class="modal-dialog">
-    <div class="modal-content">
+    <div class="modal-content emp-modal-content">
       <div class="modal-header">
         <h5 class="modal-title">Crear Usuario</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
@@ -274,45 +98,19 @@
           {% csrf_token %}
           <input type="hidden" name="rol" id="rolUsuario">
           <input type="hidden" name="registro" value="1">
-
-          <div class="mb-3">
-            <label>Nombre y Apellido</label>
-            <input type="text" class="form-control" name="nombre" required>
-          </div>
-          <div class="mb-3">
-            <label>Nombre de cuenta</label>
-            <input type="text" class="form-control" name="username" required>
-          </div>
-          <div class="mb-3">
-            <label>Contraseña</label>
-            <input type="password" class="form-control" name="password" required>
-          </div>
-          <div class="mb-3">
-            <label>Repetir contraseña</label>
-            <input type="password" class="form-control" name="confirm_password" required>
-          </div>
-          <div class="mb-3">
-            <label>RUT</label>
-            <input type="text" class="form-control" name="rut" required>
-          </div>
-          <div class="mb-3">
-            <label>Fecha de Nacimiento</label>
-            <input type="date" class="form-control" name="fecha_nacimiento" required>
-          </div>
-          <div class="mb-3">
-            <label>Email</label>
-            <input type="email" class="form-control" name="email" required>
-          </div>
-          <div class="mb-3">
-            <label>Género</label>
-            <select class="form-control" name="genero" required>
-              <option value="" selected disabled>Selecciona una opción</option>
-              <option value="Masculino">Masculino</option>
-              <option value="Femenino">Femenino</option>
-              <option value="Otro">Otro</option>
-            </select>
-          </div>
-
+          <input type="text" name="nombre" class="form-control mb-2" placeholder="Nombre completo" required>
+          <input type="text" name="username" class="form-control mb-2" placeholder="Usuario" required>
+          <input type="password" name="password" class="form-control mb-2" placeholder="Contraseña" required>
+          <input type="password" name="confirm_password" class="form-control mb-2" placeholder="Confirmar contraseña" required>
+          <input type="text" name="rut" class="form-control mb-2" placeholder="RUT" required>
+          <input type="date" name="fecha_nacimiento" class="form-control mb-2" required>
+          <input type="email" name="email" class="form-control mb-2" placeholder="Email" required>
+          <select name="genero" class="form-control mb-3" required>
+            <option value="" disabled selected>Selecciona género</option>
+            <option value="Masculino">Masculino</option>
+            <option value="Femenino">Femenino</option>
+            <option value="Otro">Otro</option>
+          </select>
           <div class="text-center">
             <button type="submit" class="btn btn-primary">Crear Usuario</button>
           </div>
@@ -322,33 +120,55 @@
   </div>
 </div>
 
-<!-- Confirmación de creación -->
-<div class="modal fade" id="confirmModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body text-center">
-        <p>¿Estás seguro que deseas crear esta cuenta?</p>
-        <div class="d-flex justify-content-center gap-3">
-          <button class="btn btn-success" onclick="document.getElementById('formCrearCuenta').submit();">¡Sí!</button>
-          <button class="btn btn-secondary" data-bs-dismiss="modal">No</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Resultado de creación -->
-<div class="modal fade" id="resultadoModal" tabindex="-1" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-body text-center" id="mensajeResultado"></div>
-    </div>
-  </div>
-</div>
-
-
-
 <script>
+  function eliminarCuenta(id) {
+    if (!confirm("¿Deseas eliminar esta cuenta?")) return;
+    fetch(`/eliminar_empleado/${id}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': getCookie('csrftoken'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({})
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        document.getElementById(`empleado-${id}`).remove();
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+          <td>${data.usuario.username}</td>
+          <td>${data.usuario.email}</td>
+          <td>${data.usuario.nombre}</td>
+          <td>${data.usuario.rut}</td>
+          <td>${data.usuario.fecha_nacimiento}</td>
+          <td>${data.usuario.genero}</td>`;
+        document.getElementById('tablaEliminados').appendChild(fila);
+      } else {
+        alert(data.error);
+      }
+    });
+  }
+
+  function abrirModal(rol) {
+    document.getElementById('rolUsuario').value = rol;
+    new bootstrap.Modal(document.getElementById('crearCuentaModal')).show();
+  }
+
+  function toggleMode() {
+    const isDark = document.body.classList.contains('emp-dark-mode');
+    document.body.classList.toggle('emp-dark-mode', !isDark);
+    document.body.classList.toggle('emp-light-mode', isDark);
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  }
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+
   function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -364,98 +184,10 @@
     return cookieValue;
   }
 
-  function abrirModal(rol) {
-    document.getElementById('rolUsuario').value = rol;
-    new bootstrap.Modal(document.getElementById('crearCuentaModal')).show();
-  }
-
-  function confirmarCreacion() {
-    const form = document.getElementById('formCrearCuenta');
-    const pass1 = form.querySelector('input[name="password1"]').value;
-    const pass2 = form.querySelector('input[name="password2"]').value;
-
-    if (pass1 !== pass2) {
-      alert("❌ Las contraseñas no coinciden.");
-      return;
-    }
-
-    new bootstrap.Modal(document.getElementById('confirmModal')).show();
-  }
-
-  function crearCuentaConfirmada() {
-    const form = document.getElementById('formCrearCuenta');
-    form.submit();
-
-    const modal = new bootstrap.Modal(document.getElementById('resultadoModal'));
-    document.getElementById('mensajeResultado').innerHTML = `<p>Cuenta creada con éxito.</p>`;
-    modal.show();
-
-    bootstrap.Modal.getInstance(document.getElementById('confirmModal')).hide();
-    bootstrap.Modal.getInstance(document.getElementById('crearCuentaModal')).hide();
-  }
-
-  function eliminarCuenta(id) {
-    if (!confirm("¿Deseas eliminar esta cuenta?")) return;
-
-    fetch(`/eliminar_empleado/${id}/`, {
-      method: 'POST',
-      headers: {
-        'X-CSRFToken': getCookie('csrftoken'),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({})
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error('Error en la respuesta del servidor');
-      }
-      return response.json();
-    })
-    .then(data => {
-      if (data.success) {
-        document.getElementById(`empleado-${id}`).remove();
-        const tabla = document.getElementById('tablaEliminados');
-        const fila = document.createElement('tr');
-        fila.innerHTML = `
-          <td>${data.usuario.username}</td>
-          <td>${data.usuario.email}</td>
-          <td>${data.usuario.nombre}</td>
-          <td>${data.usuario.rut}</td>
-          <td>${data.usuario.fecha_nacimiento}</td>
-          <td>${data.usuario.genero}</td>
-        `;
-        tabla.appendChild(fila);
-      } else {
-        alert("Error al eliminar: " + data.error);
-      }
-    })
-    .catch(error => {
-      console.error('Error al eliminar empleado:', error);
-      alert("❌ Error inesperado. Revisa la consola.");
-    });
-  }
-
-  function toggleMode() {
-    const isDark = document.body.classList.contains('dark-mode');
-    document.body.classList.toggle('dark-mode', !isDark);
-    document.body.classList.toggle('light-mode', isDark);
-    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
-    localStorage.setItem('theme', isDark ? 'light' : 'dark');
-  }
-
   document.addEventListener('DOMContentLoaded', () => {
     const storedMode = localStorage.getItem('theme') || 'light';
-    document.body.classList.add(storedMode + '-mode');
+    document.body.classList.add(`emp-${storedMode}-mode`);
     document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
   });
-
-  function confirmLogout() {
-    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
-      window.location.href = "{% url 'cerrar_sesion' %}";
-    }
-  }
 </script>
-
-
-
 {% endblock %}
