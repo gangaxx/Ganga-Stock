@@ -7,9 +7,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado
+from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado, VentaCajero
 
-# Diccionario temporal para guardar carritos
 carritos_guardados = {}
 
 def index(request):
@@ -35,7 +34,6 @@ def index(request):
                         return redirect('cajero')
                 except PerfilUsuario.DoesNotExist:
                     messages.error(request, 'Perfil de usuario no encontrado.')
-                    return redirect('index')
             else:
                 messages.error(request, 'Credenciales incorrectas.')
 
@@ -57,7 +55,11 @@ def index(request):
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
     movimientos = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
-    return render(request, 'index_admin.html', {'movimientos': movimientos})
+    ventas_cajero = VentaCajero.objects.select_related('producto', 'cajero').order_by('-fecha', '-hora')
+    return render(request, 'index_admin.html', {
+        'movimientos': movimientos,
+        'ventas_cajero': ventas_cajero
+    })
 
 def cerrar_sesion(request):
     logout(request)
@@ -92,12 +94,7 @@ def inventario(request):
         cantidad = request.POST.get('cantidad')
 
         if nombre and imagen and precio and cantidad:
-            Producto.objects.create(
-                nombre=nombre,
-                imagen=imagen,
-                precio=precio,
-                cantidad=cantidad
-            )
+            Producto.objects.create(nombre=nombre, imagen=imagen, precio=precio, cantidad=cantidad)
             messages.success(request, "Producto agregado correctamente.")
             return redirect('inventario')
 
@@ -181,13 +178,22 @@ def eliminar_producto(request):
 @login_required
 def cajero(request):
     codigo = request.GET.get("codigo")
-    carrito = carritos_guardados.get(codigo, []) if codigo else []
-    total_general = sum(item['precio'] * item['cantidad'] for item in carrito)
-    for item in carrito:
-        item['total'] = item['precio'] * item['cantidad']
-        item['nombre'] = item.get('nombre', item.get('name'))
-        item['imagen_url'] = item.get('imagen_url', item.get('img'))
-    return render(request, 'cajero.html', {'carrito': carrito, 'total_general': total_general})
+    carrito = []
+    total_general = 0
+
+    if codigo and codigo != 'None':
+        carrito = carritos_guardados.get(codigo, [])
+        total_general = sum(item['precio'] * item['cantidad'] for item in carrito)
+        for item in carrito:
+            item['total'] = item['precio'] * item['cantidad']
+            item['nombre'] = item.get('nombre', item.get('name'))
+            item['imagen_url'] = item.get('imagen_url', item.get('img'))
+
+    return render(request, 'cajero.html', {
+        'carrito': carrito,
+        'total_general': total_general,
+        'codigo': codigo
+    })
 
 @login_required
 @user_passes_test(lambda u: PerfilUsuario.objects.filter(user=u, rol='bodeguero').exists())
@@ -199,12 +205,7 @@ def bodeguero(request):
         cantidad = request.POST.get('cantidad')
 
         if nombre and imagen and precio and cantidad:
-            Producto.objects.create(
-                nombre=nombre,
-                imagen=imagen,
-                precio=precio,
-                cantidad=cantidad
-            )
+            Producto.objects.create(nombre=nombre, imagen=imagen, precio=precio, cantidad=cantidad)
             messages.success(request, "Producto agregado correctamente.")
             return redirect('bodeguero')
 
@@ -260,13 +261,9 @@ def guardar_carrito(request):
             codigo = str(data.get('codigo'))
             carrito = data.get('carrito', [])
 
-            print(">> Código recibido:", codigo)
-            print(">> Carrito recibido:", carrito)
-
             carritos_guardados[codigo] = carrito
             return JsonResponse({'success': True})
         except Exception as e:
-            print(">> Error en guardar_carrito:", str(e))
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
@@ -296,20 +293,49 @@ def confirmar_venta(request):
             if not carrito:
                 return JsonResponse({'success': False, 'error': 'Carrito no encontrado'})
 
+            perfil = PerfilUsuario.objects.filter(user=request.user).first()
+
             for item in carrito:
                 producto = Producto.objects.get(id=item['id'])
-                if producto.cantidad < item['cantidad']:
+                cantidad = item['cantidad']
+
+                if producto.cantidad < cantidad:
                     return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
-                producto.cantidad -= item['cantidad']
+
+                producto.cantidad -= cantidad
                 producto.save()
-                Movimiento.objects.create(
-                    producto=producto,
-                    cantidad_vendida=item['cantidad'],
-                    empleado=request.user
-                )
+
+                if perfil and perfil.rol == 'vendedor':
+                    Movimiento.objects.create(
+                        producto=producto,
+                        cantidad_vendida=cantidad,
+                        empleado=request.user
+                    )
+
+                elif perfil and perfil.rol == 'cajero':
+                    VentaCajero.objects.create(
+                        producto=producto,
+                        cantidad=cantidad,
+                        precio_unitario=item['precio'],
+                        total_venta=item['precio'] * cantidad,
+                        cajero=request.user
+                    )
 
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
+@login_required
+def boleta_cliente(request, codigo):
+    carrito = carritos_guardados.get(codigo, [])
+    for item in carrito:
+        item['nombre'] = item.get('nombre', item.get('name'))
+        item['imagen_url'] = item.get('imagen_url', item.get('img'))
+    total = sum(item['precio'] * item['cantidad'] for item in carrito)
+    return render(request, 'boleta_cliente.html', {
+        'carrito': carrito,
+        'codigo': codigo,
+        'total': total
+    })

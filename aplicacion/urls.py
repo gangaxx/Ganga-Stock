@@ -21,6 +21,7 @@ urlpatterns = [
     path('guardar_carrito/', views.guardar_carrito, name='guardar_carrito'),
     path('boleta/<str:codigo>/', views.boleta, name='boleta'),
     path('confirmar_venta/', views.confirmar_venta, name='confirmar_venta'),
+    path('boleta_cliente/<str:codigo>/', views.boleta_cliente, name='boleta_cliente'),
 ]
 
 if settings.DEBUG:

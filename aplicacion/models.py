@@ -19,7 +19,7 @@ class PerfilUsuario(models.Model):
 
 class Producto(models.Model):
     nombre = models.CharField(max_length=100)
-    imagen = models.ImageField(upload_to='productos/')  # Ahora usa ImageField
+    imagen = models.ImageField(upload_to='productos/')
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.IntegerField(default=0)
 
@@ -53,6 +53,19 @@ class EmpleadoEliminado(models.Model):
 
 class CarritoTemporal(models.Model):
     codigo = models.CharField(max_length=6, unique=True)
-    productos = models.JSONField()  # [{id, nombre, cantidad, precio, imagen_url}]
+    productos = models.JSONField()
     total = models.DecimalField(max_digits=10, decimal_places=2)
     creado = models.DateTimeField(auto_now_add=True)
+
+
+class VentaCajero(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    precio_unitario = models.DecimalField(max_digits=10, decimal_places=2)
+    total_venta = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+    cajero = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # ← CAMBIO AQUI
+
+    def __str__(self):
+        return f"Venta {self.producto.nombre} - {self.fecha} - {self.total_venta}"

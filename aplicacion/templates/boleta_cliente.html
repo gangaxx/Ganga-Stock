@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<body class="bocli bocli-light-mode">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" height="40">
+  <div class="topbar-center">
+    <h1>Boleta Cliente</h1>
+  </div>
+  <div class="buttons">
+    <button class="btn btn-red" onclick="window.location.href='{% url 'cerrar_sesion' %}'">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- CUERPO PRINCIPAL -->
+<div class="container">
+  <div class="bocli-carrito-box">
+    <h2>Detalle de la Compra</h2>
+    <table class="bocli-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Nombre</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in carrito %}
+        <tr>
+          <td><img src="{{ item.imagen_url }}" alt="{{ item.nombre }}"></td>
+          <td>{{ item.nombre }}</td>
+          <td>{{ item.cantidad }}</td>
+          <td>${{ item.precio|floatformat:0 }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="bocli-total">
+      Total a pagar: <strong>${{ total|floatformat:0 }}</strong>
+    </div>
+
+    <div class="bocli-ticket">
+      Número de ticket: <strong>{{ codigo }}</strong>
+    </div>
+  </div>
+</div>
+
+<!-- MODO OSCURO -->
+<script>
+  function toggleBoletaTheme() {
+    const body = document.body;
+    const isLight = body.classList.contains('bocli-light-mode');
+    body.classList.toggle('bocli-light-mode', !isLight);
+    body.classList.toggle('bocli-dark-mode', isLight);
+    localStorage.setItem('bocliTheme', isLight ? 'dark' : 'light');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('bocliTheme') || 'light';
+    document.body.classList.toggle('bocli-light-mode', theme === 'light');
+    document.body.classList.toggle('bocli-dark-mode', theme === 'dark');
+  });
+</script>
+
+</body>
+{% endblock %}
+

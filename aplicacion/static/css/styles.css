@@ -694,7 +694,12 @@ body.ven-dark-mode .ven-carrito-table td {
 }
 
 
+
 /* ======================== CAJERO.HTML  ======================== */
+
+
+
+
 
 /* ======================== RESET Y VARIABLES ======================== */
 * {
@@ -926,7 +931,15 @@ body.caj-dark-mode .caj-carrito-table td {
     cursor: pointer;
 }
 
+
+
+
+
 /* INDEX_ADMIN.HTML*/
+
+
+
+
 
 /* ======================== RESET Y VARIABLES ======================== */
 * {
@@ -1074,7 +1087,40 @@ body.admin-dark-mode .admin-history-box {
     font-size: 1rem;
 }
 
+/* Cajero Table Styles */
+.admin-history-cajero-box {
+    height: 400px;
+    overflow-y: auto;
+    border-top: 1px solid var(--admin-table-border);
+    margin-top: 40px;
+    background-color: var(--admin-panel-light);
+}
+
+body.admin-dark-mode .admin-history-cajero-box {
+    background-color: var(--admin-panel-dark);
+}
+
+.admin-history-cajero-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-history-cajero-table th, .admin-history-cajero-table td {
+    border: 1px solid var(--admin-table-border);
+    padding: 8px;
+    text-align: center;
+}
+
+
+
+
+
+
 /* INVENTARIO.HTML */
+
+
+
+
 
 :root {
     --inv-bg-light: #ffffff;
@@ -1262,7 +1308,16 @@ body.inv-dark-mode .inv-modal-content {
 }
 
 
+
+
+
+
 /* ======================== EMPLEADO.HTML  ======================== */
+
+
+
+
+
 
 :root {
   --emp-bg-light: #ffffff;
@@ -1364,7 +1419,15 @@ body.emp-dark-mode .emp-modal-content {
   color: white;
 }
 
+
+
+
+
 /* ======================== BOLETA.HTML  ======================== */
+
+
+
+
 
 
 :root {
@@ -1496,4 +1559,143 @@ body.bol-dark-mode .bol-boleta-total {
 
 body.bol-dark-mode .bol-boleta-codigo {
   color: white;
+}
+
+
+
+/* ======================== BOLETA_CLIENTE.HTML  ======================== */
+
+/* ======================== BOLETA CLIENTE ======================== */
+
+body.bocli-light-mode {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+body.bocli-dark-mode {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+/* Topbar */
+.topbar {
+  background-color: black;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  position: relative;
+}
+
+.topbar img {
+  height: 40px;
+}
+
+.topbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 36px;
+  color: white;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.buttons button {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+}
+
+.btn-red {
+  background-color: red;
+  color: white;
+}
+
+/* Contenedor Principal */
+.container {
+  padding: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.bocli-carrito-box {
+  width: 100%;
+  max-width: 900px;
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  padding: 30px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+body.bocli-dark-mode .bocli-carrito-box {
+  background-color: #2c2c2c;
+  color: white;
+}
+
+.bocli-carrito-box h2 {
+  text-align: center;
+  font-size: 28px;
+  margin-bottom: 20px;
+  font-weight: bold;
+}
+
+/* Tabla */
+.bocli-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.bocli-table thead {
+  background-color: #000;
+  color: #fff;
+}
+
+body.bocli-dark-mode .bocli-table thead {
+  background-color: #444;
+}
+
+.bocli-table tbody {
+  background-color: #fff;
+}
+
+body.bocli-dark-mode .bocli-table tbody {
+  background-color: #1e1e1e;
+}
+
+.bocli-table th,
+.bocli-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ccc;
+}
+
+body.bocli-dark-mode .bocli-table th,
+body.bocli-dark-mode .bocli-table td {
+  border: 1px solid #666;
+}
+
+.bocli-table img {
+  width: 80px;
+  height: auto;
+  border-radius: 6px;
+}
+
+/* Total y Ticket */
+.bocli-total {
+  text-align: right;
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.bocli-ticket {
+  text-align: center;
+  font-size: 16px;
+  margin-top: 25px;
 }

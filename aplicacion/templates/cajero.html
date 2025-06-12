@@ -42,16 +42,16 @@
           <td><img src="{{ item.imagen_url }}" alt="{{ item.nombre }}"></td>
           <td>{{ item.nombre }}</td>
           <td>{{ item.cantidad }}</td>
-          <td>${{ item.total }}</td>
+          <td>${{ item.total|floatformat:0 }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
     <div class="caj-total-section">
-      Total a pagar: ${{ total_general }}
+      Total a pagar: ${{ total_general|floatformat:0 }}
     </div>
     <div class="caj-confirmar-btn">
-      <input type="hidden" id="codigoVenta" value="{{ request.GET.codigo }}">
+      <input type="hidden" id="codigoVenta" value="{{ codigo }}">
       <button onclick="confirmarVenta()">Confirmar Venta</button>
     </div>
   </div>
@@ -62,6 +62,11 @@
 <script>
   function confirmarVenta() {
     const codigo = document.getElementById("codigoVenta").value;
+    if (!codigo || codigo === "None") {
+      alert("❌ Código de carrito inválido.");
+      return;
+    }
+
     fetch("/confirmar_venta/", {
       method: "POST",
       headers: {
@@ -74,7 +79,7 @@
     .then(data => {
       if (data.success) {
         alert("✅ Venta confirmada correctamente");
-        window.location.href = "/cajero/";
+        location.href = `/boleta_cliente/${codigo}/`;
       } else {
         alert("❌ Error: " + data.error);
       }

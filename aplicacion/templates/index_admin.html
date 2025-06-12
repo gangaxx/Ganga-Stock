@@ -18,7 +18,7 @@
 <div class="admin-main">
   <!-- Panel izquierdo -->
   <div class="admin-panel" style="flex: 1 1 60%;">
-    <h2>Historial de movimientos</h2>
+    <h2>Historial movimientos de vendedores</h2>
     <div class="admin-history-box">
       <table class="admin-history-table">
         <thead>
@@ -26,7 +26,6 @@
             <th>Producto</th>
             <th>Nombre Producto</th>
             <th>Vendidas</th>
-            <th>Devuelta</th>
             <th>Fecha</th>
             <th>Hora</th>
             <th>Nombre Empleado</th>
@@ -38,14 +37,55 @@
             <td>{{ m.producto.id }}</td>
             <td>{{ m.producto.nombre }}</td>
             <td>{{ m.cantidad_vendida }}</td>
-            <td>{{ m.cantidad_devuelta }}</td>
             <td>{{ m.fecha|date:"d/m/Y" }}</td>
             <td>{{ m.hora|time:"H:i" }}</td>
             <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7">No hay movimientos registrados.</td>
+            <td colspan="6">No hay movimientos registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <h2 style="margin-top: 50px;">Historial ventas cajero</h2>
+    <div class="admin-history-cajero-box">
+      <table class="admin-history-cajero-table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio unitario</th>
+            <th>Total</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Nombre Cajero</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for venta in ventas_cajero %}
+          <tr>
+            <td>{{ venta.id }}</td>
+            <td>{{ venta.producto.nombre }}</td>
+            <td>{{ venta.cantidad }}</td>
+            <td>${{ venta.precio_unitario|floatformat:0 }}</td>
+            <td>${{ venta.total_venta|floatformat:0 }}</td>
+            <td>{{ venta.fecha|date:"d/m/Y" }}</td>
+            <td>{{ venta.hora|time:"H:i" }}</td>
+            <td>
+              {% if venta.cajero %}
+                {{ venta.cajero.get_full_name|default:venta.cajero.username }}
+              {% else %}
+                Sin cajero
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="8">No hay ventas registradas por cajero.</td>
           </tr>
           {% endfor %}
         </tbody>
