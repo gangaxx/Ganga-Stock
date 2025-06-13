@@ -54,8 +54,21 @@ def index(request):
 
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
-    movimientos = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
+    movimientos_queryset = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     ventas_cajero = VentaCajero.objects.select_related('producto', 'cajero').order_by('-fecha', '-hora')
+
+    # Convertimos movimientos a una lista con campo adicional
+    movimientos = []
+    for m in movimientos_queryset:
+        nombre_empleado = m.empleado.get_full_name() if m.empleado.get_full_name() else m.empleado.username
+        movimientos.append({
+            'producto': m.producto,
+            'cantidad_vendida': m.cantidad_vendida,
+            'fecha': m.fecha,
+            'hora': m.hora,
+            'nombre_empleado': nombre_empleado
+        })
+
     return render(request, 'index_admin.html', {
         'movimientos': movimientos,
         'ventas_cajero': ventas_cajero
@@ -71,19 +84,31 @@ def procesar_compra(request):
         try:
             data = json.loads(request.body)
             carrito = data.get('carrito', [])
+            perfil = PerfilUsuario.objects.filter(user=request.user).first()
+
             for item in carrito:
                 producto = Producto.objects.get(id=item['id'])
                 cantidad = item['cantidad']
+
                 if producto.cantidad >= cantidad:
                     producto.cantidad -= cantidad
                     producto.save()
-                    Movimiento.objects.create(producto=producto, cantidad_vendida=cantidad, empleado=request.user)
+
+                    # Solo registrar movimiento si el usuario es vendedor
+                    if perfil and perfil.rol == 'vendedor':
+                        Movimiento.objects.create(
+                            producto=producto,
+                            cantidad_vendida=cantidad,
+                            empleado=request.user
+                        )
                 else:
                     return JsonResponse({'success': False, 'error': f'Stock insuficiente para {producto.nombre}'})
+
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
 
 @user_passes_test(lambda u: u.is_superuser)
 def inventario(request):
@@ -182,7 +207,8 @@ def cajero(request):
     total_general = 0
 
     if codigo and codigo != 'None':
-        carrito = carritos_guardados.get(codigo, [])
+        session = carritos_guardados.get(codigo, {})
+        carrito = session.get('carrito', []) if isinstance(session, dict) else []
         total_general = sum(item['precio'] * item['cantidad'] for item in carrito)
         for item in carrito:
             item['total'] = item['precio'] * item['cantidad']
@@ -194,6 +220,7 @@ def cajero(request):
         'total_general': total_general,
         'codigo': codigo
     })
+
 
 @login_required
 @user_passes_test(lambda u: PerfilUsuario.objects.filter(user=u, rol='bodeguero').exists())
@@ -261,7 +288,11 @@ def guardar_carrito(request):
             codigo = str(data.get('codigo'))
             carrito = data.get('carrito', [])
 
-            carritos_guardados[codigo] = carrito
+            # Guardar también el ID del vendedor actual
+            carritos_guardados[codigo] = {
+                'carrito': carrito,
+                'vendedor_id': request.user.id
+            }
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -270,7 +301,8 @@ def guardar_carrito(request):
 
 @login_required
 def boleta(request, codigo):
-    carrito = carritos_guardados.get(codigo, [])
+    session = carritos_guardados.get(codigo, {})
+    carrito = session.get('carrito', []) if isinstance(session, dict) else []
     for item in carrito:
         item['nombre'] = item.get('nombre', item.get('name'))
         item['imagen_url'] = item.get('imagen_url', item.get('img'))
@@ -281,6 +313,7 @@ def boleta(request, codigo):
         'total': total
     })
 
+
 @csrf_exempt
 @login_required
 def confirmar_venta(request):
@@ -288,10 +321,14 @@ def confirmar_venta(request):
         try:
             data = json.loads(request.body)
             codigo = data.get('codigo')
-            carrito = carritos_guardados.pop(codigo, None)
+            session = carritos_guardados.pop(codigo, None)
 
-            if not carrito:
+            if not session:
                 return JsonResponse({'success': False, 'error': 'Carrito no encontrado'})
+
+            carrito = session['carrito']
+            vendedor_id = session.get('vendedor_id')
+            vendedor_user = User.objects.filter(id=vendedor_id).first()
 
             perfil = PerfilUsuario.objects.filter(user=request.user).first()
 
@@ -305,14 +342,15 @@ def confirmar_venta(request):
                 producto.cantidad -= cantidad
                 producto.save()
 
-                if perfil and perfil.rol == 'vendedor':
+                if perfil and perfil.rol == 'cajero' and vendedor_user:
+                    # Registrar en Movimiento al verdadero vendedor
                     Movimiento.objects.create(
                         producto=producto,
                         cantidad_vendida=cantidad,
-                        empleado=request.user
+                        empleado=vendedor_user
                     )
 
-                elif perfil and perfil.rol == 'cajero':
+                    # Registrar también como venta del cajero
                     VentaCajero.objects.create(
                         producto=producto,
                         cantidad=cantidad,
@@ -326,7 +364,6 @@ def confirmar_venta(request):
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
-
 @login_required
 def boleta_cliente(request, codigo):
     carrito = carritos_guardados.get(codigo, [])

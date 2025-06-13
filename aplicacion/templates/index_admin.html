@@ -39,7 +39,7 @@
             <td>{{ m.cantidad_vendida }}</td>
             <td>{{ m.fecha|date:"d/m/Y" }}</td>
             <td>{{ m.hora|time:"H:i" }}</td>
-            <td>{{ m.empleado.get_full_name|default:m.empleado.username }}</td>
+            <td>{{ m.nombre_empleado }}</td>
           </tr>
           {% empty %}
           <tr>
