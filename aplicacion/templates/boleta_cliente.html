@@ -19,6 +19,8 @@
 <div class="container">
   <div class="bocli-carrito-box">
     <h2>Detalle de la Compra</h2>
+
+    {% if carrito %}
     <table class="bocli-table">
       <thead>
         <tr>
@@ -31,7 +33,13 @@
       <tbody>
         {% for item in carrito %}
         <tr>
-          <td><img src="{{ item.imagen_url }}" alt="{{ item.nombre }}"></td>
+          <td>
+            {% if item.imagen_url %}
+              <img src="{{ item.imagen_url }}" alt="{{ item.nombre }}">
+            {% else %}
+              <span style="color: gray;">Sin imagen</span>
+            {% endif %}
+          </td>
           <td>{{ item.nombre }}</td>
           <td>{{ item.cantidad }}</td>
           <td>${{ item.precio|floatformat:0 }}</td>
@@ -47,6 +55,9 @@
     <div class="bocli-ticket">
       Número de ticket: <strong>{{ codigo }}</strong>
     </div>
+    {% else %}
+      <p style="text-align: center; font-weight: bold;">No se encontraron productos en el carrito.</p>
+    {% endif %}
   </div>
 </div>
 
@@ -69,4 +80,3 @@
 
 </body>
 {% endblock %}
-

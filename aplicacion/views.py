@@ -7,7 +7,16 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado, VentaCajero, MovimientoBodega
+from .models import (
+    Producto,
+    Movimiento,
+    PerfilUsuario,
+    EmpleadoEliminado,
+    VentaCajero,
+    MovimientoBodega,
+    BoletaCliente,         
+    BoletaItem             
+)
 
 carritos_guardados = {}
 
@@ -350,7 +359,6 @@ def boleta(request, codigo):
     })
 
 
-@csrf_exempt
 @login_required
 def confirmar_venta(request):
     if request.method == 'POST':
@@ -365,8 +373,17 @@ def confirmar_venta(request):
             carrito = session['carrito']
             vendedor_id = session.get('vendedor_id')
             vendedor_user = User.objects.filter(id=vendedor_id).first()
-
             perfil = PerfilUsuario.objects.filter(user=request.user).first()
+
+            total = 0
+            for item in carrito:
+                total += item['precio'] * item['cantidad']
+
+            boleta = BoletaCliente.objects.create(
+                codigo=codigo,
+                total=total,
+                cajero=request.user if perfil and perfil.rol == 'cajero' else None
+            )
 
             for item in carrito:
                 producto = Producto.objects.get(id=item['id'])
@@ -379,14 +396,11 @@ def confirmar_venta(request):
                 producto.save()
 
                 if perfil and perfil.rol == 'cajero' and vendedor_user:
-                    # Registrar en Movimiento al verdadero vendedor
                     Movimiento.objects.create(
                         producto=producto,
                         cantidad_vendida=cantidad,
                         empleado=vendedor_user
                     )
-
-                    # Registrar también como venta del cajero
                     VentaCajero.objects.create(
                         producto=producto,
                         cantidad=cantidad,
@@ -395,20 +409,35 @@ def confirmar_venta(request):
                         cajero=request.user
                     )
 
+                BoletaItem.objects.create(
+                    boleta=boleta,
+                    producto=producto,
+                    nombre=item.get('nombre', producto.nombre),
+                    precio=item['precio'],
+                    cantidad=cantidad
+                )
+
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
 @login_required
 def boleta_cliente(request, codigo):
-    carrito = carritos_guardados.get(codigo, [])
-    for item in carrito:
-        item['nombre'] = item.get('nombre', item.get('name'))
-        item['imagen_url'] = item.get('imagen_url', item.get('img'))
-    total = sum(item['precio'] * item['cantidad'] for item in carrito)
-    return render(request, 'boleta_cliente.html', {
-        'carrito': carrito,
-        'codigo': codigo,
-        'total': total
-    })
+    try:
+        boleta = BoletaCliente.objects.get(codigo=codigo)
+        items = BoletaItem.objects.filter(boleta=boleta)
+        return render(request, 'boleta_cliente.html', {
+            'carrito': items,
+            'codigo': boleta.codigo,
+            'total': boleta.total
+        })
+    except BoletaCliente.DoesNotExist:
+        return render(request, 'boleta_cliente.html', {
+            'carrito': [],
+            'codigo': codigo,
+            'total': 0
+        })
+
+

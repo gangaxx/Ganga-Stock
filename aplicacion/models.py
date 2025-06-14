@@ -81,3 +81,25 @@ class VentaCajero(models.Model):
 
     def __str__(self):
         return f"Venta {self.producto.nombre} - {self.fecha} - {self.total_venta}"
+
+
+class BoletaCliente(models.Model):
+    codigo = models.CharField(max_length=6, unique=True)
+    total = models.DecimalField(max_digits=10, decimal_places=2)
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+    cajero = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Boleta {self.codigo} - ${self.total}"
+
+
+class BoletaItem(models.Model):
+    boleta = models.ForeignKey(BoletaCliente, related_name='items', on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.SET_NULL, null=True)
+    nombre = models.CharField(max_length=100)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    cantidad = models.PositiveIntegerField()
+
+    def __str__(self):
+        return f"{self.nombre} x{self.cantidad}"
