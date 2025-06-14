@@ -973,6 +973,7 @@ body.caj-dark-mode .caj-carrito-table td {
     --admin-toggle-text-light: #1e1e1e;
 }
 
+/* ======================== MODO CLARO / OSCURO ======================== */
 body.admin-light-mode {
     background-color: var(--admin-bg-light);
     color: var(--admin-text-light);
@@ -995,6 +996,7 @@ body.admin-dark-mode .admin-panel {
     border: 1px solid var(--admin-border-dark);
 }
 
+/* ======================== TOPBAR ======================== */
 .admin-topbar {
     background-color: black;
     padding: 10px 20px;
@@ -1051,6 +1053,7 @@ body.admin-dark-mode .admin-mode-toggle {
     border: 1px solid var(--admin-toggle-text-dark);
 }
 
+/* ======================== ESTRUCTURA GENERAL ======================== */
 .admin-main {
     display: flex;
     justify-content: space-between;
@@ -1058,7 +1061,10 @@ body.admin-dark-mode .admin-mode-toggle {
     gap: 40px;
 }
 
-.admin-history-box {
+/* ======================== TABLAS VENTA Y BODEGA ======================== */
+.admin-history-box,
+.admin-history-cajero-box,
+.admin-history-bodega-box {
     height: 400px;
     overflow-y: auto;
     border-top: 1px solid var(--admin-table-border);
@@ -1066,49 +1072,32 @@ body.admin-dark-mode .admin-mode-toggle {
     background-color: var(--admin-panel-light);
 }
 
-body.admin-dark-mode .admin-history-box {
+body.admin-dark-mode .admin-history-box,
+body.admin-dark-mode .admin-history-cajero-box,
+body.admin-dark-mode .admin-history-bodega-box {
     background-color: var(--admin-panel-dark);
 }
 
-.admin-history-table {
+.admin-history-table,
+.admin-history-cajero-table,
+.admin-history-bodega-table {
     width: 100%;
     border-collapse: collapse;
 }
 
-.admin-history-table th, .admin-history-table td {
+.admin-history-table th, .admin-history-table td,
+.admin-history-cajero-table th, .admin-history-cajero-table td,
+.admin-history-bodega-table th, .admin-history-bodega-table td {
     border: 1px solid var(--admin-table-border);
     padding: 8px;
     text-align: center;
 }
 
+/* ======================== PANEL DERECHO ======================== */
 .admin-section-title {
     font-weight: bold;
     color: inherit;
     font-size: 1rem;
-}
-
-/* Cajero Table Styles */
-.admin-history-cajero-box {
-    height: 400px;
-    overflow-y: auto;
-    border-top: 1px solid var(--admin-table-border);
-    margin-top: 40px;
-    background-color: var(--admin-panel-light);
-}
-
-body.admin-dark-mode .admin-history-cajero-box {
-    background-color: var(--admin-panel-dark);
-}
-
-.admin-history-cajero-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.admin-history-cajero-table th, .admin-history-cajero-table td {
-    border: 1px solid var(--admin-table-border);
-    padding: 8px;
-    text-align: center;
 }
 
 

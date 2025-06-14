@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 
-from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado, VentaCajero
+from .models import Producto, Movimiento, PerfilUsuario, EmpleadoEliminado, VentaCajero, MovimientoBodega
 
 carritos_guardados = {}
 
@@ -56,8 +56,8 @@ def index(request):
 def index_admin(request):
     movimientos_queryset = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     ventas_cajero = VentaCajero.objects.select_related('producto', 'cajero').order_by('-fecha', '-hora')
+    movimientos_bodega_queryset = MovimientoBodega.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
 
-    # Convertimos movimientos a una lista con campo adicional
     movimientos = []
     for m in movimientos_queryset:
         nombre_empleado = m.empleado.get_full_name() if m.empleado.get_full_name() else m.empleado.username
@@ -69,9 +69,22 @@ def index_admin(request):
             'nombre_empleado': nombre_empleado
         })
 
+    movimientos_bodega = []
+    for b in movimientos_bodega_queryset:
+        nombre_empleado = b.empleado.get_full_name() if b.empleado.get_full_name() else b.empleado.username
+        movimientos_bodega.append({
+            'producto': b.producto,
+            'agregado': b.agregado,
+            'eliminado': b.eliminado,
+            'fecha': b.fecha,
+            'hora': b.hora,
+            'nombre_empleado': nombre_empleado
+        })
+
     return render(request, 'index_admin.html', {
         'movimientos': movimientos,
-        'ventas_cajero': ventas_cajero
+        'ventas_cajero': ventas_cajero,
+        'movimientos_bodega': movimientos_bodega
     })
 
 def cerrar_sesion(request):
@@ -94,7 +107,6 @@ def procesar_compra(request):
                     producto.cantidad -= cantidad
                     producto.save()
 
-                    # Solo registrar movimiento si el usuario es vendedor
                     if perfil and perfil.rol == 'vendedor':
                         Movimiento.objects.create(
                             producto=producto,
@@ -177,11 +189,27 @@ def update_stock(request):
         try:
             data = json.loads(request.body)
             producto = Producto.objects.get(id=data['id'])
+            agregado = 0
+            eliminado = 0
+
             if data['action'] == 'add':
                 producto.cantidad += 1
+                agregado = 1
             elif data['action'] == 'remove' and producto.cantidad > 0:
                 producto.cantidad -= 1
+                eliminado = 1
+
             producto.save()
+
+            perfil = PerfilUsuario.objects.filter(user=request.user, rol='bodeguero').first()
+            if perfil:
+                MovimientoBodega.objects.create(
+                    producto=producto,
+                    agregado=agregado,
+                    eliminado=eliminado,
+                    empleado=request.user
+                )
+
             return JsonResponse({'success': True})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
@@ -194,6 +222,14 @@ def eliminar_producto(request):
         try:
             data = json.loads(request.body)
             producto = Producto.objects.get(id=data['id'])
+            perfil = PerfilUsuario.objects.filter(user=request.user, rol='bodeguero').first()
+            if perfil:
+                MovimientoBodega.objects.create(
+                    producto=producto,
+                    agregado=0,
+                    eliminado=producto.cantidad,
+                    empleado=request.user
+                )
             producto.delete()
             return JsonResponse({'success': True})
         except Exception as e:

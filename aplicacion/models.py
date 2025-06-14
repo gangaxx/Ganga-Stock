@@ -39,6 +39,18 @@ class Movimiento(models.Model):
         return f"{self.producto.nombre} - {self.empleado.username} - {self.fecha}"
 
 
+class MovimientoBodega(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    agregado = models.PositiveIntegerField(default=0)
+    eliminado = models.PositiveIntegerField(default=0)
+    fecha = models.DateField(auto_now_add=True)
+    hora = models.TimeField(auto_now_add=True)
+    empleado = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+
+    def __str__(self):
+        return f"{self.producto.nombre} - Agregado: {self.agregado} - Eliminado: {self.eliminado}"
+
+
 class EmpleadoEliminado(models.Model):
     username = models.CharField(max_length=150)
     email = models.EmailField()
@@ -65,7 +77,7 @@ class VentaCajero(models.Model):
     total_venta = models.DecimalField(max_digits=10, decimal_places=2)
     fecha = models.DateField(auto_now_add=True)
     hora = models.TimeField(auto_now_add=True)
-    cajero = models.ForeignKey(User, on_delete=models.CASCADE, null=True)  # ← CAMBIO AQUI
+    cajero = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
 
     def __str__(self):
         return f"Venta {self.producto.nombre} - {self.fecha} - {self.total_venta}"

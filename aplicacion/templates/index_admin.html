@@ -91,6 +91,40 @@
         </tbody>
       </table>
     </div>
+
+    <h2 style="margin-top: 50px;">Movimientos bodega</h2>
+    <div class="admin-history-bodega-box">
+      <table class="admin-history-bodega-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Nombre Producto</th>
+            <th>Agregado</th>
+            <th>Eliminado</th>
+            <th>Fecha</th>
+            <th>Hora</th>
+            <th>Empleado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in movimientos_bodega %}
+          <tr>
+            <td>{{ b.producto.id }}</td>
+            <td>{{ b.producto.nombre }}</td>
+            <td>{{ b.agregado }}</td>
+            <td>{{ b.eliminado }}</td>
+            <td>{{ b.fecha|date:"d/m/Y" }}</td>
+            <td>{{ b.hora|time:"H:i" }}</td>
+            <td>{{ b.nombre_empleado }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="7">No hay movimientos de bodega registrados.</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Panel derecho -->
