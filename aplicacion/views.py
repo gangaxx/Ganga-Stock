@@ -441,3 +441,79 @@ def boleta_cliente(request, codigo):
         })
 
 
+
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def modificar_rol(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        nuevo_rol = request.POST.get('rol')
+        try:
+            usuario = User.objects.get(id=user_id)
+            perfil = PerfilUsuario.objects.get(user=usuario)
+            perfil.rol = nuevo_rol
+            perfil.save()
+            messages.success(request, 'Rol actualizado correctamente.')
+        except (User.DoesNotExist, PerfilUsuario.DoesNotExist):
+            messages.error(request, 'Error al actualizar el rol.')
+
+    usuarios = User.objects.filter(is_superuser=False)
+    perfiles = PerfilUsuario.objects.filter(user__in=usuarios)
+    empleados_info = []
+    for usuario in usuarios:
+        perfil = perfiles.filter(user=usuario).first()
+        empleados_info.append({
+            'id': usuario.id,
+            'username': usuario.username,
+            'nombre': usuario.first_name,
+            'rol': perfil.rol if perfil else 'Sin rol'
+        })
+
+    return render(request, 'modificar_rol.html', {'empleados': empleados_info})
+
+
+from django.views.decorators.csrf import csrf_exempt
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def modificar_rol_api(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("usuario")
+            nuevo_rol = data.get("nuevo_rol")
+
+            user = User.objects.get(username=username)
+            perfil = PerfilUsuario.objects.get(user=user)
+
+            perfil.rol = nuevo_rol
+            perfil.save()
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
+    return JsonResponse({"success": False, "error": "Método no permitido"})
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def modificar_rol_lista_usuarios(request):
+    if request.method == "GET":
+        rol = request.GET.get("rol")
+
+        if rol not in ["vendedor", "bodeguero", "cajero"]:
+            return JsonResponse({"success": False, "error": "Rol no válido"})
+
+        perfiles = PerfilUsuario.objects.filter(rol=rol).select_related('user')
+        usuarios = [
+            {
+                "username": p.user.username,
+                "nombre": p.user.first_name or p.user.username,
+                "rol": p.rol
+            }
+            for p in perfiles
+        ]
+        return JsonResponse({"success": True, "usuarios": usuarios})
+
+    return JsonResponse({"success": False, "error": "Método no permitido"})

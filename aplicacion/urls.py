@@ -22,6 +22,11 @@ urlpatterns = [
     path('boleta/<str:codigo>/', views.boleta, name='boleta'),
     path('confirmar_venta/', views.confirmar_venta, name='confirmar_venta'),
     path('boleta_cliente/<str:codigo>/', views.boleta_cliente, name='boleta_cliente'),
+    path('modificar_rol/', views.modificar_rol, name='modificar_rol'),
+    path('modificar_rol_api/', views.modificar_rol_api, name='modificar_rol_api'),
+    path('api/modificar_rol/', views.modificar_rol_lista_usuarios, name='modificar_rol_lista_usuarios'),
+
+        # ✅ NUEVA RUTA
 ]
 
 if settings.DEBUG:

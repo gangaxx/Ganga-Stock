@@ -935,169 +935,182 @@ body.caj-dark-mode .caj-carrito-table td {
 
 
 
-/* INDEX_ADMIN.HTML*/
-
-
-
-
-
 /* ======================== RESET Y VARIABLES ======================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
-    --nav-color: rgb(0, 0, 0);
-    --bg-color: rgb(85, 85, 85);
-    --text-a-color: rgb(255, 255, 255);
-    --text-b-color: rgb(0, 0, 0);
-    --button-color: rgb(255, 255, 0);
-    --button-hover-color: rgb(255, 235, 85);
+  --nav-color: rgb(0, 0, 0);
+  --bg-color: rgb(85, 85, 85);
+  --text-a-color: rgb(255, 255, 255);
+  --text-b-color: rgb(0, 0, 0);
+  --button-color: rgb(255, 255, 0);
+  --button-hover-color: rgb(255, 235, 85);
 
-    /* Variables para admin */
-    --admin-bg-dark: #1e1e1e;
-    --admin-bg-light: #ffffff;
-    --admin-text-dark: white;
-    --admin-text-light: #1e1e1e;
-    --admin-panel-dark: #1e1e1e;
-    --admin-panel-light: #ffffff;
-    --admin-border-dark: #fff;
-    --admin-border-light: #ccc;
-    --admin-table-border: #999;
-    --admin-logout-bg: red;
-    --admin-toggle-bg-dark: #333;
-    --admin-toggle-bg-light: #f5f5f5;
-    --admin-toggle-text-dark: #ff0;
-    --admin-toggle-text-light: #1e1e1e;
+  /* Variables para admin */
+  --admin-bg-dark: #1e1e1e;
+  --admin-bg-light: #ffffff;
+  --admin-text-dark: white;
+  --admin-text-light: #1e1e1e;
+  --admin-panel-dark: #1e1e1e;
+  --admin-panel-light: #ffffff;
+  --admin-border-dark: #fff;
+  --admin-border-light: #ccc;
+  --admin-table-border: #999;
+  --admin-logout-bg: red;
+  --admin-toggle-bg-dark: #333;
+  --admin-toggle-bg-light: #f5f5f5;
+  --admin-toggle-text-dark: #ff0;
+  --admin-toggle-text-light: #1e1e1e;
 }
 
 /* ======================== MODO CLARO / OSCURO ======================== */
 body.admin-light-mode {
-    background-color: var(--admin-bg-light);
-    color: var(--admin-text-light);
+  background-color: var(--admin-bg-light);
+  color: var(--admin-text-light);
 }
 
 body.admin-dark-mode {
-    background-color: var(--admin-bg-dark);
-    color: var(--admin-text-dark);
+  background-color: var(--admin-bg-dark);
+  color: var(--admin-text-dark);
 }
 
 .admin-panel {
-    border-radius: 4px;
-    padding: 20px;
-    background-color: var(--admin-panel-light);
-    border: 1px solid var(--admin-border-light);
+  border-radius: 4px;
+  padding: 20px;
+  background-color: var(--admin-panel-light);
+  border: 1px solid var(--admin-border-light);
 }
 
 body.admin-dark-mode .admin-panel {
-    background-color: var(--admin-panel-dark);
-    border: 1px solid var(--admin-border-dark);
+  background-color: var(--admin-panel-dark);
+  border: 1px solid var(--admin-border-dark);
 }
 
 /* ======================== TOPBAR ======================== */
 .admin-topbar {
-    background-color: black;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    gap: 10px;
-    height: 70px;
+  background-color: black;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  gap: 10px;
+  height: 70px;
 }
 
 .admin-topbar img.logo-img-small {
-    height: 50px;
-    width: auto;
+  height: 50px;
+  width: auto;
 }
 
 .admin-topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    font-weight: bold;
-    color: white;
-    white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;
 }
 
 .admin-welcome-message {
-    display: none;
+  display: none;
 }
 
 .admin-logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: var(--admin-logout-bg);
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+  padding: 6px 12px;
+  border-radius: 4px;
+  background-color: var(--admin-logout-bg);
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
 }
 
 .admin-mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: var(--admin-toggle-bg-light);
-    color: var(--admin-toggle-text-light);
-    border: 1px solid var(--admin-border-light);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  background-color: var(--admin-toggle-bg-light);
+  color: var(--admin-toggle-text-light);
+  border: 1px solid var(--admin-border-light);
 }
 
 body.admin-dark-mode .admin-mode-toggle {
-    background-color: var(--admin-toggle-bg-dark);
-    color: var(--admin-toggle-text-dark);
-    border: 1px solid var(--admin-toggle-text-dark);
+  background-color: var(--admin-toggle-bg-dark);
+  color: var(--admin-toggle-text-dark);
+  border: 1px solid var(--admin-toggle-text-dark);
 }
 
 /* ======================== ESTRUCTURA GENERAL ======================== */
 .admin-main {
-    display: flex;
-    justify-content: space-between;
-    padding: 40px 60px;
-    gap: 40px;
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 60px;
+  gap: 40px;
 }
 
 /* ======================== TABLAS VENTA Y BODEGA ======================== */
 .admin-history-box,
 .admin-history-cajero-box,
 .admin-history-bodega-box {
-    height: 400px;
-    overflow-y: auto;
-    border-top: 1px solid var(--admin-table-border);
-    margin-top: 20px;
-    background-color: var(--admin-panel-light);
+  height: 400px;
+  overflow-y: auto;
+  border-top: 1px solid var(--admin-table-border);
+  margin-top: 20px;
+  background-color: var(--admin-panel-light);
 }
 
 body.admin-dark-mode .admin-history-box,
 body.admin-dark-mode .admin-history-cajero-box,
 body.admin-dark-mode .admin-history-bodega-box {
-    background-color: var(--admin-panel-dark);
+  background-color: var(--admin-panel-dark);
 }
 
 .admin-history-table,
 .admin-history-cajero-table,
 .admin-history-bodega-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
-.admin-history-table th, .admin-history-table td,
-.admin-history-cajero-table th, .admin-history-cajero-table td,
-.admin-history-bodega-table th, .admin-history-bodega-table td {
-    border: 1px solid var(--admin-table-border);
-    padding: 8px;
-    text-align: center;
+.admin-history-table th,
+.admin-history-table td,
+.admin-history-cajero-table th,
+.admin-history-cajero-table td,
+.admin-history-bodega-table th,
+.admin-history-bodega-table td {
+  border: 1px solid var(--admin-table-border);
+  padding: 8px;
+  text-align: center;
 }
 
 /* ======================== PANEL DERECHO ======================== */
 .admin-section-title {
-    font-weight: bold;
-    color: inherit;
-    font-size: 1rem;
+  font-weight: bold;
+  color: inherit;
+  font-size: 1rem;
+}
+
+.section {
+  margin-bottom: 16px;
+}
+
+.btn-warning {
+  background-color: var(--button-color);
+  color: var(--text-b-color);
+  border: none;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.btn-warning:hover {
+  background-color: var(--button-hover-color);
 }
 
 
@@ -1687,4 +1700,203 @@ body.bocli-dark-mode .bocli-table td {
   text-align: center;
   font-size: 16px;
   margin-top: 25px;
+}
+
+
+
+
+
+
+
+/* ======================== MODIFICAR_ROL.HTML  ======================== */
+
+
+
+
+
+
+/* ======================== RESET ======================== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body.admin-light-mode {
+  background-color: #ffffff;
+  color: #1e1e1e;
+}
+
+body.admin-dark-mode {
+  background-color: #1e1e1e;
+  color: white;
+}
+
+/* ======================== TOPBAR ======================== */
+.admin-topbar {
+  background-color: black;
+  padding: 10px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  height: 70px;
+  position: relative;
+}
+
+.admin-topbar img.logo-img-small {
+  height: 50px;
+  width: auto;
+}
+
+.admin-topbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 32px;
+  font-weight: bold;
+  color: white;
+  white-space: nowrap;
+}
+
+.admin-welcome-message {
+  color: white;
+}
+
+/* ======================== TOGGLE Y LOGOUT ======================== */
+.admin-logout-button,
+.admin-mode-toggle {
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid #ccc;
+}
+
+.admin-logout-button {
+  background-color: red;
+  color: white;
+  border: none;
+}
+
+.admin-mode-toggle {
+  background-color: #f5f5f5;
+  color: #1e1e1e;
+}
+
+body.admin-dark-mode .admin-mode-toggle {
+  background-color: #333;
+  color: #ff0;
+  border: 1px solid #ff0;
+}
+
+/* ======================== LAYOUT MODIFICAR ROL ======================== */
+.admin-main-centered {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 60px;
+  padding: 60px;
+  flex-wrap: wrap;
+}
+
+/* ======================== CAJA IZQUIERDA: BOTONES ======================== */
+.admin-role-box {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 60px;
+  border-radius: 10px;
+  width: 400px;
+  min-height: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 30px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+body.admin-dark-mode .admin-role-box {
+  background-color: #2b2b2b;
+  border: 1px solid #999;
+}
+
+.admin-role-title {
+  font-size: 28px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.role-button {
+  width: 100%;
+  padding: 14px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 17px;
+  border: none;
+  cursor: pointer;
+  background-color: #ffcc00;
+  color: black;
+  transition: background-color 0.3s ease;
+}
+
+.role-button:hover {
+  background-color: #ffdb4d;
+}
+
+body.admin-dark-mode .role-button {
+  background-color: #e6b800;
+  color: white;
+}
+
+body.admin-dark-mode .role-button:hover {
+  background-color: #ffd633;
+}
+
+/* ======================== CAJA DERECHA: TABLA DE USUARIOS ======================== */
+.admin-role-table-box {
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  padding: 60px;
+  border-radius: 10px;
+  width: 650px;
+  min-height: 500px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.15);
+}
+
+body.admin-dark-mode .admin-role-table-box {
+  background-color: #2b2b2b;
+  border: 1px solid #999;
+}
+
+.admin-role-table-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 25px;
+}
+
+.role-users-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.role-users-table th,
+.role-users-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ccc;
+}
+
+body.admin-dark-mode .role-users-table th,
+body.admin-dark-mode .role-users-table td {
+  border-bottom: 1px solid #555;
+}
+
+.role-users-table select {
+  padding: 6px;
+  border-radius: 4px;
+}
+
+.role-users-table select:focus {
+  outline: none;
+  border-color: #333;
 }

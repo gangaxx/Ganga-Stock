@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+{% endblock %}
+
+{% block content %}
+<body class="admin-light-mode">
+
+<div class="admin-topbar">
+  <img src="{% static 'img/logo.png' %}" alt="Logo" class="logo-img-small">
+  <div class="admin-topbar-center">
+    <span class="admin-welcome-message">¡Bienvenido, {{ request.user.first_name|default:request.user.username }}!</span>
+  </div>
+  <div class="d-flex gap-2">
+    <button class="admin-mode-toggle" id="modeToggle" onclick="toggleMode()">🌙 Oscuro</button>
+    <button class="admin-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<div class="admin-main-centered">
+  <!-- Caja izquierda: botones de roles -->
+  <div class="admin-role-box">
+    <div class="admin-role-title">Modificar Roles</div>
+    <button class="role-button" onclick="cargarUsuarios('vendedor')">Vendedor</button>
+    <button class="role-button" onclick="cargarUsuarios('bodeguero')">Bodega</button>
+    <button class="role-button" onclick="cargarUsuarios('cajero')">Cajero</button>
+  </div>
+
+  <!-- Caja derecha: tabla dinámica -->
+  <div class="admin-role-table-box">
+    <div class="admin-role-table-title" id="titulo-rol">Modificar rol</div>
+    <p>Selecciona un rol a modificar para ver los empleados disponibles.</p>
+    <div id="tabla-usuarios"></div>
+  </div>
+</div>
+
+<script>
+  function toggleMode() {
+    const body = document.body;
+    const isLight = body.classList.contains('admin-light-mode');
+    body.classList.toggle('admin-light-mode', !isLight);
+    body.classList.toggle('admin-dark-mode', isLight);
+    const toggleBtn = document.getElementById('modeToggle');
+    toggleBtn.textContent = isLight ? '☀ Claro' : '🌙 Oscuro';
+    localStorage.setItem('adminTheme', isLight ? 'dark' : 'light');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const theme = localStorage.getItem('adminTheme') || 'light';
+    document.body.classList.toggle('admin-light-mode', theme === 'light');
+    document.body.classList.toggle('admin-dark-mode', theme === 'dark');
+
+    const toggleBtn = document.getElementById('modeToggle');
+    if (toggleBtn) {
+      toggleBtn.textContent = theme === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+    }
+  });
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+
+  function cargarUsuarios(rol) {
+    document.getElementById('titulo-rol').innerText = `Modificar ${rol}`;
+    fetch(`/api/modificar_rol/?rol=${rol}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          mostrarTablaUsuarios(data.usuarios, rol);
+        } else {
+          alert('Error al cargar usuarios');
+        }
+      });
+  }
+
+  function mostrarTablaUsuarios(usuarios, rol) {
+    const tabla = document.getElementById('tabla-usuarios');
+    if (usuarios.length === 0) {
+      tabla.innerHTML = "<p>No hay usuarios disponibles.</p>";
+      return;
+    }
+
+    let html = `
+      <table class="role-users-table">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Nombre</th>
+            <th>Rol actual</th>
+            <th>Asignar nuevo rol</th>
+          </tr>
+        </thead>
+        <tbody>`;
+    usuarios.forEach(user => {
+      html += `
+        <tr>
+          <td>${user.username}</td>
+          <td>${user.nombre}</td>
+          <td>${user.rol}</td>
+          <td>
+            <select onchange="asignarRol('${user.username}', this.value)">
+              <option disabled selected>Selecciona nuevo rol</option>`;
+
+      if (rol === 'vendedor') {
+        html += `<option value="bodeguero">Bodega</option><option value="cajero">Cajero</option>`;
+      } else if (rol === 'bodeguero') {
+        html += `<option value="vendedor">Vendedor</option><option value="cajero">Cajero</option>`;
+      } else if (rol === 'cajero') {
+        html += `<option value="vendedor">Vendedor</option><option value="bodeguero">Bodega</option>`;
+      }
+
+      html += `</select></td></tr>`;
+    });
+
+    html += `</tbody></table>`;
+    tabla.innerHTML = html;
+  }
+
+  function asignarRol(usuario, nuevoRol) {
+    if (!confirm(`¿Deseas cambiar el rol de ${usuario} a ${nuevoRol}?`)) return;
+
+    fetch("{% url 'modificar_rol_api' %}", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRFToken": "{{ csrf_token }}"
+      },
+      body: JSON.stringify({ usuario: usuario, nuevo_rol: nuevoRol })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.success) {
+        alert("Rol asignado correctamente.");
+        location.reload();
+      } else {
+        alert("Error: " + data.error);
+      }
+    });
+  }
+</script>
+
+</body>
+{% endblock %}
