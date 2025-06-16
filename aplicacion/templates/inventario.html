@@ -112,13 +112,15 @@
   }
 
   function updateStock(id, action) {
+    let cantidad = action === 'add' ? 1 : -1;
+
     fetch('/update_stock/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': '{{ csrf_token }}'
       },
-      body: JSON.stringify({ id: id, action: action })
+      body: JSON.stringify({ producto_id: id, cantidad: cantidad })
     })
     .then(response => response.json())
     .then(data => data.success ? location.reload() : alert(data.error));

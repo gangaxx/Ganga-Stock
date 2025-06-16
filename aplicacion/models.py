@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.utils import timezone
 
 class PerfilUsuario(models.Model):
     ROLES = (
@@ -7,14 +8,38 @@ class PerfilUsuario(models.Model):
         ('bodeguero', 'Bodeguero'),
         ('cajero', 'Cajero'),
     )
+
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     rol = models.CharField(max_length=10, choices=ROLES)
     rut = models.CharField(max_length=20)
     fecha_nacimiento = models.DateField()
     genero = models.CharField(max_length=10)
 
+    # NUEVOS CAMPOS PARA ROL TEMPORAL
+    rol_temporal = models.CharField(max_length=10, choices=ROLES, null=True, blank=True)
+    inicio_temporal = models.DateTimeField(null=True, blank=True)
+    fin_temporal = models.DateTimeField(null=True, blank=True)
+
     def __str__(self):
-        return f"{self.user.username} - {self.rol}"
+        return f"{self.user.username} - {self.get_rol_actual_display()}"
+
+    def get_rol_actual(self):
+        """Devuelve el rol activo, considerando si hay un rol temporal vigente."""
+        now = timezone.now()
+        if self.rol_temporal and self.inicio_temporal and self.fin_temporal:
+            if self.inicio_temporal <= now <= self.fin_temporal:
+                return self.rol_temporal
+            else:
+                # Limpiar si está vencido
+                self.rol_temporal = None
+                self.inicio_temporal = None
+                self.fin_temporal = None
+                self.save()
+        return self.rol
+
+    def get_rol_actual_display(self):
+        actual = self.get_rol_actual()
+        return dict(self.ROLES).get(actual, actual)
 
 
 class Producto(models.Model):

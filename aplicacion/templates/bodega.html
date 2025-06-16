@@ -126,23 +126,31 @@
   }
 
   function updateStock(productId, action) {
-    fetch(`/update_stock/`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-      },
-      body: JSON.stringify({ id: productId, action: action })
+  let cantidad = 0;
+  if (action === 'add') cantidad = 1;
+  if (action === 'remove') cantidad = -1;
+
+  fetch(`/update_stock/`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-CSRFToken': '{{ csrf_token }}'
+    },
+    body: JSON.stringify({
+      producto_id: productId,
+      cantidad: cantidad
     })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.error);
-      }
-    });
-  }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      location.reload();
+    } else {
+      alert(data.error);
+    }
+  });
+}
+
 
   function deleteProduct(productId) {
     if (!confirm("¿Deseas eliminar este producto completamente?")) return;

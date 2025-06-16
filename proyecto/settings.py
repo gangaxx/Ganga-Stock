@@ -72,10 +72,10 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internacionalización
 LANGUAGE_CODE = 'es-es'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/Santiago'  # <-- CAMBIO REALIZADO PARA USAR HORA LOCAL CHILENA
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True
+USE_TZ = True  # <-- SE MANTIENE PARA USAR OBJETOS "aware" (con zona horaria)
 
 # Archivos estáticos (CSS, JS, logo, etc.)
 STATIC_URL = '/static/'

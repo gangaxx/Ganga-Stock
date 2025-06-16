@@ -23,10 +23,11 @@ urlpatterns = [
     path('confirmar_venta/', views.confirmar_venta, name='confirmar_venta'),
     path('boleta_cliente/<str:codigo>/', views.boleta_cliente, name='boleta_cliente'),
     path('modificar_rol/', views.modificar_rol, name='modificar_rol'),
-    path('modificar_rol_api/', views.modificar_rol_api, name='modificar_rol_api'),
-    path('api/modificar_rol/', views.modificar_rol_lista_usuarios, name='modificar_rol_lista_usuarios'),
-
-        # ✅ NUEVA RUTA
+    
+    # API endpoints para roles
+    path('api/lista_usuarios_por_rol/', views.modificar_rol_lista_usuarios, name='modificar_rol_lista_usuarios'),
+    path('api/modificar_rol/', views.modificar_rol_api, name='modificar_rol_api'),
+    path('api/asignar_rol_temporal/', views.asignar_rol_temporal, name='asignar_rol_temporal'),
 ]
 
 if settings.DEBUG:

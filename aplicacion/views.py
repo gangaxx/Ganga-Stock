@@ -5,7 +5,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
+from django.utils import timezone
+from django.utils.dateparse import parse_datetime
+from django.utils.timezone import make_aware, is_naive  # ✅ IMPORTANTE
+
 import json
+from datetime import timedelta
 
 from .models import (
     Producto,
@@ -14,8 +19,8 @@ from .models import (
     EmpleadoEliminado,
     VentaCajero,
     MovimientoBodega,
-    BoletaCliente,         
-    BoletaItem             
+    BoletaCliente,
+    BoletaItem
 )
 
 carritos_guardados = {}
@@ -33,16 +38,26 @@ def index(request):
 
                 if user.is_superuser:
                     return redirect('index_admin')
+
                 try:
                     perfil = PerfilUsuario.objects.get(user=user)
-                    if perfil.rol == 'vendedor':
+                    # 👇 Esto limpia automáticamente el rol temporal si ya venció
+                    rol = perfil.get_rol_actual()
+
+                    if rol == 'vendedor':
                         return redirect('vendedor')
-                    elif perfil.rol == 'bodeguero':
+                    elif rol == 'bodeguero':
                         return redirect('bodeguero')
-                    elif perfil.rol == 'cajero':
+                    elif rol == 'cajero':
                         return redirect('cajero')
+                    else:
+                        logout(request)
+                        messages.error(request, "Rol no válido.")
+                        return redirect('index')
                 except PerfilUsuario.DoesNotExist:
                     messages.error(request, 'Perfil de usuario no encontrado.')
+                    logout(request)
+                    return redirect('index')
             else:
                 messages.error(request, 'Credenciales incorrectas.')
 
@@ -60,35 +75,28 @@ def index(request):
                 messages.success(request, 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.')
 
     return render(request, 'index.html')
-
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
     movimientos_queryset = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     ventas_cajero = VentaCajero.objects.select_related('producto', 'cajero').order_by('-fecha', '-hora')
     movimientos_bodega_queryset = MovimientoBodega.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
 
-    movimientos = []
-    for m in movimientos_queryset:
-        nombre_empleado = m.empleado.get_full_name() if m.empleado.get_full_name() else m.empleado.username
-        movimientos.append({
-            'producto': m.producto,
-            'cantidad_vendida': m.cantidad_vendida,
-            'fecha': m.fecha,
-            'hora': m.hora,
-            'nombre_empleado': nombre_empleado
-        })
+    movimientos = [{
+        'producto': m.producto,
+        'cantidad_vendida': m.cantidad_vendida,
+        'fecha': m.fecha,
+        'hora': m.hora,
+        'nombre_empleado': m.empleado.get_full_name() or m.empleado.username
+    } for m in movimientos_queryset]
 
-    movimientos_bodega = []
-    for b in movimientos_bodega_queryset:
-        nombre_empleado = b.empleado.get_full_name() if b.empleado.get_full_name() else b.empleado.username
-        movimientos_bodega.append({
-            'producto': b.producto,
-            'agregado': b.agregado,
-            'eliminado': b.eliminado,
-            'fecha': b.fecha,
-            'hora': b.hora,
-            'nombre_empleado': nombre_empleado
-        })
+    movimientos_bodega = [{
+        'producto': b.producto,
+        'agregado': b.agregado,
+        'eliminado': b.eliminado,
+        'fecha': b.fecha,
+        'hora': b.hora,
+        'nombre_empleado': b.empleado.get_full_name() or b.empleado.username
+    } for b in movimientos_bodega_queryset]
 
     return render(request, 'index_admin.html', {
         'movimientos': movimientos,
@@ -116,7 +124,7 @@ def procesar_compra(request):
                     producto.cantidad -= cantidad
                     producto.save()
 
-                    if perfil and perfil.rol == 'vendedor':
+                    if perfil and perfil.get_rol_actual() == 'vendedor':
                         Movimiento.objects.create(
                             producto=producto,
                             cantidad_vendida=cantidad,
@@ -191,38 +199,52 @@ def empleado(request):
         'empleados_eliminados': eliminados
     })
 
+
 @csrf_exempt
 @login_required
 def update_stock(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            producto = Producto.objects.get(id=data['id'])
-            agregado = 0
-            eliminado = 0
+            producto_id = data.get('producto_id')
+            cantidad = int(data.get('cantidad', 0))
 
-            if data['action'] == 'add':
-                producto.cantidad += 1
-                agregado = 1
-            elif data['action'] == 'remove' and producto.cantidad > 0:
-                producto.cantidad -= 1
-                eliminado = 1
+            producto = Producto.objects.get(id=producto_id)
 
-            producto.save()
+            # Verifica si el usuario es superusuario
+            if request.user.is_superuser:
+                producto.cantidad += cantidad
+                producto.save()
+                return JsonResponse({'success': True, 'nuevo_stock': producto.cantidad})
 
-            perfil = PerfilUsuario.objects.filter(user=request.user, rol='bodeguero').first()
-            if perfil:
+            # Si no es superusuario, asume que es bodeguero
+            perfil = PerfilUsuario.objects.get(user=request.user)
+            if cantidad > 0:
+                producto.cantidad += cantidad
                 MovimientoBodega.objects.create(
                     producto=producto,
-                    agregado=agregado,
-                    eliminado=eliminado,
+                    agregado=cantidad,
+                    eliminado=0,
                     empleado=request.user
                 )
+            elif cantidad < 0 and producto.cantidad >= abs(cantidad):
+                producto.cantidad += cantidad
+                MovimientoBodega.objects.create(
+                    producto=producto,
+                    agregado=0,
+                    eliminado=abs(cantidad),
+                    empleado=request.user
+                )
+            else:
+                return JsonResponse({'success': False, 'error': 'Cantidad inválida o insuficiente.'})
 
-            return JsonResponse({'success': True})
+            producto.save()
+            return JsonResponse({'success': True, 'nuevo_stock': producto.cantidad})
+
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
 
 @csrf_exempt
 @login_required
@@ -283,6 +305,7 @@ def bodeguero(request):
 
     productos = Producto.objects.all()
     return render(request, 'bodega.html', {'productos': productos})
+
 
 @login_required
 def vendedor(request):
@@ -382,7 +405,7 @@ def confirmar_venta(request):
             boleta = BoletaCliente.objects.create(
                 codigo=codigo,
                 total=total,
-                cajero=request.user if perfil and perfil.rol == 'cajero' else None
+                cajero=request.user if perfil and perfil.get_rol_actual() == 'cajero' else None
             )
 
             for item in carrito:
@@ -395,7 +418,7 @@ def confirmar_venta(request):
                 producto.cantidad -= cantidad
                 producto.save()
 
-                if perfil and perfil.rol == 'cajero' and vendedor_user:
+                if perfil and perfil.get_rol_actual() == 'cajero' and vendedor_user:
                     Movimiento.objects.create(
                         producto=producto,
                         cantidad_vendida=cantidad,
@@ -483,17 +506,44 @@ def modificar_rol_api(request):
             data = json.loads(request.body)
             username = data.get("usuario")
             nuevo_rol = data.get("nuevo_rol")
+            es_temporal = data.get("temporal", False)
 
             user = User.objects.get(username=username)
             perfil = PerfilUsuario.objects.get(user=user)
 
-            perfil.rol = nuevo_rol
-            perfil.save()
+            if es_temporal:
+                inicio = parse_datetime(data.get("inicio"))
+                fin = parse_datetime(data.get("fin"))
 
+                if not inicio or not fin or inicio >= fin:
+                    return JsonResponse({"success": False, "error": "Fechas inválidas"})
+
+                if is_naive(inicio):
+                    inicio = make_aware(inicio)
+                if is_naive(fin):
+                    fin = make_aware(fin)
+
+                perfil.rol_temporal = nuevo_rol
+                perfil.inicio_temporal = inicio
+                perfil.fin_temporal = fin
+            else:
+                perfil.rol = nuevo_rol
+                perfil.rol_temporal = None
+                perfil.inicio_temporal = None
+                perfil.fin_temporal = None
+
+            perfil.save()
             return JsonResponse({"success": True})
+
+        except User.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Usuario no encontrado"})
+        except PerfilUsuario.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Perfil de usuario no encontrado"})
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
+
     return JsonResponse({"success": False, "error": "Método no permitido"})
+
 
 @csrf_exempt
 @login_required
@@ -501,19 +551,40 @@ def modificar_rol_api(request):
 def modificar_rol_lista_usuarios(request):
     if request.method == "GET":
         rol = request.GET.get("rol")
-
         if rol not in ["vendedor", "bodeguero", "cajero"]:
             return JsonResponse({"success": False, "error": "Rol no válido"})
 
         perfiles = PerfilUsuario.objects.filter(rol=rol).select_related('user')
-        usuarios = [
-            {
-                "username": p.user.username,
-                "nombre": p.user.first_name or p.user.username,
-                "rol": p.rol
-            }
-            for p in perfiles
-        ]
+        usuarios = [{
+            "username": p.user.username,
+            "nombre": p.user.first_name or p.user.username,
+            "rol": p.rol
+        } for p in perfiles]
+
         return JsonResponse({"success": True, "usuarios": usuarios})
 
+    return JsonResponse({"success": False, "error": "Método no permitido"})
+
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def asignar_rol_temporal(request):
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body)
+            username = data.get("usuario")
+            nuevo_rol = data.get("nuevo_rol")
+            duracion = int(data.get("duracion"))  # en horas
+
+            user = User.objects.get(username=username)
+            perfil = PerfilUsuario.objects.get(user=user)
+
+            perfil.rol_temporal = nuevo_rol
+            perfil.vencimiento_rol_temporal = timezone.now() + timedelta(hours=duracion)
+            perfil.save()
+
+            return JsonResponse({"success": True})
+        except Exception as e:
+            return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "Método no permitido"})
