@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',  # ✅ Agregado para usar filtros como intcomma
     'aplicacion',
 ]
 
@@ -72,17 +73,17 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internacionalización
 LANGUAGE_CODE = 'es-es'
-TIME_ZONE = 'America/Santiago'  # <-- CAMBIO REALIZADO PARA USAR HORA LOCAL CHILENA
+TIME_ZONE = 'America/Santiago'  # Hora local chilena
 USE_I18N = True
 USE_L10N = True
-USE_TZ = True  # <-- SE MANTIENE PARA USAR OBJETOS "aware" (con zona horaria)
+USE_TZ = True
 
-# Archivos estáticos (CSS, JS, logo, etc.)
+# Archivos estáticos
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [BASE_DIR / 'aplicacion' / 'static']  # Ruta válida existente
-STATIC_ROOT = BASE_DIR / 'staticfiles'  # Solo necesario en producción
+STATICFILES_DIRS = [BASE_DIR / 'aplicacion' / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Archivos multimedia (imagenes subidas por el usuario, como productos)
+# Archivos multimedia
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 

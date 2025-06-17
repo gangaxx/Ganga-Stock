@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 <div class="bod-topbar">
@@ -45,7 +46,7 @@
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr class="product-row" data-name="{{ producto.nombre }}">
+        <tr class="product-row" data-id="{{ producto.id }}" data-name="{{ producto.nombre }}">
           <td>
             {% if producto.imagen %}
               <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
@@ -56,7 +57,7 @@
             {% endif %}
           </td>
           <td>{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">${{ producto.precio|floatformat:0|intcomma }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
           <td>
             <button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button>
@@ -98,7 +99,10 @@
         const modal = document.getElementById('myModal');
         document.getElementById('modalImg').src = img.src;
         document.getElementById('modalTitle').textContent = img.alt;
-        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.closest('tr').querySelector('.price-cell').dataset.price).toLocaleString();
+
+        const price = parseFloat(img.closest('tr').querySelector('.price-cell').dataset.price);
+        const formattedPrice = '$' + price.toLocaleString('es-CL');
+        document.getElementById('modalPrice').textContent = 'Precio: ' + formattedPrice;
         modal.style.display = 'block';
       });
     });
@@ -126,31 +130,34 @@
   }
 
   function updateStock(productId, action) {
-  let cantidad = 0;
-  if (action === 'add') cantidad = 1;
-  if (action === 'remove') cantidad = -1;
+    let cantidad = 0;
+    if (action === 'add') cantidad = 1;
+    if (action === 'remove') cantidad = -1;
 
-  fetch(`/update_stock/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'X-CSRFToken': '{{ csrf_token }}'
-    },
-    body: JSON.stringify({
-      producto_id: productId,
-      cantidad: cantidad
+    fetch(`/update_stock/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        producto_id: productId,
+        cantidad: cantidad
+      })
     })
-  })
-  .then(response => response.json())
-  .then(data => {
-    if (data.success) {
-      location.reload();
-    } else {
-      alert(data.error);
-    }
-  });
-}
-
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        // Actualizar cantidades en tiempo real sin recargar
+        const cantidadActual = parseInt(document.getElementById('prod' + productId).textContent);
+        const cantidadSumada = parseInt(document.getElementById('prov' + productId).textContent);
+        document.getElementById('prod' + productId).textContent = data.nuevo_stock;
+        document.getElementById('prov' + productId).textContent = cantidadSumada + cantidad;
+      } else {
+        alert(data.error);
+      }
+    });
+  }
 
   function deleteProduct(productId) {
     if (!confirm("¿Deseas eliminar este producto completamente?")) return;

@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block content %}
 
@@ -51,7 +52,7 @@
             {% endif %}
           </td>
           <td>{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}">{{ producto.precio|floatformat:0 }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">$ {{ producto.precio|floatformat:0|intcomma }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
           <td><button class="inv-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
@@ -123,7 +124,17 @@
       body: JSON.stringify({ producto_id: id, cantidad: cantidad })
     })
     .then(response => response.json())
-    .then(data => data.success ? location.reload() : alert(data.error));
+    .then(data => {
+      if (data.success) {
+        // Aumenta el contador dinámicamente
+        const span = document.getElementById('prov' + id);
+        span.textContent = parseInt(span.textContent) + cantidad;
+        // Actualiza la cantidad disponible
+        document.getElementById('prod' + id).textContent = data.nuevo_stock;
+      } else {
+        alert(data.error);
+      }
+    });
   }
 
   function deleteProduct(id) {
