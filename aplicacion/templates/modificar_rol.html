@@ -9,7 +9,9 @@
 <div class="admin-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
   <div class="admin-topbar-center">
-    <span class="admin-welcome-message">¡Bienvenido, {{ request.user.first_name|default:request.user.username }}!</span>
+    <span class="admin-welcome-message">
+      ¡Bienvenido, {{ request.user.first_name|default:request.user.username }}!
+    </span>
   </div>
   <div class="d-flex gap-2">
     <button class="admin-mode-toggle" id="modeToggle" onclick="toggleMode()">🌙 Oscuro</button>
@@ -18,6 +20,7 @@
 </div>
 
 <div class="admin-main-centered">
+  <!-- Lado Izquierdo: Botones -->
   <div class="admin-role-box">
     <div class="admin-role-title">Modificar Roles</div>
     <button class="role-button" onclick="cargarUsuarios('vendedor')">Vendedor</button>
@@ -25,6 +28,7 @@
     <button class="role-button" onclick="cargarUsuarios('cajero')">Cajero</button>
   </div>
 
+  <!-- Lado Derecho: Tabla de Usuarios -->
   <div class="admin-role-table-box">
     <div class="admin-role-table-title" id="titulo-rol">Modificar rol</div>
     <p>Selecciona un rol a modificar para ver los empleados disponibles.</p>
@@ -32,6 +36,7 @@
   </div>
 </div>
 
+<!-- ======================== SCRIPTS ======================== -->
 <script>
 function toggleMode() {
   const body = document.body;
@@ -120,17 +125,20 @@ function mostrarOpcionesTemporales(select, username) {
   if (fila.querySelector('.temporal-options')) return;
 
   const html = `
-    <div class="temporal-options" style="margin-top:10px;">
-      <label>¿Temporal?</label>
-      <input type="checkbox" onchange="toggleTemporalInputs(this, '${username}', '${nuevoRol}')">
-      <div class="temporal-inputs" style="display:none; margin-top:5px;">
+    <div class="temporal-options">
+      <label class="temporal-label">
+        <input type="checkbox" onchange="toggleTemporalInputs(this, '${username}', '${nuevoRol}')"> ¿Temporal?
+      </label>
+      <div class="temporal-inputs">
         <label>Inicio:</label>
         <input type="datetime-local" id="inicio-${username}">
         <label>Fin:</label>
         <input type="datetime-local" id="fin-${username}">
-        <button onclick="asignarRol('${username}', '${nuevoRol}', true)">Asignar Temporal</button>
       </div>
-      <button onclick="asignarRol('${username}', '${nuevoRol}', false)">Asignar Permanente</button>
+      <div class="temporal-buttons">
+        <button class="btn-azul" onclick="asignarRol('${username}', '${nuevoRol}', true)">Asignar Temporal</button>
+        <button class="btn-celeste" onclick="asignarRol('${username}', '${nuevoRol}', false)">Asignar Permanente</button>
+      </div>
     </div>`;
 
   const cell = fila.cells[3];
@@ -154,7 +162,6 @@ function asignarRol(usuario, nuevoRol, esTemporal) {
       return;
     }
 
-    // ✅ Agregamos ":00" para que Django lo entienda correctamente
     data.temporal = true;
     data.inicio = inicio + ":00";
     data.fin = fin + ":00";
