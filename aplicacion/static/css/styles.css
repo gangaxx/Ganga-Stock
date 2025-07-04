@@ -1181,196 +1181,278 @@ body.admin-dark-mode .admin-history-bodega-box {
 
 
 
-/* INVENTARIO.HTML */
-
-
-
-
+/* ========================= INVENTARIO.HTML ========================= */
+/* ========================= RESET Y VARIABLES ========================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 :root {
-    --inv-bg-light: #ffffff;
-    --inv-bg-dark: #1e1e1e;
-    --inv-text-light: #1e1e1e;
-    --inv-text-dark: white;
-    --inv-panel-light: #ffffff;
-    --inv-panel-dark: #1e1e1e;
-    --inv-border-light: #ccc;
-    --inv-border-dark: #fff;
-    --inv-table-border: #999;
-    --inv-modal-bg: rgba(0, 0, 0, 0.6);
-    --inv-modal-light: white;
-    --inv-modal-dark: #2b2b2b;
-    --inv-button-add: green;
-    --inv-button-remove: red;
-    --inv-button-delete: #555;
+  --inv-bg-light: #ffffff;
+  --inv-bg-dark: #1e1e1e;
+  --inv-text-light: #1e1e1e;
+  --inv-text-dark: #ffffff;
+  --inv-panel-light: #f9f9f9;
+  --inv-panel-dark: #2a2a2a;
+  --inv-border-light: #ccc;
+  --inv-border-dark: #555;
+  --inv-table-border: #999;
+  --inv-add-btn-bg: green;
+  --inv-remove-btn-bg: red;
+  --inv-delete-btn-bg: #555;
+  --inv-save-btn-bg: #007bff;
+  --inv-modal-bg: rgba(0, 0, 0, 0.6);
+  --inv-modal-light: #fff;
+  --inv-modal-dark: #333;
 }
 
+/* ☀ Light Mode */
 body.inv-light-mode {
-    background-color: var(--inv-bg-light);
-    color: var(--inv-text-light);
+  background-color: var(--inv-bg-light);
+  color: var(--inv-text-light);
 }
 
+.inv-light-mode .inv-panel {
+  background-color: var(--inv-panel-light);
+  border: 1px solid var(--inv-border-light);
+}
+
+.inv-light-mode h2,
+.inv-light-mode label {
+  color: var(--inv-text-light);
+}
+
+.inv-light-mode input {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+.inv-light-mode .inv-mode-toggle {
+  background-color: #f5f5f5;
+  color: var(--inv-text-light);
+  border: 1px solid var(--inv-border-light);
+}
+
+/* 🌙 Dark Mode */
 body.inv-dark-mode {
-    background-color: var(--inv-bg-dark);
-    color: var(--inv-text-dark);
+  background-color: var(--inv-bg-dark);
+  color: var(--inv-text-dark);
+}
+
+.inv-dark-mode .inv-panel {
+  background-color: var(--inv-panel-dark);
+  border: 1px solid var(--inv-border-dark);
+}
+
+.inv-dark-mode h2,
+.inv-dark-mode label {
+  color: var(--inv-text-dark);
+}
+
+.inv-dark-mode input {
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #777;
+}
+
+.inv-dark-mode .inv-mode-toggle {
+  background-color: #333;
+  color: #ff0;
+  border: 1px solid #ff0;
+}
+
+/* 📦 Layout */
+.inv-main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  gap: 40px;
 }
 
 .inv-panel {
-    background-color: var(--inv-panel-light);
-    border: 1px solid var(--inv-border-light);
-    padding: 20px;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 1200px;
+  padding: 20px 30px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 1200px;
 }
 
-body.inv-dark-mode .inv-panel {
-    background-color: var(--inv-panel-dark);
-    border: 1px solid var(--inv-border-dark);
+.inv-inventory-form {
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.inv-topbar {
-    background-color: black;
-    padding: 10px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    gap: 10px;
-    height: 70px;
+.inv-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
 }
 
-.inv-topbar img.logo-img-small {
-    height: 40px;
-    width: auto;
+.inv-form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
-.inv-topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    font-weight: bold;
-    color: white;
-    white-space: nowrap;
+.inv-inventory-form input {
+  padding: 8px;
+  border-radius: 4px;
 }
 
-.inv-logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+.inv-form-submit {
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
 
-.inv-mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-weight: bold;
-    cursor: pointer;
-    background-color: #f5f5f5;
-    color: var(--inv-text-light);
-    border: 1px solid var(--inv-border-light);
-}
-
-body.inv-dark-mode .inv-mode-toggle {
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
-}
-
-.inv-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 60px;
-    gap: 40px;
-}
-
-.inv-inventory-form,
 .inv-inventory-table {
-    width: 100%;
-}
-
-.inv-inventory-form input,
-.inv-inventory-form button {
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 4px;
-}
-
-.inv-add-btn,
-.inv-remove-btn,
-.inv-delete-btn {
-    font-size: 24px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-}
-
-.inv-add-btn {
-    background-color: var(--inv-button-add);
-    color: white;
-}
-
-.inv-remove-btn {
-    background-color: var(--inv-button-remove);
-    color: white;
-}
-
-.inv-delete-btn {
-    background-color: var(--inv-button-delete);
-    color: white;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .inv-inventory-table th,
 .inv-inventory-table td {
-    border: 1px solid var(--inv-table-border);
-    padding: 12px;
-    text-align: center;
-    vertical-align: middle;
-    height: 120px;
+  padding: 12px;
+  border: 1px solid var(--inv-table-border);
+  text-align: center;
+  vertical-align: middle;
 }
 
+.inv-inventory-table th {
+  background-color: #ddd;
+}
+
+.inv-inventory-table img {
+  border-radius: 4px;
+}
+
+/* 🟢 Botones */
+.inv-add-btn {
+  background-color: var(--inv-add-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.inv-remove-btn {
+  background-color: var(--inv-remove-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.inv-delete-btn {
+  background-color: var(--inv-delete-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.inv-save-btn {
+  background-color: var(--inv-save-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* 🧱 Topbar */
+.inv-topbar {
+  background-color: black;
+  padding: 10px 40px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.inv-topbar img.logo-img-small {
+  height: 50px;
+}
+
+.inv-topbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  color: #fff;
+  font-weight: bold;
+}
+
+.inv-logout-button {
+  background-color: var(--inv-remove-btn-bg);
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.inv-mode-toggle {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* 🎞 Modal */
 .inv-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: var(--inv-modal-bg);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: var(--inv-modal-bg);
 }
 
 .inv-modal-content {
-    background-color: var(--inv-modal-light);
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-    color: black;
-    text-align: center;
+  background-color: var(--inv-modal-light);
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  color: #000;
+  text-align: center;
 }
 
 body.inv-dark-mode .inv-modal-content {
-    background-color: var(--inv-modal-dark);
-    color: white;
+  background-color: var(--inv-modal-dark);
+  color: #fff;
 }
 
 .inv-modal-img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-bottom: 20px;
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
+
+/* 📄 Footer */
+.footer {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin: 40px 0 10px;
+}
+
 
 
 

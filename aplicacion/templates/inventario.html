@@ -3,32 +3,73 @@
 {% load humanize %}
 
 {% block content %}
-
-<div class="inv-topbar">
+<div class="bod-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
-  <div class="inv-topbar-center">Bienvenido, {{ user.username }}</div>
-  <div style="display: flex; gap: 10px;">
-    <button id="modeToggle" class="inv-mode-toggle" onclick="toggleMode()">Cargando...</button>
-    <button class="inv-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  <div class="bod-topbar-center">
+    <span class="bod-welcome-message">Bienvenido, {{ user.username }}</span>
+  </div>
+  <div class="topbar-actions">
+    <button id="modeToggle" class="bod-toggle" onclick="toggleMode()">Cargando...</button>
+    <button class="bod-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
-<div class="inv-main">
-  <div class="inv-panel">
+<div class="bod-main">
+  <!-- ✅ FORM AGREGAR NUEVO PRODUCTO -->
+  <div class="bod-panel bod-form-panel">
     <h2>Agregar nuevo producto</h2>
-    <form method="POST" class="inv-inventory-form" enctype="multipart/form-data">
+    <form method="POST" class="bod-inventory-form" enctype="multipart/form-data">
       {% csrf_token %}
-      <input type="file" name="imagen" accept="image/*" required>
-      <input type="text" name="nombre" placeholder="Nombre del producto" required>
-      <input type="number" name="precio" placeholder="Precio" step="0.01" required>
-      <input type="number" name="cantidad" placeholder="Unidades" required>
-      <button type="submit" class="inv-add-btn">Agregar</button>
+      <div class="bod-form-group">
+        <label>Imagen:</label>
+        <input type="file" name="imagen" accept="image/*" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" placeholder="Nombre del producto" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Precio:</label>
+        <input type="number" name="precio" placeholder="Precio" step="0.01" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Cantidad:</label>
+        <input type="number" name="cantidad" placeholder="Unidades" required>
+      </div>
+      <div class="bod-form-submit">
+        <button type="submit" class="bod-add-btn">Agregar</button>
+      </div>
     </form>
   </div>
 
-  <div class="inv-panel">
+  <!-- ✅ PANEL MODIFICAR PRODUCTO -->
+  <div class="bod-panel bod-modificar-panel" id="modificarPanel" style="display: none;">
+    <h2>Modificar Producto</h2>
+    <form id="modificarForm">
+      {% csrf_token %}
+      <input type="hidden" id="modificarId" name="producto_id">
+      <div class="bod-form-group">
+        <label>Nuevo nombre del producto:</label>
+        <input type="text" id="modificarNombre" name="nuevo_nombre" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nuevo precio:</label>
+        <input type="number" id="modificarPrecio" name="nuevo_precio" step="0.01" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nueva cantidad:</label>
+        <input type="number" id="modificarCantidad" name="nuevo_cantidad" required>
+      </div>
+      <div class="bod-form-submit">
+        <button type="button" class="bod-save-btn" onclick="guardarCambios()">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ✅ TABLA INVENTARIO -->
+  <div class="bod-panel">
     <h2>Inventario actual</h2>
-    <table class="inv-inventory-table">
+    <table class="bod-inventory-table">
       <thead>
         <tr>
           <th>Producto</th>
@@ -38,6 +79,7 @@
           <th>Agregar</th>
           <th>Cantidades</th>
           <th>Eliminar</th>
+          <th>Modificar</th>
           <th>Eliminar Producto</th>
         </tr>
       </thead>
@@ -46,31 +88,36 @@
         <tr>
           <td>
             {% if producto.imagen %}
-              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image" style="width: 100px; height: 120px; object-fit: cover;">
+              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image"
+                   style="width: 100px; height: 120px; object-fit: cover;">
             {% else %}
               <span style="color: red;">Sin imagen</span>
             {% endif %}
           </td>
-          <td>{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}">$ {{ producto.precio|floatformat:0|intcomma }}</td>
+          <td style="min-width: 220px; white-space: nowrap;">{{ producto.nombre }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}" style="min-width: 150px; white-space: nowrap;">
+            ${{ producto.precio|floatformat:0|intcomma }}
+          </td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td><button class="inv-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
+          <td><button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
-          <td><button class="inv-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
-          <td><button class="inv-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
+          <td><button class="bod-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
+          <td><button class="bod-modify-btn" onclick="mostrarModificar('{{ producto.id }}', '{{ producto.nombre }}', '{{ producto.precio }}', '{{ producto.cantidad }}')">Modificar</button></td>
+          <td><button class="bod-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
         </tr>
         {% empty %}
-        <tr><td colspan="8">No hay productos en inventario.</td></tr>
+        <tr><td colspan="9">No hay productos en inventario.</td></tr>
         {% endfor %}
       </tbody>
     </table>
   </div>
 </div>
 
-<div id="invModal" class="inv-modal">
-  <div class="inv-modal-content">
-    <span onclick="document.getElementById('invModal').style.display='none'" style="float:right;cursor:pointer;">&times;</span>
-    <img id="modalImg" class="inv-modal-img" src="" alt="Producto">
+<!-- ✅ MODAL -->
+<div id="myModal" class="bod-modal">
+  <div class="bod-modal-content">
+    <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
+    <img id="modalImg" class="bod-modal-img" src="" alt="Producto">
     <h3 id="modalTitle"></h3>
     <p id="modalPrice"></p>
   </div>
@@ -78,30 +125,34 @@
 
 <script>
   document.addEventListener('DOMContentLoaded', () => {
-    const mode = localStorage.getItem('theme') || 'light';
-    document.body.classList.add('inv-' + mode + '-mode');
-    document.getElementById('modeToggle').innerText = mode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+    const storedMode = localStorage.getItem('theme') || 'light';
+    document.body.classList.add('bod-' + storedMode + '-mode');
+    document.getElementById('modeToggle').innerText = storedMode === 'dark' ? '☀ Claro' : '🌙 Oscuro';
 
     document.querySelectorAll('.product-image').forEach(img => {
       img.addEventListener('click', () => {
+        const modal = document.getElementById('myModal');
         document.getElementById('modalImg').src = img.src;
         document.getElementById('modalTitle').textContent = img.alt;
-        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.closest('tr').querySelector('.price-cell').dataset.price).toLocaleString();
-        document.getElementById('invModal').style.display = 'block';
+
+        const price = parseFloat(img.closest('tr').querySelector('.price-cell').dataset.price);
+        const formattedPrice = '$' + price.toLocaleString('es-CL');
+        document.getElementById('modalPrice').textContent = 'Precio: ' + formattedPrice;
+        modal.style.display = 'block';
       });
     });
 
-    window.onclick = e => {
-      if (e.target === document.getElementById('invModal')) {
-        document.getElementById('invModal').style.display = 'none';
+    window.onclick = event => {
+      if (event.target === document.getElementById('myModal')) {
+        modal.style.display = 'none';
       }
     };
   });
 
   function toggleMode() {
-    const isDark = document.body.classList.contains('inv-dark-mode');
-    document.body.classList.toggle('inv-dark-mode', !isDark);
-    document.body.classList.toggle('inv-light-mode', isDark);
+    const isDark = document.body.classList.contains('bod-dark-mode');
+    document.body.classList.toggle('bod-dark-mode', !isDark);
+    document.body.classList.toggle('bod-light-mode', isDark);
     document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
@@ -114,8 +165,7 @@
 
   function updateStock(id, action) {
     let cantidad = action === 'add' ? 1 : -1;
-
-    fetch('/update_stock/', {
+    fetch(`/update_stock/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -126,11 +176,9 @@
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // Aumenta el contador dinámicamente
-        const span = document.getElementById('prov' + id);
-        span.textContent = parseInt(span.textContent) + cantidad;
-        // Actualiza la cantidad disponible
         document.getElementById('prod' + id).textContent = data.nuevo_stock;
+        const sum = parseInt(document.getElementById('prov' + id).textContent);
+        document.getElementById('prov' + id).textContent = sum + cantidad;
       } else {
         alert(data.error);
       }
@@ -139,8 +187,7 @@
 
   function deleteProduct(id) {
     if (!confirm("¿Deseas eliminar este producto completamente?")) return;
-
-    fetch('/eliminar_producto/', {
+    fetch(`/eliminar_producto/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -151,6 +198,40 @@
     .then(response => response.json())
     .then(data => data.success ? location.reload() : alert(data.error));
   }
-</script>
 
+  function mostrarModificar(id, nombre, precio, cantidad) {
+    document.getElementById('modificarId').value = id;
+    document.getElementById('modificarNombre').value = nombre;
+    document.getElementById('modificarPrecio').value = precio;
+    document.getElementById('modificarCantidad').value = cantidad;
+    document.getElementById('modificarPanel').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function guardarCambios() {
+    const id = document.getElementById('modificarId').value;
+    const nombre = document.getElementById('modificarNombre').value;
+    const precio = document.getElementById('modificarPrecio').value;
+    const cantidad = document.getElementById('modificarCantidad').value;
+
+    fetch(`/modificar_producto/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        producto_id: id,
+        nuevo_nombre: nombre,
+        nuevo_precio: precio,
+        nuevo_cantidad: cantidad
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) location.reload();
+      else alert(data.error);
+    });
+  }
+</script>
 {% endblock %}

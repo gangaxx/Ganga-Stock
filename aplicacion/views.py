@@ -593,7 +593,6 @@ def asignar_rol_temporal(request):
 
 @csrf_exempt
 @login_required
-@user_passes_test(lambda u: PerfilUsuario.objects.filter(user=u, rol='bodeguero').exists())
 def modificar_producto(request):
     if request.method == 'POST':
         try:
@@ -607,8 +606,6 @@ def modificar_producto(request):
                 return JsonResponse({'success': False, 'error': 'ID de producto no proporcionado'})
 
             producto = Producto.objects.get(id=producto_id)
-
-            # Guarda valores antiguos
             cantidad_anterior = producto.cantidad
 
             # Actualiza campos si vienen
@@ -621,14 +618,14 @@ def modificar_producto(request):
 
             producto.save()
 
-            # 👉 Registra movimiento de bodega si hubo cambio de stock
-            if nuevo_cantidad is not None:
+            # Registra movimiento de bodega solo si cambia la cantidad
+            if nuevo_cantidad is not None and int(nuevo_cantidad) != cantidad_anterior:
                 diferencia = int(nuevo_cantidad) - cantidad_anterior
+                agregado = diferencia if diferencia > 0 else 0
+                eliminado = abs(diferencia) if diferencia < 0 else 0
 
-                if diferencia != 0:
-                    agregado = diferencia if diferencia > 0 else 0
-                    eliminado = abs(diferencia) if diferencia < 0 else 0
-
+                # ✅ Solo registrar movimiento si es superuser o bodeguero
+                if request.user.is_superuser or PerfilUsuario.objects.filter(user=request.user, rol='bodeguero').exists():
                     MovimientoBodega.objects.create(
                         producto=producto,
                         agregado=agregado,
