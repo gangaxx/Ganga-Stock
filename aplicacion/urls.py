@@ -17,13 +17,14 @@ urlpatterns = [
     path('bodega/', views.bodeguero, name='bodeguero'),
     path('update_stock/', views.update_stock, name='update_stock'),
     path('eliminar_producto/', views.eliminar_producto, name='eliminar_producto'),
+    path('modificar_producto/', views.modificar_producto, name='modificar_producto'),  # ✅ Nueva ruta para modificar producto
     path('eliminar_empleado/<int:id>/', views.eliminar_empleado, name='eliminar_empleado'),
     path('guardar_carrito/', views.guardar_carrito, name='guardar_carrito'),
     path('boleta/<str:codigo>/', views.boleta, name='boleta'),
     path('confirmar_venta/', views.confirmar_venta, name='confirmar_venta'),
     path('boleta_cliente/<str:codigo>/', views.boleta_cliente, name='boleta_cliente'),
     path('modificar_rol/', views.modificar_rol, name='modificar_rol'),
-    
+
     # API endpoints para roles
     path('api/lista_usuarios_por_rol/', views.modificar_rol_lista_usuarios, name='modificar_rol_lista_usuarios'),
     path('api/modificar_rol/', views.modificar_rol_api, name='modificar_rol_api'),

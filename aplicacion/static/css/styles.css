@@ -2,271 +2,334 @@
 
 /* ======================== RESET Y VARIABLES ======================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 :root {
-    --nav-color: rgb(0, 0, 0);
-    --bg-color: rgb(85, 85, 85);
-    --text-a-color: rgb(255, 255, 255);
-    --text-b-color: rgb(0, 0, 0);
-    --button-color: rgb(255, 255, 0);
-    --button-hover-color: rgb(255, 235, 85);
+  --nav-color: rgb(0, 0, 0);
+  --bg-color: rgb(85, 85, 85);
+  --text-a-color: rgb(255, 255, 255);
+  --text-b-color: rgb(0, 0, 0);
+  --button-color: rgb(255, 255, 0);
+  --button-hover-color: rgb(255, 235, 85);
 
-    /* Variables para boleta */
-    --bol-bg-color: #1e1e1e;
-    --bol-text-color: #ffffff;
-    --bol-panel-color: #111;
-    --bol-input-bg: #222;
-    --bol-input-border: #444;
-    --bol-placeholder-color: #aaa;
-    --bol-button-bg: #ff0;
-    --bol-button-text: #000;
-    --bol-panel-light: #f5f5f5;
-    --bol-text-light: #000;
-    --bol-panel-dark: #111;
-    --bol-text-dark: #fff;
-
-    /* Variables para bodega */
-    --bod-bg-dark: #1e1e1e;
-    --bod-bg-light: #ffffff;
-    --bod-text-dark: white;
-    --bod-text-light: #1e1e1e;
-    --bod-panel-dark: #1e1e1e;
-    --bod-panel-light: #ffffff;
-    --bod-border-dark: #fff;
-    --bod-border-light: #ccc;
-    --bod-table-border: #999;
-    --bod-add-btn-bg: green;
-    --bod-remove-btn-bg: red;
-    --bod-delete-btn-bg: #555;
-    --bod-modal-bg: rgba(0, 0, 0, 0.6);
-    --bod-modal-light: white;
-    --bod-modal-dark: #2b2b2b;
+  /* Variables bodega */
+  --bod-bg-dark: #1e1e1e;
+  --bod-bg-light: #ffffff;
+  --bod-text-dark: #ffffff;
+  --bod-text-light: #1e1e1e;
+  --bod-panel-dark: #2a2a2a;
+  --bod-panel-light: #f9f9f9;
+  --bod-border-dark: #555;
+  --bod-border-light: #ccc;
+  --bod-table-border: #999;
+  --bod-add-btn-bg: green;
+  --bod-remove-btn-bg: red;
+  --bod-delete-btn-bg: #555;
+  --bod-save-btn-bg: #28a745;
+  --bod-modify-btn-bg: #007bff;
+  --bod-modal-bg: rgba(0, 0, 0, 0.6);
+  --bod-modal-light: #fff;
+  --bod-modal-dark: #333;
 }
 
-/* 🌙 Dark Mode - Bodega */
+/* 🌙 Dark Mode */
 body.bod-dark-mode {
-    background-color: var(--bod-bg-dark);
-    color: var(--bod-text-dark);
+  background-color: var(--bod-bg-dark);
+  color: var(--bod-text-dark);
 }
 
 .bod-dark-mode .bod-panel {
-    background-color: var(--bod-panel-dark);
-    border: 1px solid var(--bod-border-dark);
+  background-color: var(--bod-panel-dark);
+  border: 1px solid var(--bod-border-dark);
 }
 
 .bod-dark-mode .bod-title,
-.bod-dark-mode h2 {
-    color: var(--bod-text-dark);
+.bod-dark-mode h2,
+.bod-dark-mode label {
+  color: var(--bod-text-dark);
+}
+
+.bod-dark-mode input {
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #777;
 }
 
 .bod-dark-mode .bod-toggle {
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
+  background-color: #333;
+  color: #ff0;
+  border: 1px solid #ff0;
 }
 
-/* ☀ Light Mode - Bodega */
+.bod-dark-mode .bod-modificar-panel {
+  background: var(--bod-panel-dark);
+  border: 1px solid var(--bod-border-dark);
+}
+
+.bod-dark-mode .bod-modificar-panel input {
+  background-color: #444;
+  color: #fff;
+  border: 1px solid #777;
+}
+
+/* ☀ Light Mode */
 body.bod-light-mode {
-    background-color: var(--bod-bg-light);
-    color: var(--bod-text-light);
+  background-color: var(--bod-bg-light);
+  color: var(--bod-text-light);
 }
 
 .bod-light-mode .bod-panel {
-    background-color: var(--bod-panel-light);
-    border: 1px solid var(--bod-border-light);
+  background-color: var(--bod-panel-light);
+  border: 1px solid var(--bod-border-light);
 }
 
 .bod-light-mode .bod-title,
-.bod-light-mode h2 {
-    color: var(--bod-text-light);
+.bod-light-mode h2,
+.bod-light-mode label {
+  color: var(--bod-text-light);
+}
+
+.bod-light-mode input {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
 }
 
 .bod-light-mode .bod-toggle {
-    background-color: #f5f5f5;
-    color: var(--bod-text-light);
-    border: 1px solid var(--bod-border-light);
+  background-color: #f5f5f5;
+  color: var(--bod-text-light);
+  border: 1px solid var(--bod-border-light);
 }
 
-/* 📦 Layout y Contenedores */
+.bod-light-mode .bod-modificar-panel {
+  background: var(--bod-panel-light);
+  border: 1px solid var(--bod-border-light);
+}
+
+.bod-light-mode .bod-modificar-panel input {
+  background-color: #fff;
+  color: #000;
+  border: 1px solid #ccc;
+}
+
+/* 📦 Layout */
 .bod-main {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 40px 60px;
-    gap: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px;
+  gap: 40px;
 }
 
 .bod-panel {
-    padding: 20px;
-    border-radius: 4px;
-    width: 100%;
-    max-width: 1200px;
+  padding: 20px 30px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 1200px;
 }
 
 .bod-form-panel {
-    max-width: 600px;
-    margin: 0 auto;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
-.bod-inventory-form {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 10px;
+.bod-modificar-panel {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px 30px;
+  border-radius: 8px;
+  border: 1px solid var(--bod-table-border);
+}
+
+.bod-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
+}
+
+.bod-form-group label {
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 .bod-inventory-form input {
-    padding: 5px;
-    border-radius: 4px;
+  padding: 8px;
+  border-radius: 4px;
 }
 
 .bod-form-submit {
-    display: flex;
-    justify-content: center;
-    margin-top: 10px;
-    width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-top: 10px;
 }
 
 .bod-inventory-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .bod-inventory-table th,
 .bod-inventory-table td {
-    padding: 12px;
-    border: 1px solid var(--bod-table-border);
-    text-align: center;
-    vertical-align: middle;
-    height: 120px;
+  padding: 12px;
+  border: 1px solid var(--bod-table-border);
+  text-align: center;
+  vertical-align: middle;
 }
 
+.bod-inventory-table th {
+  background-color: #ddd;
+}
+
+.bod-inventory-table img {
+  border-radius: 4px;
+}
+
+/* 🟢 Botones */
 .bod-add-btn {
-    font-size: 24px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    background-color: var(--bod-add-btn-bg);
-    color: white;
-    cursor: pointer;
+  background-color: var(--bod-add-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .bod-remove-btn {
-    font-size: 24px;
-    padding: 8px 16px;
-    border-radius: 6px;
-    font-weight: bold;
-    background-color: var(--bod-remove-btn-bg);
-    color: white;
-    cursor: pointer;
+  background-color: var(--bod-remove-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
 }
 
 .bod-delete-btn {
-    background-color: var(--bod-delete-btn-bg);
-    color: white;
-    cursor: pointer;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
+  background-color: var(--bod-delete-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bod-save-btn {
+  background-color: var(--bod-save-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bod-save-btn:hover {
+  background-color: #218838;
+}
+
+.bod-modify-btn {
+  background-color: var(--bod-modify-btn-bg);
+  color: #fff;
+  border: none;
+  padding: 8px 14px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bod-modify-btn:hover {
+  background-color: #0056b3;
 }
 
 /* 🧱 Topbar */
 .bod-topbar {
-    background-color: black;
-    padding: 10px 40px;
-    height: 70px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    position: relative;
+  background-color: var(--nav-color);
+  padding: 10px 40px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
 }
 
 .bod-topbar img {
-    height: 50px;
-    width: auto;
+  height: 50px;
 }
 
 .bod-topbar-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 32px;
-    color: white;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-.bod-welcome-message {
-    display: inline;
-}
-
-.bod-topbar-actions {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.bod-mode-toggle {
-    padding: 6px 12px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: bold;
-    background-color: #333;
-    color: #ff0;
-    border: 1px solid #ff0;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  color: #fff;
+  font-weight: bold;
 }
 
 .bod-logout-button {
-    padding: 6px 12px;
-    border-radius: 4px;
-    background-color: red;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
+  background-color: var(--bod-remove-btn-bg);
+  color: #fff;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.bod-toggle {
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
 }
 
 /* 🎞 Modal */
 .bod-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: var(--bod-modal-bg);
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  overflow: auto;
+  background-color: var(--bod-modal-bg);
 }
 
 .bod-modal-content {
-    background-color: var(--bod-modal-light);
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 8px;
-    width: 80%;
-    max-width: 700px;
-    color: black;
-    text-align: center;
+  background-color: var(--bod-modal-light);
+  margin: 10% auto;
+  padding: 20px;
+  border-radius: 8px;
+  width: 80%;
+  max-width: 600px;
+  color: #000;
+  text-align: center;
 }
 
 body.bod-dark-mode .bod-modal-content {
-    background-color: var(--bod-modal-dark);
-    color: white;
+  background-color: var(--bod-modal-dark);
+  color: #fff;
 }
 
 .bod-modal-img {
-    width: 100%;
-    max-height: 400px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-bottom: 20px;
+  width: 100%;
+  max-height: 400px;
+  object-fit: contain;
+  border-radius: 6px;
+  margin-bottom: 20px;
 }
+
+/* 📄 Footer */
+.footer {
+  text-align: center;
+  font-size: 14px;
+  color: #777;
+  margin: 40px 0 10px;
+}
+
 
 
 

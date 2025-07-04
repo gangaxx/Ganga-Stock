@@ -588,3 +588,61 @@ def asignar_rol_temporal(request):
         except Exception as e:
             return JsonResponse({"success": False, "error": str(e)})
     return JsonResponse({"success": False, "error": "Método no permitido"})
+
+
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: PerfilUsuario.objects.filter(user=u, rol='bodeguero').exists())
+def modificar_producto(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            producto_id = data.get('producto_id')
+            nuevo_nombre = data.get('nuevo_nombre')
+            nuevo_precio = data.get('nuevo_precio')
+            nuevo_cantidad = data.get('nuevo_cantidad')
+
+            if not producto_id:
+                return JsonResponse({'success': False, 'error': 'ID de producto no proporcionado'})
+
+            producto = Producto.objects.get(id=producto_id)
+
+            # Guarda valores antiguos
+            cantidad_anterior = producto.cantidad
+
+            # Actualiza campos si vienen
+            if nuevo_nombre:
+                producto.nombre = nuevo_nombre
+            if nuevo_precio:
+                producto.precio = float(nuevo_precio)
+            if nuevo_cantidad is not None:
+                producto.cantidad = int(nuevo_cantidad)
+
+            producto.save()
+
+            # 👉 Registra movimiento de bodega si hubo cambio de stock
+            if nuevo_cantidad is not None:
+                diferencia = int(nuevo_cantidad) - cantidad_anterior
+
+                if diferencia != 0:
+                    agregado = diferencia if diferencia > 0 else 0
+                    eliminado = abs(diferencia) if diferencia < 0 else 0
+
+                    MovimientoBodega.objects.create(
+                        producto=producto,
+                        agregado=agregado,
+                        eliminado=eliminado,
+                        fecha=timezone.now().date(),
+                        hora=timezone.now().time(),
+                        empleado=request.user
+                    )
+
+            return JsonResponse({'success': True})
+
+        except Producto.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Producto no encontrado'})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    else:
+        return JsonResponse({'success': False, 'error': 'Método no permitido'})

@@ -8,27 +8,65 @@
   <div class="bod-topbar-center">
     <span class="bod-welcome-message">Bienvenido, {{ user.username }}</span>
   </div>
-  <div class="topbar-actions" style="display: flex; gap: 10px;">
+  <div class="topbar-actions">
     <button id="modeToggle" class="bod-toggle" onclick="toggleMode()">Cargando...</button>
     <button class="bod-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
   </div>
 </div>
 
 <div class="bod-main">
+  <!-- ✅ FORM AGREGAR NUEVO PRODUCTO -->
   <div class="bod-panel bod-form-panel">
     <h2>Agregar nuevo producto</h2>
     <form method="POST" class="bod-inventory-form" enctype="multipart/form-data">
       {% csrf_token %}
-      <input type="file" name="imagen" accept="image/*" required>
-      <input type="text" name="nombre" placeholder="Nombre del producto" required>
-      <input type="number" name="precio" placeholder="Precio" step="0.01" required>
-      <input type="number" name="cantidad" placeholder="Unidades" required>
+      <div class="bod-form-group">
+        <label>Imagen:</label>
+        <input type="file" name="imagen" accept="image/*" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nombre:</label>
+        <input type="text" name="nombre" placeholder="Nombre del producto" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Precio:</label>
+        <input type="number" name="precio" placeholder="Precio" step="0.01" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Cantidad:</label>
+        <input type="number" name="cantidad" placeholder="Unidades" required>
+      </div>
       <div class="bod-form-submit">
         <button type="submit" class="bod-add-btn">Agregar</button>
       </div>
     </form>
   </div>
 
+  <!-- ✅ NUEVA TABLA MODIFICAR PRODUCTO -->
+  <div class="bod-panel bod-modificar-panel" id="modificarPanel" style="display: none;">
+    <h2>Modificar Producto</h2>
+    <form id="modificarForm">
+      {% csrf_token %}
+      <input type="hidden" id="modificarId" name="producto_id">
+      <div class="bod-form-group">
+        <label>Nuevo nombre del producto:</label>
+        <input type="text" id="modificarNombre" name="nuevo_nombre" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nuevo precio:</label>
+        <input type="number" step="0.01" id="modificarPrecio" name="nuevo_precio" required>
+      </div>
+      <div class="bod-form-group">
+        <label>Nueva cantidad:</label>
+        <input type="number" id="modificarCantidad" name="nuevo_cantidad" required>
+      </div>
+      <div class="bod-form-submit">
+        <button type="button" class="bod-save-btn" onclick="guardarCambios()">Guardar Cambios</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ✅ TABLA INVENTARIO ACTUAL -->
   <div class="bod-panel">
     <h2>Inventario actual</h2>
     <table class="bod-inventory-table">
@@ -41,17 +79,18 @@
           <th>Agregar</th>
           <th>Cantidades</th>
           <th>Eliminar</th>
+          <th>Modificar</th>
           <th>Eliminar Producto</th>
         </tr>
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr class="product-row" data-id="{{ producto.id }}" data-name="{{ producto.nombre }}">
+        <tr class="product-row" data-id="{{ producto.id }}">
           <td>
             {% if producto.imagen %}
               <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                   class="product-image"
-                   style="width: 100px; height: 120px; object-fit: cover;">
+                class="product-image"
+                style="width: 100px; height: 120px; object-fit: cover;">
             {% else %}
               <span style="color: red;">Sin imagen</span>
             {% endif %}
@@ -59,19 +98,21 @@
           <td>{{ producto.nombre }}</td>
           <td class="price-cell" data-price="{{ producto.precio }}">${{ producto.precio|floatformat:0|intcomma }}</td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td>
-            <button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button>
-          </td>
+          <td><button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
+          <td><button class="bod-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
           <td>
-            <button class="bod-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button>
+            <button class="bod-modify-btn" onclick="mostrarModificar(
+              {{ producto.id }},
+              '{{ producto.nombre }}',
+              '{{ producto.precio }}',
+              '{{ producto.cantidad }}'
+            )">Modificar</button>
           </td>
-          <td>
-            <button class="bod-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button>
-          </td>
+          <td><button class="bod-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
         </tr>
         {% empty %}
-        <tr><td colspan="8">No hay productos en inventario.</td></tr>
+        <tr><td colspan="9">No hay productos en inventario.</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -79,6 +120,7 @@
   <div class="footer">© 2025 Ganga Stock. Todos los derechos reservados.</div>
 </div>
 
+<!-- ✅ MODAL -->
 <div id="myModal" class="bod-modal">
   <div class="bod-modal-content">
     <span class="modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
@@ -130,28 +172,20 @@
   }
 
   function updateStock(productId, action) {
-    let cantidad = 0;
-    if (action === 'add') cantidad = 1;
-    if (action === 'remove') cantidad = -1;
-
+    let cantidad = action === 'add' ? 1 : -1;
     fetch(`/update_stock/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'X-CSRFToken': '{{ csrf_token }}'
       },
-      body: JSON.stringify({
-        producto_id: productId,
-        cantidad: cantidad
-      })
+      body: JSON.stringify({ producto_id: productId, cantidad: cantidad })
     })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // Actualizar cantidades en tiempo real sin recargar
-        const cantidadActual = parseInt(document.getElementById('prod' + productId).textContent);
-        const cantidadSumada = parseInt(document.getElementById('prov' + productId).textContent);
         document.getElementById('prod' + productId).textContent = data.nuevo_stock;
+        const cantidadSumada = parseInt(document.getElementById('prov' + productId).textContent);
         document.getElementById('prov' + productId).textContent = cantidadSumada + cantidad;
       } else {
         alert(data.error);
@@ -161,7 +195,6 @@
 
   function deleteProduct(productId) {
     if (!confirm("¿Deseas eliminar este producto completamente?")) return;
-
     fetch(`/eliminar_producto/`, {
       method: 'POST',
       headers: {
@@ -172,11 +205,43 @@
     })
     .then(response => response.json())
     .then(data => {
-      if (data.success) {
-        location.reload();
-      } else {
-        alert(data.error);
-      }
+      if (data.success) location.reload();
+      else alert(data.error);
+    });
+  }
+
+  function mostrarModificar(id, nombre, precio, cantidad) {
+    document.getElementById('modificarId').value = id;
+    document.getElementById('modificarNombre').value = nombre;
+    document.getElementById('modificarPrecio').value = precio;
+    document.getElementById('modificarCantidad').value = cantidad;
+    document.getElementById('modificarPanel').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function guardarCambios() {
+    const id = document.getElementById('modificarId').value;
+    const nuevoNombre = document.getElementById('modificarNombre').value;
+    const nuevoPrecio = document.getElementById('modificarPrecio').value;
+    const nuevoCantidad = document.getElementById('modificarCantidad').value;
+
+    fetch(`/modificar_producto/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        producto_id: id,
+        nuevo_nombre: nuevoNombre,
+        nuevo_precio: nuevoPrecio,
+        nuevo_cantidad: nuevoCantidad
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) location.reload();
+      else alert(data.error);
     });
   }
 </script>
