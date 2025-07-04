@@ -4,6 +4,7 @@
 {% block content %}
 <body class="admin-light-mode">
 
+<!-- ✅ TOPBAR ADMIN -->
 <div class="admin-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
   <div class="admin-topbar-center">
@@ -15,12 +16,13 @@
   </div>
 </div>
 
-<div class="admin-main">
-  <!-- Panel izquierdo -->
-  <div class="admin-panel" style="flex: 1 1 60%;">
+<!-- ✅ CONTENIDO PRINCIPAL -->
+<div class="admin-main flex-wrap">
+  <!-- PANEL IZQUIERDO -->
+  <div class="admin-panel flex-fill mb-4">
     <h2>Historial movimientos de vendedores</h2>
-    <div class="admin-history-box">
-      <table class="admin-history-table">
+    <div class="admin-history-box table-responsive">
+      <table class="admin-history-table table">
         <thead>
           <tr>
             <th>Producto</th>
@@ -42,17 +44,15 @@
             <td>{{ m.nombre_empleado }}</td>
           </tr>
           {% empty %}
-          <tr>
-            <td colspan="6">No hay movimientos registrados.</td>
-          </tr>
+          <tr><td colspan="6">No hay movimientos registrados.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <h2 style="margin-top: 50px;">Historial ventas cajero</h2>
-    <div class="admin-history-cajero-box">
-      <table class="admin-history-cajero-table">
+    <h2 class="mt-5">Historial ventas cajero</h2>
+    <div class="admin-history-cajero-box table-responsive">
+      <table class="admin-history-cajero-table table">
         <thead>
           <tr>
             <th>ID</th>
@@ -84,17 +84,15 @@
             </td>
           </tr>
           {% empty %}
-          <tr>
-            <td colspan="8">No hay ventas registradas por cajero.</td>
-          </tr>
+          <tr><td colspan="8">No hay ventas registradas por cajero.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
 
-    <h2 style="margin-top: 50px;">Movimientos bodega</h2>
-    <div class="admin-history-bodega-box">
-      <table class="admin-history-bodega-table">
+    <h2 class="mt-5">Movimientos bodega</h2>
+    <div class="admin-history-bodega-box table-responsive">
+      <table class="admin-history-bodega-table table">
         <thead>
           <tr>
             <th>Producto</th>
@@ -118,38 +116,35 @@
             <td>{{ b.nombre_empleado }}</td>
           </tr>
           {% empty %}
-          <tr>
-            <td colspan="7">No hay movimientos de bodega registrados.</td>
-          </tr>
+          <tr><td colspan="7">No hay movimientos de bodega registrados.</td></tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Panel derecho -->
-  <div class="admin-panel" style="flex: 0 0 270px;">
-    <h2 style="font-size: 1.2rem;">Base de datos</h2>
+  <!-- PANEL DERECHO -->
+  <div class="admin-panel flex-shrink-0" style="flex-basis: 270px;">
+    <h2 class="admin-section-title">Base de datos</h2>
 
     <div class="section d-flex align-items-center justify-content-between mb-3">
       <div class="admin-section-title">Inventario</div>
-      <a href="{% url 'inventario' %}" class="btn btn-warning" style="padding: 4px 12px;">Ver todo</a>
+      <a href="{% url 'inventario' %}" class="btn btn-warning btn-sm">Ver todo</a>
+    </div>
+
+    <div class="section d-flex align-items-center justify-content-between mb-3">
+      <div class="admin-section-title">Empleados</div>
+      <a href="{% url 'empleado' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
 
     <div class="section d-flex align-items-center justify-content-between">
-      <div class="admin-section-title">Empleados</div>
-      <a href="{% url 'empleado' %}" class="btn btn-warning" style="padding: 4px 12px;">Ver todo</a>
-    </div>
-
-    <!-- ✅ NUEVO BOTÓN: MODIFICAR ROL -->
-    <div class="section d-flex align-items-center justify-content-between mt-3">
       <div class="admin-section-title">Modificar Rol</div>
-      <a href="{% url 'modificar_rol' %}" class="btn btn-warning" style="padding: 4px 12px;">Ver todo</a>
+      <a href="{% url 'modificar_rol' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
-
   </div>
 </div>
 
+<!-- ✅ SCRIPT THEME + LOGOUT -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('admin-theme') || 'light';
@@ -161,8 +156,7 @@
     const isDark = document.body.classList.contains('admin-dark-mode');
     document.body.classList.toggle('admin-dark-mode', !isDark);
     document.body.classList.toggle('admin-light-mode', isDark);
-    const modeText = isDark ? '🌙 Oscuro' : '☀ Claro';
-    document.getElementById('modeToggle').innerText = modeText;
+    document.getElementById('modeToggle').innerText = isDark ? '🌙 Oscuro' : '☀ Claro';
     localStorage.setItem('admin-theme', isDark ? 'light' : 'dark');
   }
 

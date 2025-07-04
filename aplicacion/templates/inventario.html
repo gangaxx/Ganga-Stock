@@ -69,47 +69,48 @@
   <!-- ✅ TABLA INVENTARIO -->
   <div class="bod-panel">
     <h2>Inventario actual</h2>
-    <table class="bod-inventory-table">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Nombre</th>
-          <th>Precio</th>
-          <th>Disponibles</th>
-          <th>Agregar</th>
-          <th>Cantidades</th>
-          <th>Eliminar</th>
-          <th>Modificar</th>
-          <th>Eliminar Producto</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for producto in productos %}
-        <tr>
-          <td>
-            {% if producto.imagen %}
-              <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image"
-                   style="width: 100px; height: 120px; object-fit: cover;">
-            {% else %}
-              <span style="color: red;">Sin imagen</span>
-            {% endif %}
-          </td>
-          <td style="min-width: 220px; white-space: nowrap;">{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}" style="min-width: 150px; white-space: nowrap;">
-            ${{ producto.precio|floatformat:0|intcomma }}
-          </td>
-          <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td><button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
-          <td><span id="prov{{ producto.id }}">0</span></td>
-          <td><button class="bod-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
-          <td><button class="bod-modify-btn" onclick="mostrarModificar('{{ producto.id }}', '{{ producto.nombre }}', '{{ producto.precio }}', '{{ producto.cantidad }}')">Modificar</button></td>
-          <td><button class="bod-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="9">No hay productos en inventario.</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="table-responsive">
+      <table class="bod-inventory-table table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Disponibles</th>
+            <th>Agregar</th>
+            <th>Cantidades</th>
+            <th>Eliminar</th>
+            <th>Modificar</th>
+            <th>Eliminar Producto</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for producto in productos %}
+          <tr>
+            <td>
+              {% if producto.imagen %}
+                <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="product-image" style="width: 100px; height: 120px; object-fit: cover;">
+              {% else %}
+                <span style="color: red;">Sin imagen</span>
+              {% endif %}
+            </td>
+            <td>{{ producto.nombre }}</td>
+            <td class="price-cell" data-price="{{ producto.precio }}">
+              ${{ producto.precio|floatformat:0|intcomma }}
+            </td>
+            <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
+            <td><button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
+            <td><span id="prov{{ producto.id }}">0</span></td>
+            <td><button class="bod-remove-btn" onclick="updateStock({{ producto.id }}, 'remove')">-</button></td>
+            <td><button class="bod-modify-btn" onclick="mostrarModificar('{{ producto.id }}', '{{ producto.nombre }}', '{{ producto.precio }}', '{{ producto.cantidad }}')">Modificar</button></td>
+            <td><button class="bod-delete-btn" onclick="deleteProduct({{ producto.id }})">🗑</button></td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="9">No hay productos en inventario.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 

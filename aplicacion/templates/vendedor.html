@@ -5,6 +5,7 @@
 {% block content %}
 <body class="ven-light-mode">
 
+<!-- ✅ TOPBAR -->
 <div class="ven-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
   <div class="ven-topbar-center">
@@ -17,6 +18,7 @@
   </div>
 </div>
 
+<!-- ✅ INVENTARIO -->
 <div class="ven-main-content">
   <div class="ven-inventory-header">
     <span>Productos</span>
@@ -58,7 +60,7 @@
   </div>
 </div>
 
-<!-- MODALES -->
+<!-- ✅ MODALES -->
 <div id="carritoModal" class="ven-modal">
   <div class="ven-modal-content">
     <span class="ven-modal-close" onclick="toggleCarrito()">&times;</span>
@@ -97,6 +99,7 @@
   </div>
 </div>
 
+<!-- ✅ SCRIPTS -->
 <script src="{% static 'js/validaciones.js' %}"></script>
 <script>
   const csrfToken = "{{ csrf_token }}";
@@ -133,10 +136,16 @@
     localStorage.setItem('theme', isDark ? 'light' : 'dark');
   }
 
+  function toggleCarrito() {
+    const modal = document.getElementById('carritoModal');
+    modal.style.display = modal.style.display === 'block' ? 'none' : 'block';
+  }
+
   function confirmLogout() {
     if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
       window.location.href = "{% url 'cerrar_sesion' %}";
     }
   }
 </script>
+</body>
 {% endblock %}

@@ -2158,3 +2158,128 @@ body.admin-dark-mode .temporal-buttons .btn-celeste:hover {
     width: 90%;
   }
 }
+
+
+
+
+
+
+
+
+
+/* 🌐 UNIVERSAL RESPONSIVE ADJUSTMENTS */
+
+/* Para todas las tablas grandes */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-responsive table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-responsive img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Paneles que deben apilarse en móviles */
+@media (max-width: 992px) {
+  .bod-main,
+  .inv-main,
+  .admin-main,
+  .caj-main-content,
+  .ven-main-content {
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+}
+
+/* Topbars: ajusta gap y fuente */
+@media (max-width: 768px) {
+  .bod-topbar,
+  .inv-topbar,
+  .admin-topbar,
+  .caj-topbar,
+  .ven-topbar,
+  .emp-topbar {
+    flex-direction: column;
+    height: auto;
+    padding: 20px;
+    text-align: center;
+    gap: 20px;
+  }
+
+  .bod-topbar-center,
+  .inv-topbar-center,
+  .admin-topbar-center,
+  .caj-topbar-center,
+  .ven-topbar-center,
+  .emp-topbar-center {
+    position: static;
+    transform: none;
+    font-size: 22px;
+  }
+}
+
+/* Formularios */
+@media (max-width: 768px) {
+  .bod-form-panel,
+  .bod-modificar-panel,
+  .inv-inventory-form,
+  .inv-panel,
+  .emp-panel {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+  }
+
+  input, select, button {
+    width: 100%;
+  }
+}
+
+/* Tablas */
+@media (max-width: 768px) {
+  .bod-inventory-table,
+  .inv-inventory-table,
+  .ven-inventory-table,
+  .admin-history-table {
+    font-size: 14px;
+  }
+
+  .bod-inventory-table img,
+  .inv-inventory-table img,
+  .ven-inventory-table img {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* Modal */
+@media (max-width: 768px) {
+  .bod-modal-content,
+  .inv-modal-content,
+  .ven-modal-content {
+    width: 90%;
+  }
+}
+
+/* Ajusta botones */
+@media (max-width: 480px) {
+  .bod-add-btn,
+  .bod-remove-btn,
+  .bod-save-btn,
+  .bod-modify-btn,
+  .bod-delete-btn,
+  .inv-add-btn,
+  .inv-remove-btn,
+  .inv-save-btn,
+  .inv-delete-btn {
+    padding: 10px;
+    font-size: 14px;
+  }
+}

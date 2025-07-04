@@ -2,63 +2,72 @@
 {% load static %}
 
 {% block content %}
-<body class="caj caj-light-mode">
 
-<!-- TOPBAR -->
-<div class="caj-topbar">
-  <img src="{% static 'img/logo.jpg' %}" alt="Logo">
-  <div class="caj-topbar-center">
-    Bienvenido, {{ user.username }}
-  </div>
-  <div class="caj-topbar-actions">
-    <button id="cajModeToggle" class="caj-mode-toggle" onclick="toggleCajeroTheme()">🌙 Oscuro</button>
-    <button class="caj-logout-button" onclick="window.location.href='{% url 'cerrar_sesion' %}'">Cerrar sesión</button>
-  </div>
-</div>
+<div class="caj caj-light-mode">
 
-<!-- CONTENIDO -->
-<div class="caj-main-content">
-  <form method="GET" class="caj-codigo-form">
-    <h2>Buscar carrito con código</h2>
-    <input type="text" name="codigo" placeholder="Ingresa el código de 6 dígitos" required maxlength="6">
-    <button type="submit">Ver Carrito</button>
-  </form>
-
-  {% if carrito %}
-  <div class="caj-carrito-box">
-    <h2>Resumen del Carrito</h2>
-    <table class="caj-carrito-table">
-      <thead>
-        <tr>
-          <th>Producto</th>
-          <th>Nombre</th>
-          <th>Cantidad</th>
-          <th>Total</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for item in carrito %}
-        <tr>
-          <td><img src="{{ item.imagen_url }}" alt="{{ item.nombre }}"></td>
-          <td>{{ item.nombre }}</td>
-          <td>{{ item.cantidad }}</td>
-          <td>${{ item.total|floatformat:0 }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    <div class="caj-total-section">
-      Total a pagar: ${{ total_general|floatformat:0 }}
+  <!-- ✅ TOPBAR -->
+  <div class="caj-topbar">
+    <img src="{% static 'img/logo.jpg' %}" alt="Logo">
+    <div class="caj-topbar-center">
+      Bienvenido, {{ user.username }}
     </div>
-    <div class="caj-confirmar-btn">
-      <input type="hidden" id="codigoVenta" value="{{ codigo }}">
-      <button onclick="confirmarVenta()">Confirmar Venta</button>
+    <div class="caj-topbar-actions">
+      <button id="cajModeToggle" class="caj-mode-toggle" onclick="toggleCajeroTheme()">🌙 Oscuro</button>
+      <button class="caj-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
     </div>
   </div>
-  {% endif %}
+
+  <!-- ✅ CONTENIDO PRINCIPAL -->
+  <div class="caj-main-content">
+    <form method="GET" class="caj-codigo-form">
+      <h2>Buscar carrito con código</h2>
+      <input type="text" name="codigo" placeholder="Ingresa el código de 6 dígitos" required maxlength="6">
+      <button type="submit">Ver Carrito</button>
+    </form>
+
+    {% if carrito %}
+    <div class="caj-carrito-box">
+      <h2>Resumen del Carrito</h2>
+      <table class="caj-carrito-table">
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Nombre</th>
+            <th>Cantidad</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in carrito %}
+          <tr>
+            <td>
+              {% if item.imagen_url %}
+                <img src="{{ item.imagen_url }}" alt="{{ item.nombre }}">
+              {% else %}
+                <span style="color: gray;">Sin imagen</span>
+              {% endif %}
+            </td>
+            <td>{{ item.nombre }}</td>
+            <td>{{ item.cantidad }}</td>
+            <td>${{ item.total|floatformat:0 }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="caj-total-section">
+        Total a pagar: ${{ total_general|floatformat:0 }}
+      </div>
+      <div class="caj-confirmar-btn">
+        <input type="hidden" id="codigoVenta" value="{{ codigo }}">
+        <button type="button" onclick="confirmarVenta()">Confirmar Venta</button>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
 </div>
 
-<!-- SCRIPTS -->
+<!-- ✅ SCRIPTS -->
 <script>
   function confirmarVenta() {
     const codigo = document.getElementById("codigoVenta").value;
@@ -90,6 +99,12 @@
     });
   }
 
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+
   function toggleCajeroTheme() {
     const body = document.body;
     const isLight = body.classList.contains('caj-light-mode');
@@ -112,5 +127,4 @@
   });
 </script>
 
-</body>
 {% endblock %}

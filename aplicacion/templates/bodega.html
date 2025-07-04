@@ -42,7 +42,7 @@
     </form>
   </div>
 
-  <!-- ✅ NUEVA TABLA MODIFICAR PRODUCTO -->
+  <!-- ✅ PANEL MODIFICAR PRODUCTO -->
   <div class="bod-panel bod-modificar-panel" id="modificarPanel" style="display: none;">
     <h2>Modificar Producto</h2>
     <form id="modificarForm">
@@ -89,14 +89,16 @@
           <td>
             {% if producto.imagen %}
               <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}"
-                class="product-image"
-                style="width: 100px; height: 120px; object-fit: cover;">
+                   class="product-image"
+                   style="width: 100px; height: 120px; object-fit: cover;">
             {% else %}
               <span style="color: red;">Sin imagen</span>
             {% endif %}
           </td>
           <td>{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}">${{ producto.precio|floatformat:0|intcomma }}</td>
+          <td class="price-cell" data-price="{{ producto.precio }}">
+            ${{ producto.precio|floatformat:0|intcomma }}
+          </td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
           <td><button class="bod-add-btn" onclick="updateStock({{ producto.id }}, 'add')">+</button></td>
           <td><span id="prov{{ producto.id }}">0</span></td>
