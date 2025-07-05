@@ -3,25 +3,30 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse  # ✅ Incluye ambos aquí
 from django.views.decorators.csrf import csrf_exempt
 from django.utils import timezone
 from django.utils.dateparse import parse_datetime
-from django.utils.timezone import make_aware, is_naive  # ✅ IMPORTANTE
+from django.utils.timezone import make_aware, is_naive
+
+from openpyxl import Workbook  # ✅ Para generar Excel
+from django.db.models.functions import TruncMonth
+from django.db.models import Count
 
 import json
 from datetime import timedelta
 
 from .models import (
     Producto,
-    Movimiento,
+    Movimiento,          # ✅ Tu modelo para historial vendedores
     PerfilUsuario,
     EmpleadoEliminado,
-    VentaCajero,
-    MovimientoBodega,
+    VentaCajero,         # ✅ Tu modelo para ventas cajero
+    MovimientoBodega,    # ✅ Tu modelo para movimientos bodega
     BoletaCliente,
     BoletaItem
 )
+
 
 carritos_guardados = {}
 
@@ -75,12 +80,17 @@ def index(request):
                 messages.success(request, 'Cuenta creada exitosamente. Ahora puedes iniciar sesión.')
 
     return render(request, 'index.html')
+
+
+
 @user_passes_test(lambda u: u.is_superuser)
 def index_admin(request):
+    # Datos principales
     movimientos_queryset = Movimiento.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
     ventas_cajero = VentaCajero.objects.select_related('producto', 'cajero').order_by('-fecha', '-hora')
     movimientos_bodega_queryset = MovimientoBodega.objects.select_related('producto', 'empleado').order_by('-fecha', '-hora')
 
+    # Serializa para tabla vendedores
     movimientos = [{
         'producto': m.producto,
         'cantidad_vendida': m.cantidad_vendida,
@@ -89,6 +99,7 @@ def index_admin(request):
         'nombre_empleado': m.empleado.get_full_name() or m.empleado.username
     } for m in movimientos_queryset]
 
+    # Serializa para tabla bodega
     movimientos_bodega = [{
         'producto': b.producto,
         'agregado': b.agregado,
@@ -98,11 +109,20 @@ def index_admin(request):
         'nombre_empleado': b.empleado.get_full_name() or b.empleado.username
     } for b in movimientos_bodega_queryset]
 
+    # ✅ Calcula meses distintos para los filtros
+    meses_vendedores = Movimiento.objects.annotate(mes=TruncMonth('fecha')).values_list('mes', flat=True).distinct()
+    meses_cajero = VentaCajero.objects.annotate(mes=TruncMonth('fecha')).values_list('mes', flat=True).distinct()
+    meses_bodega = MovimientoBodega.objects.annotate(mes=TruncMonth('fecha')).values_list('mes', flat=True).distinct()
+
     return render(request, 'index_admin.html', {
         'movimientos': movimientos,
         'ventas_cajero': ventas_cajero,
-        'movimientos_bodega': movimientos_bodega
+        'movimientos_bodega': movimientos_bodega,
+        'meses_vendedores': meses_vendedores,
+        'meses_cajero': meses_cajero,
+        'meses_bodega': meses_bodega,
     })
+
 
 def cerrar_sesion(request):
     logout(request)
@@ -643,3 +663,83 @@ def modificar_producto(request):
             return JsonResponse({'success': False, 'error': str(e)})
     else:
         return JsonResponse({'success': False, 'error': 'Método no permitido'})
+    
+
+
+
+
+def exportar_excel(request, tipo):
+    mes = request.GET.get('mes')  # Formato esperado: '2025-07'
+
+    # 🟢 1) Crea libro Excel y hoja activa
+    wb = Workbook()
+    ws = wb.active
+
+    # 🟢 2) Filtra datos según tipo
+    if tipo == 'vendedores':
+        queryset = Movimiento.objects.all()
+        ws.title = "Movimientos Vendedores"
+        headers = ['Producto ID', 'Nombre Producto', 'Vendidas', 'Fecha', 'Hora', 'Empleado']
+    elif tipo == 'cajero':
+        queryset = VentaCajero.objects.all()
+        ws.title = "Ventas Cajero"
+        headers = ['ID', 'Producto', 'Cantidad', 'Precio unitario', 'Total', 'Fecha', 'Hora', 'Cajero']
+    elif tipo == 'bodega':
+        queryset = MovimientoBodega.objects.all()
+        ws.title = "Movimientos Bodega"
+        headers = ['Producto ID', 'Nombre Producto', 'Agregado', 'Eliminado', 'Fecha', 'Hora', 'Empleado']
+    else:
+        return HttpResponse("Tipo no válido.", status=400)
+
+    # 🟢 3) Si se pasó un mes, filtra por año y mes
+    if mes:
+        año, mes_num = mes.split('-')
+        queryset = queryset.filter(fecha__year=año, fecha__month=mes_num)
+
+    # 🟢 4) Escribe cabeceras
+    ws.append(headers)
+
+    # 🟢 5) Recorre resultados y agrega filas
+    for obj in queryset:
+        if tipo == 'vendedores':
+            row = [
+                obj.producto.id if obj.producto else '',
+                obj.producto.nombre if obj.producto else '',
+                obj.cantidad_vendida,
+                obj.fecha.strftime('%d/%m/%Y') if obj.fecha else '',
+                obj.hora.strftime('%H:%M') if obj.hora else '',
+                obj.empleado.get_full_name() if hasattr(obj, 'empleado') and obj.empleado else 'Sin empleado'
+            ]
+        elif tipo == 'cajero':
+            row = [
+                obj.id,
+                obj.producto.nombre if obj.producto else '',
+                obj.cantidad,
+                obj.precio_unitario,
+                obj.total_venta,
+                obj.fecha.strftime('%d/%m/%Y') if obj.fecha else '',
+                obj.hora.strftime('%H:%M') if obj.hora else '',
+                obj.cajero.get_full_name() if hasattr(obj, 'cajero') and obj.cajero else 'Sin cajero'
+            ]
+        elif tipo == 'bodega':
+            row = [
+                obj.producto.id if obj.producto else '',
+                obj.producto.nombre if obj.producto else '',
+                obj.agregado,
+                obj.eliminado,
+                obj.fecha.strftime('%d/%m/%Y') if obj.fecha else '',
+                obj.hora.strftime('%H:%M') if obj.hora else '',
+                obj.empleado.get_full_name() if hasattr(obj, 'empleado') and obj.empleado else 'Sin empleado'
+            ]
+        ws.append(row)
+
+    # 🟢 6) Configura respuesta para descarga
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    filename = f"{tipo}_historico.xlsx"
+    response['Content-Disposition'] = f'attachment; filename={filename}'
+
+    # 🟢 7) Guarda libro Excel en la respuesta
+    wb.save(response)
+    return response

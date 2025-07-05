@@ -38,6 +38,8 @@ urlpatterns = [
     path('api/lista_usuarios_por_rol/', views.modificar_rol_lista_usuarios, name='modificar_rol_lista_usuarios'),
     path('api/modificar_rol/', views.modificar_rol_api, name='modificar_rol_api'),
     path('api/asignar_rol_temporal/', views.asignar_rol_temporal, name='asignar_rol_temporal'),
+
+    path('exportar_excel/<str:tipo>/', views.exportar_excel, name='exportar_excel'),
 ]
 
 if settings.DEBUG:

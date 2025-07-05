@@ -20,7 +20,19 @@
 <div class="admin-main flex-wrap">
   <!-- PANEL IZQUIERDO -->
   <div class="admin-panel flex-fill mb-4">
+
+    <!-- ✅ HISTORIAL MOVIMIENTOS VENDEDORES -->
     <h2>Historial movimientos de vendedores</h2>
+    <div class="mb-2 d-flex gap-2">
+      <button class="btn btn-success btn-sm" onclick="descargarExcel('vendedores')">Descargar todo</button>
+      <select id="mesVendedores" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+        <option value="">Seleccionar mes</option>
+        {% for mes in meses_vendedores %}
+          <option value="{{ mes|date:"Y-m" }}">{{ mes|date:"F Y" }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="descargarExcel('vendedores', true)">Descargar por mes</button>
+    </div>
     <div class="admin-history-box table-responsive">
       <table class="admin-history-table table">
         <thead>
@@ -50,7 +62,18 @@
       </table>
     </div>
 
+    <!-- ✅ HISTORIAL VENTAS CAJERO -->
     <h2 class="mt-5">Historial ventas cajero</h2>
+    <div class="mb-2 d-flex gap-2">
+      <button class="btn btn-success btn-sm" onclick="descargarExcel('cajero')">Descargar todo</button>
+      <select id="mesCajero" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+        <option value="">Seleccionar mes</option>
+        {% for mes in meses_cajero %}
+          <option value="{{ mes|date:"Y-m" }}">{{ mes|date:"F Y" }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="descargarExcel('cajero', true)">Descargar por mes</button>
+    </div>
     <div class="admin-history-cajero-box table-responsive">
       <table class="admin-history-cajero-table table">
         <thead>
@@ -90,7 +113,18 @@
       </table>
     </div>
 
+    <!-- ✅ HISTORIAL MOVIMIENTOS BODEGA -->
     <h2 class="mt-5">Movimientos bodega</h2>
+    <div class="mb-2 d-flex gap-2">
+      <button class="btn btn-success btn-sm" onclick="descargarExcel('bodega')">Descargar todo</button>
+      <select id="mesBodega" class="form-select form-select-sm" style="width: auto; display: inline-block;">
+        <option value="">Seleccionar mes</option>
+        {% for mes in meses_bodega %}
+          <option value="{{ mes|date:"Y-m" }}">{{ mes|date:"F Y" }}</option>
+        {% endfor %}
+      </select>
+      <button class="btn btn-primary btn-sm" onclick="descargarExcel('bodega', true)">Descargar por mes</button>
+    </div>
     <div class="admin-history-bodega-box table-responsive">
       <table class="admin-history-bodega-table table">
         <thead>
@@ -126,17 +160,14 @@
   <!-- PANEL DERECHO -->
   <div class="admin-panel flex-shrink-0" style="flex-basis: 270px;">
     <h2 class="admin-section-title">Base de datos</h2>
-
     <div class="section d-flex align-items-center justify-content-between mb-3">
       <div class="admin-section-title">Inventario</div>
       <a href="{% url 'inventario' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
-
     <div class="section d-flex align-items-center justify-content-between mb-3">
       <div class="admin-section-title">Empleados</div>
       <a href="{% url 'empleado' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
-
     <div class="section d-flex align-items-center justify-content-between">
       <div class="admin-section-title">Modificar Rol</div>
       <a href="{% url 'modificar_rol' %}" class="btn btn-warning btn-sm">Ver todo</a>
@@ -144,7 +175,7 @@
   </div>
 </div>
 
-<!-- ✅ SCRIPT THEME + LOGOUT -->
+<!-- ✅ SCRIPT THEME + EXPORTACIÓN -->
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('admin-theme') || 'light';
@@ -164,6 +195,19 @@
     if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
       window.location.href = "{% url 'cerrar_sesion' %}";
     }
+  }
+
+  function descargarExcel(tipo, porMes=false) {
+    let url = `/exportar_excel/${tipo}/`;
+    if (porMes) {
+      const mes = document.getElementById(`mes${tipo.charAt(0).toUpperCase() + tipo.slice(1)}`).value;
+      if (!mes) {
+        alert('Selecciona un mes para descargar.');
+        return;
+      }
+      url += `?mes=${mes}`;
+    }
+    window.location.href = url;
   }
 </script>
 
