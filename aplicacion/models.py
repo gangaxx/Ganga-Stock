@@ -48,8 +48,37 @@ class Producto(models.Model):
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     cantidad = models.IntegerField(default=0)
 
+    # ✅ Campos de oferta bien definidos
+    descuento = models.DecimalField(
+        max_digits=5, decimal_places=2, default=0,
+        help_text="Porcentaje de descuento, por ejemplo: 15 para 15%"
+    )
+    fecha_inicio_oferta = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Fecha y hora de inicio de la oferta"
+    )
+    fecha_fin_oferta = models.DateTimeField(
+        null=True, blank=True,
+        help_text="Fecha y hora de fin de la oferta"
+    )
+
     def __str__(self):
         return self.nombre
+
+    def precio_oferta(self):
+        """
+        Calcula el precio final con descuento si está vigente.
+        """
+        from django.utils import timezone
+        ahora = timezone.now()
+        if (
+            self.descuento > 0 and
+            self.fecha_inicio_oferta and
+            self.fecha_fin_oferta and
+            self.fecha_inicio_oferta <= ahora <= self.fecha_fin_oferta
+        ):
+            return self.precio * (1 - self.descuento / 100)
+        return self.precio
 
 
 class Movimiento(models.Model):

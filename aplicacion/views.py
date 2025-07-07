@@ -296,17 +296,18 @@ def cajero(request):
     if codigo and codigo != 'None':
         session = carritos_guardados.get(codigo, {})
         carrito = session.get('carrito', []) if isinstance(session, dict) else []
-        total_general = sum(item['precio'] * item['cantidad'] for item in carrito)
         for item in carrito:
+            # ✅ Verifica campos
             item['total'] = item['precio'] * item['cantidad']
-            item['nombre'] = item.get('nombre', item.get('name'))
-            item['imagen_url'] = item.get('imagen_url', item.get('img'))
+            item['imagen_url'] = item.get('img') or item.get('imagen_url') or ""
+        total_general = sum(item['total'] for item in carrito)
 
     return render(request, 'cajero.html', {
         'carrito': carrito,
         'total_general': total_general,
         'codigo': codigo
     })
+
 
 
 @login_required
@@ -329,8 +330,23 @@ def bodeguero(request):
 
 @login_required
 def vendedor(request):
+    ahora = timezone.now()
     productos = Producto.objects.all()
-    return render(request, 'vendedor.html', {'productos': productos})
+
+    for producto in productos:
+        # ✅ Si tiene descuento y fechas configuradas
+        if producto.descuento and producto.fecha_inicio_oferta and producto.fecha_fin_oferta:
+            if producto.fecha_inicio_oferta <= ahora <= producto.fecha_fin_oferta:
+                # ✅ Calcula el precio con descuento
+                producto.precio_oferta = producto.precio * (1 - producto.descuento / 100)
+            else:
+                producto.precio_oferta = None  # Oferta vencida
+        else:
+            producto.precio_oferta = None  # No tiene oferta configurada
+
+    return render(request, 'vendedor.html', {
+        'productos': productos
+    })
 
 @csrf_exempt
 def eliminar_empleado(request, id):
@@ -373,19 +389,23 @@ def guardar_carrito(request):
     if request.method == 'POST':
         try:
             data = json.loads(request.body)
-            codigo = str(data.get('codigo'))
             carrito = data.get('carrito', [])
 
-            # Guardar también el ID del vendedor actual
+            # ⚡ Generar un código único seguro de 6 caracteres
+            import random, string
+            codigo = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
+
+            # Guarda el carrito en memoria usando el código como clave
             carritos_guardados[codigo] = {
                 'carrito': carrito,
                 'vendedor_id': request.user.id
             }
-            return JsonResponse({'success': True})
+
+            return JsonResponse({'success': True, 'codigo': codigo})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
-
     return JsonResponse({'success': False, 'error': 'Método no permitido'})
+
 
 @login_required
 def boleta(request, codigo):
@@ -482,6 +502,7 @@ def boleta_cliente(request, codigo):
             'codigo': codigo,
             'total': 0
         })
+
 
 
 
@@ -743,3 +764,37 @@ def exportar_excel(request, tipo):
     # 🟢 7) Guarda libro Excel en la respuesta
     wb.save(response)
     return response
+
+
+
+def ofertas(request):
+    return render(request, 'ofertas.html')
+
+
+
+@csrf_exempt
+@login_required
+@user_passes_test(lambda u: u.is_superuser)
+def activar_oferta(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            evento = data.get('evento')
+            descuento = int(data.get('descuento'))
+            inicio = parse_datetime(data.get('inicio'))
+            fin = parse_datetime(data.get('fin'))
+
+            if not inicio or not fin:
+                return JsonResponse({'success': False, 'error': 'Fechas inválidas'})
+
+            # Aplica oferta a todos los productos (o podrías filtrar por categoría)
+            for producto in Producto.objects.all():
+                producto.descuento = descuento
+                producto.fecha_inicio_oferta = inicio
+                producto.fecha_fin_oferta = fin
+                producto.save()
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    return JsonResponse({'success': False, 'error': 'Método no permitido'})

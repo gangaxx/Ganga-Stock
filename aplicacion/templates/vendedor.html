@@ -18,11 +18,16 @@
   </div>
 </div>
 
+<!-- ✅ TOTAL GENERAL centrado -->
+<div style="text-align: center; margin: 25px 0; font-size: 32px; font-weight: bold; color: #2E8B57;">
+  Total general: <span id="totalHeader">$0</span>
+</div>
+
 <!-- ✅ INVENTARIO -->
 <div class="ven-main-content">
   <div class="ven-inventory-header">
     <span>Productos</span>
-    <input type="text" placeholder="Buscar producto..." id="busqueda">
+    <input type="text" placeholder="Buscar producto..." id="busqueda" onkeyup="filtrarProductos()">
   </div>
   <div class="ven-inventory-box">
     <table class="ven-inventory-table">
@@ -40,27 +45,49 @@
       </thead>
       <tbody>
         {% for producto in productos %}
-        <tr class="product-row" data-name="{{ producto.nombre }}">
+        <tr class="product-row" data-name="{{ producto.nombre|lower }}">
           <td>
             <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}" class="ven-product-image"
-                 data-img="{{ producto.imagen.url }}" data-name="{{ producto.nombre }}" data-price="{{ producto.precio }}">
+                 data-img="{{ producto.imagen.url }}" data-name="{{ producto.nombre }}"
+                 data-price="{{ producto.precio_oferta|default:producto.precio }}">
           </td>
           <td>{{ producto.nombre }}</td>
-          <td class="price-cell" data-price="{{ producto.precio }}">${{ producto.precio|floatformat:0|intcomma }}</td>
+          <td class="price-cell" data-price="{{ producto.precio_oferta|default:producto.precio }}">
+            {% if producto.precio_oferta %}
+              <span style="text-decoration: line-through; color: red;">
+                ${{ producto.precio|floatformat:0|intcomma }}
+              </span><br>
+              <span style="color: green; font-weight: bold;">
+                ${{ producto.precio_oferta|floatformat:0|intcomma }}
+              </span>
+            {% else %}
+              ${{ producto.precio|floatformat:0|intcomma }}
+            {% endif %}
+          </td>
           <td id="prod{{ producto.id }}">{{ producto.cantidad }}</td>
-          <td><button class="ven-add-button" onclick="addProduct('prod{{ producto.id }}','{{ producto.nombre }}',{{ producto.precio }},'{{ producto.imagen.url }}')">+</button></td>
+          <td>
+            <button class="ven-add-button"
+              onclick="addProduct({{ producto.id }}, '{{ producto.nombre }}',
+                {{ producto.precio_oferta|default:producto.precio }},
+                '{{ producto.imagen.url }}')">+</button>
+          </td>
           <td><span id="prov{{ producto.id }}">0</span></td>
-          <td><button class="ven-remove-button" onclick="removeProduct('prod{{ producto.id }}')">-</button></td>
+          <td>
+            <button class="ven-remove-button"
+              onclick="removeProduct({{ producto.id }}, {{ producto.precio_oferta|default:producto.precio }})">-</button>
+          </td>
           <td class="ven-row-total">$0</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
-    <div style="margin-top: 20px; font-size: 24px; font-weight: bold;">Total general: <span id="totalSum">$0</span></div>
+    <div style="margin-top: 25px; font-size: 28px; font-weight: bold; text-align: right;">
+      Total general: <span id="totalSum">$0</span>
+    </div>
   </div>
 </div>
 
-<!-- ✅ MODALES -->
+<!-- ✅ MODAL CARRITO -->
 <div id="carritoModal" class="ven-modal">
   <div class="ven-modal-content">
     <span class="ven-modal-close" onclick="toggleCarrito()">&times;</span>
@@ -79,6 +106,7 @@
   </div>
 </div>
 
+<!-- ✅ MODAL CONFIRMACIÓN -->
 <div id="confirmModal" class="ven-modal">
   <div class="ven-modal-content">
     <span class="ven-modal-close" onclick="document.getElementById('confirmModal').style.display='none'">&times;</span>
@@ -90,6 +118,7 @@
   </div>
 </div>
 
+<!-- ✅ MODAL IMAGEN -->
 <div id="myModal" class="ven-modal">
   <div class="ven-modal-content">
     <span class="ven-modal-close" onclick="document.getElementById('myModal').style.display='none'">&times;</span>
@@ -99,34 +128,111 @@
   </div>
 </div>
 
-<!-- ✅ SCRIPTS -->
-<script src="{% static 'js/validaciones.js' %}"></script>
+<!-- ✅ SCRIPT -->
 <script>
+  let carrito = {};
   const csrfToken = "{{ csrf_token }}";
 
-  document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('.ven-product-image').forEach(img => {
-      img.addEventListener('click', () => {
-        document.getElementById('modalImg').src = img.dataset.img;
-        document.getElementById('modalTitle').textContent = img.dataset.name;
-        document.getElementById('modalPrice').textContent = 'Precio: $' + parseInt(img.dataset.price).toLocaleString();
-        document.getElementById('myModal').style.display = 'block';
-      });
+  function addProduct(id, nombre, precio, img) {
+    let cantidadSpan = document.getElementById('prov' + id);
+    let cantidad = parseInt(cantidadSpan.textContent) + 1;
+    cantidadSpan.textContent = cantidad;
+
+    carrito[id] = { id: id, nombre: nombre, cantidad: cantidad, precio: precio, img: img };
+    actualizarSubtotal(id, precio);
+    actualizarCarrito();
+  }
+
+  function removeProduct(id, precio) {
+    let cantidadSpan = document.getElementById('prov' + id);
+    let cantidad = parseInt(cantidadSpan.textContent);
+    if (cantidad > 0) {
+      cantidad -= 1;
+      cantidadSpan.textContent = cantidad;
+
+      if (cantidad === 0) {
+        delete carrito[id];
+      } else {
+        carrito[id].cantidad = cantidad;
+      }
+
+      actualizarSubtotal(id, precio);
+      actualizarCarrito();
+    }
+  }
+
+  function actualizarSubtotal(id, precio) {
+    let cantidad = parseInt(document.getElementById('prov' + id).textContent);
+    let subtotal = cantidad * precio;
+
+    let fila = document.getElementById('prov' + id).closest('tr');
+    fila.querySelector('.ven-row-total').textContent = '$' + subtotal.toLocaleString('es-CL');
+
+    actualizarTotalGeneral();
+  }
+
+  function actualizarTotalGeneral() {
+    let total = 0;
+    document.querySelectorAll('.ven-row-total').forEach(cell => {
+      let valor = parseInt(cell.textContent.replace('$','').replace(/\./g,'')); 
+      total += isNaN(valor) ? 0 : valor;
     });
+    let totalFormatted = '$' + total.toLocaleString('es-CL');
+    document.getElementById('totalSum').textContent = totalFormatted;
+    document.getElementById('totalHeader').textContent = totalFormatted;
+    document.getElementById('carritoTotal').textContent = totalFormatted;
+  }
 
-    window.onclick = e => {
-      ['myModal', 'carritoModal', 'confirmModal'].forEach(id => {
-        if (e.target === document.getElementById(id)) {
-          document.getElementById(id).style.display = 'none';
-        }
-      });
+  function actualizarCarrito() {
+    const tbody = document.getElementById('carritoItems');
+    tbody.innerHTML = '';
 
-      const theme = localStorage.getItem('theme') || 'light';
-      document.body.classList.remove('ven-dark-mode', 'ven-light-mode');
-      document.body.classList.add(theme === 'dark' ? 'ven-dark-mode' : 'ven-light-mode');
-      document.getElementById('modeToggle').innerText = theme === 'dark' ? '☀ Claro' : '🌙 Oscuro';
-    };
-  });
+    Object.entries(carrito).forEach(([id, item]) => {
+      if (item.cantidad > 0) {
+        const total = item.cantidad * item.precio;
+        tbody.innerHTML += `
+          <tr>
+            <td><img src="${item.img}" alt="${item.nombre}" style="width:50px; height:50px;"></td>
+            <td>${item.nombre}</td>
+            <td>${item.cantidad}</td>
+            <td>$${total.toLocaleString('es-CL')}</td>
+          </tr>
+        `;
+      }
+    });
+  }
+
+  function mostrarConfirmacion() {
+    document.getElementById('confirmModal').style.display = 'block';
+  }
+
+  function confirmarCompra() {
+    fetch("{% url 'guardar_carrito' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrfToken
+      },
+      body: JSON.stringify({ carrito: Object.values(carrito) })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        window.location.href = `/boleta/${data.codigo}/`;
+      } else {
+        alert('Error al guardar carrito');
+      }
+    });
+  }
+
+  function filtrarProductos() {
+    const input = document.getElementById('busqueda').value.toLowerCase();
+    const filas = document.querySelectorAll('.product-row');
+    filas.forEach(fila => {
+      const nombre = fila.dataset.name.toLowerCase();
+      fila.style.display = nombre.includes(input) ? '' : 'none';
+    });
+  }
 
   function toggleMode() {
     const isDark = document.body.classList.contains('ven-dark-mode');

@@ -40,6 +40,14 @@ urlpatterns = [
     path('api/asignar_rol_temporal/', views.asignar_rol_temporal, name='asignar_rol_temporal'),
 
     path('exportar_excel/<str:tipo>/', views.exportar_excel, name='exportar_excel'),
+
+    # Ofertas
+
+    path('ofertas/', views.ofertas, name='ofertas'),
+    path('activar_oferta/', views.activar_oferta, name='activar_oferta')
+
+
+
 ]
 
 if settings.DEBUG:

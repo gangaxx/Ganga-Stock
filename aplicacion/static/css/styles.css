@@ -2283,3 +2283,78 @@ body.admin-dark-mode .temporal-buttons .btn-celeste:hover {
     font-size: 14px;
   }
 }
+
+
+
+/* ======================== OFERTAS:HTML ========================  */
+
+
+
+.ofertas-main {
+  padding: 40px;
+}
+
+.ofertas-main h1 {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.ofertas-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.oferta-item {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 20px;
+  background: #f9f9f9;
+}
+
+.oferta-item h2 {
+  margin: 0 0 10px 0;
+  font-size: 28px;
+}
+
+.oferta-item p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.oferta-item button {
+  margin-top: 10px;
+  padding: 8px 14px;
+  font-weight: bold;
+}
+
+.oferta-opciones {
+  display: none;
+  margin-top: 10px;
+}
+
+.oferta-opciones label {
+  display: block;
+  margin-top: 5px;
+}
+
+.oferta-opciones input {
+  width: 220px;
+  padding: 4px;
+}
+
+.oferta-guardar-btn {
+  margin-top: 10px;
+  background-color: green;
+  color: white;
+  border: none;
+  cursor: pointer;
+  padding: 8px 14px;
+  border-radius: 4px;
+}
+
+body.admin-dark-mode .oferta-item {
+  background: #333;
+  color: white;
+  border-color: #999;
+}

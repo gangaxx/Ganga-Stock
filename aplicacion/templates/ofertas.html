@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<body class="admin-light-mode">
+
+<!-- ✅ TOPBAR: Igual a las demás vistas -->
+<div class="admin-topbar">
+  <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
+  <div class="admin-topbar-center">
+    <span class="admin-welcome-message">Panel Ofertas</span>
+  </div>
+  <div class="topbar-actions" style="display: flex; gap: 10px;">
+    <button id="modeToggle" class="admin-mode-toggle" onclick="toggleMode()">🌙 Oscuro</button>
+    <button class="admin-logout-button" onclick="confirmLogout()">Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ✅ CONTENIDO PRINCIPAL -->
+<div class="ofertas-main">
+  <h1>Activar Ofertas Especiales</h1>
+
+  <!-- Listado de eventos -->
+  <div class="ofertas-lista">
+    <!-- CyberDay -->
+    <div class="oferta-item">
+      <h2>CyberDay</h2>
+      <p>Descuento: 15% OFF</p>
+      <button onclick="mostrarOpciones('CyberDay')">Configurar</button>
+      <div id="opciones-CyberDay" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-CyberDay">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-CyberDay">
+        <button class="oferta-guardar-btn" onclick="activarOferta('CyberDay', 15)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- CyberMonday -->
+    <div class="oferta-item">
+      <h2>CyberMonday</h2>
+      <p>Descuento: 15% OFF</p>
+      <button onclick="mostrarOpciones('CyberMonday')">Configurar</button>
+      <div id="opciones-CyberMonday" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-CyberMonday">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-CyberMonday">
+        <button class="oferta-guardar-btn" onclick="activarOferta('CyberMonday', 15)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- Black Friday -->
+    <div class="oferta-item">
+      <h2>Black Friday</h2>
+      <p>Descuento: 20% OFF</p>
+      <button onclick="mostrarOpciones('BlackFriday')">Configurar</button>
+      <div id="opciones-BlackFriday" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-BlackFriday">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-BlackFriday">
+        <button class="oferta-guardar-btn" onclick="activarOferta('BlackFriday', 20)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- Hot Sale -->
+    <div class="oferta-item">
+      <h2>Hot Sale</h2>
+      <p>Descuento: 10% OFF</p>
+      <button onclick="mostrarOpciones('HotSale')">Configurar</button>
+      <div id="opciones-HotSale" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-HotSale">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-HotSale">
+        <button class="oferta-guardar-btn" onclick="activarOferta('HotSale', 10)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- Liquidación Verano -->
+    <div class="oferta-item">
+      <h2>Liquidación Verano</h2>
+      <p>Descuento: 12% OFF</p>
+      <button onclick="mostrarOpciones('Verano')">Configurar</button>
+      <div id="opciones-Verano" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-Verano">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-Verano">
+        <button class="oferta-guardar-btn" onclick="activarOferta('Verano', 12)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- Fiestas Patrias -->
+    <div class="oferta-item">
+      <h2>Fiestas Patrias</h2>
+      <p>Descuento: 10% OFF</p>
+      <button onclick="mostrarOpciones('FiestasPatrias')">Configurar</button>
+      <div id="opciones-FiestasPatrias" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-FiestasPatrias">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-FiestasPatrias">
+        <button class="oferta-guardar-btn" onclick="activarOferta('FiestasPatrias', 10)">Activar Oferta</button>
+      </div>
+    </div>
+
+    <!-- Navidad -->
+    <div class="oferta-item">
+      <h2>Navidad</h2>
+      <p>Descuento: 30% OFF</p>
+      <button onclick="mostrarOpciones('Navidad')">Configurar</button>
+      <div id="opciones-Navidad" class="oferta-opciones">
+        <label>Inicio:</label>
+        <input type="datetime-local" id="inicio-Navidad">
+        <label>Fin:</label>
+        <input type="datetime-local" id="fin-Navidad">
+        <button class="oferta-guardar-btn" onclick="activarOferta('Navidad', 30)">Activar Oferta</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleMode() {
+    const body = document.body;
+    const isLight = body.classList.contains('admin-light-mode');
+    body.classList.toggle('admin-light-mode', !isLight);
+    body.classList.toggle('admin-dark-mode', isLight);
+    document.getElementById('modeToggle').innerText = isLight ? '☀ Claro' : '🌙 Oscuro';
+    localStorage.setItem('adminTheme', isLight ? 'dark' : 'light');
+  }
+
+  window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('adminTheme') || 'light';
+    document.body.classList.add(`admin-${saved}-mode`);
+    document.getElementById('modeToggle').innerText = saved === 'dark' ? '☀ Claro' : '🌙 Oscuro';
+  });
+
+  function confirmLogout() {
+    if (confirm("¿Estás seguro que deseas cerrar sesión?")) {
+      window.location.href = "{% url 'cerrar_sesion' %}";
+    }
+  }
+
+  function mostrarOpciones(evento) {
+    document.getElementById(`opciones-${evento}`).style.display = 'block';
+  }
+
+  function activarOferta(evento, descuento) {
+    const inicio = document.getElementById(`inicio-${evento}`).value;
+    const fin = document.getElementById(`fin-${evento}`).value;
+
+    if (!inicio || !fin) {
+      alert("Completa fecha y hora de inicio y fin.");
+      return;
+    }
+
+    fetch("{% url 'activar_oferta' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+      },
+      body: JSON.stringify({
+        evento: evento,
+        descuento: descuento,
+        inicio: inicio,
+        fin: fin
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        alert(`Oferta ${evento} activada con éxito.`);
+      } else {
+        alert(`Error: ${data.error}`);
+      }
+    });
+  }
+</script>
+
+</body>
+{% endblock %}

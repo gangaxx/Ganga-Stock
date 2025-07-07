@@ -8,7 +8,9 @@
 <div class="admin-topbar">
   <img src="{% static 'img/logo.jpg' %}" alt="Logo" class="logo-img-small">
   <div class="admin-topbar-center">
-    <span class="admin-welcome-message">Bienvenido, {{ user.username }}</span>
+    <span class="admin-welcome-message">
+      ¡Bienvenido, {{ request.user.first_name|default:request.user.username }}!
+    </span>
   </div>
   <div class="topbar-actions" style="display: flex; gap: 10px;">
     <button id="modeToggle" class="admin-mode-toggle" onclick="toggleAdminMode()">Cargando...</button>
@@ -157,7 +159,7 @@
     </div>
   </div>
 
-  <!-- PANEL DERECHO -->
+  <!-- ✅ PANEL DERECHO BASE DE DATOS -->
   <div class="admin-panel flex-shrink-0" style="flex-basis: 270px;">
     <h2 class="admin-section-title">Base de datos</h2>
     <div class="section d-flex align-items-center justify-content-between mb-3">
@@ -168,9 +170,13 @@
       <div class="admin-section-title">Empleados</div>
       <a href="{% url 'empleado' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
-    <div class="section d-flex align-items-center justify-content-between">
+    <div class="section d-flex align-items-center justify-content-between mb-3">
       <div class="admin-section-title">Modificar Rol</div>
       <a href="{% url 'modificar_rol' %}" class="btn btn-warning btn-sm">Ver todo</a>
+    </div>
+    <div class="section d-flex align-items-center justify-content-between mb-0">
+      <div class="admin-section-title">Ofertas</div>
+      <a href="{% url 'ofertas' %}" class="btn btn-warning btn-sm">Ver todo</a>
     </div>
   </div>
 </div>
