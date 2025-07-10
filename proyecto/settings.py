@@ -88,7 +88,8 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # Redirección para login
-LOGIN_URL = '/index/'
+# ✅ apunta correctamente a la URL raíz
+LOGIN_URL = '/'
 
 # Campo por defecto
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
