@@ -32,3 +32,35 @@ Diseño de lógica de negocio e inventarios
 Manejo de bases de datos relacionales
 Automatización de reportes
 Organización de proyectos en Django
+
+
+
+
+
+
+
+ 📸 Capturas del sistema
+
+ 🔐 Pantalla de inicio
+![Inicio](screenshots/Index.html.png)
+
+ 🧑‍💼 Panel administrativo
+![Admin](screenshots/index_admin.html.png)
+
+ 📦 Gestión de inventario
+![Inventario](screenshots/inventario.html.png)
+
+ 🏬 Vista bodega
+![Bodega](screenshots/bodega.html.png)
+
+ 💵 Vista cajero
+![Cajero](screenshots/cajero.html.png)
+
+ 🧑‍💼 Vista vendedor
+![Vendedor](screenshots/vendedor.html.png)
+
+ 👥 Gestión de empleados
+![Empleados](screenshots/empleados.html.png)
+
+ 🧾 Boleta cliente
+![Boleta](screenshots/boleta_cliente.html.png)
