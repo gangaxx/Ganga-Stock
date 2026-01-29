@@ -64,3 +64,6 @@ Organización de proyectos en Django
 
  🧾 Boleta cliente
 ![Boleta](screenshots/boleta_cliente.html.png)
+
+🔁 Modificación de roles
+![Modificar Rol](screenshots/modificar_rol.html.png)
